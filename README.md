@@ -12,7 +12,7 @@ Confirmed developers will certainly already know the tools used in this project.
     + Github issues for collaboration
     + Github pages for documentation as a website
     + ZENODO for citation + versioning
-+ H. Wickham for [R style guide](http://adv-r.had.co.nz/Style.html), except “=” is accepted because “<-” has no added value
++ H. Wickham for [R style guide](http://adv-r.had.co.nz/Style.html), except `=` is accepted because `<-` has no added value.
 + Package features:
     + pkgdown is used for building the website from package documentation
     + roxygen2 is used with markdown option for documentation
