@@ -4,7 +4,7 @@ The SticsRPacks project has adopted a set of rules for proper coding, and one of
 
 The code review is an important process to ensure that the package is developed following the rules of the SticsRPacks project, but also that the changes proposed by a contributor are working, that they don't break the package or any other intercations with other packages.
 
-This document present a step-by-step checklist for reviewing the code of other contributors:
+Here is a step-by-step checklist for reviewing the code of other contributors:
 
 + The code follows the style guidelines of this project
 + The code is commented, particularly in hard-to-understand areas
