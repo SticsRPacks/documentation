@@ -5,7 +5,8 @@ Welcome to the table of contents of the `SticsRPacks` documentation.
 ## General Documentation
 
 + [`SticsRPacks` documentation](README.md) - a brief, general review of the tools used in the project and where to find them.
-+ [The sandbox](https://github.com/SticsRPacks/sandbox/blob/master/README.md) - an example project to introduce step by step all the tools described in the `SticsRPacks` documentation with use cases. The users can clone this project and use the tools.
++ [The sandbox](https://github.com/SticsRPacks/sandbox/blob/master/README.md) - an example project to introduce step by step all the tools described in the `SticsRPacks` documentation with use cases. The users can clone this project and use the tools.  
++ The [reviewing process](reviewing.md) - a tutorial on how to review other contributors changes.
 
 ## Package documentation
 
