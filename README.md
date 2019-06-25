@@ -79,7 +79,7 @@ We strongly recommend setting error and warning handling to your code whenever p
 At least one collaborator must review the code. This step is easy when forking, but can be difficult when branching. If you made your own branch, please ask a review before merging.
 
 1.	Style guide (format)  
-We adopted the [R style guide](http://adv-r.had.co.nz/Style.html) from H. Wickham, except `=` is accepted because `<-` has no real added value. Please adopt the coding style of the team, or at least have a consistent coding style. Only comment when necessary and up-date the comments when the code changes.
+Please adopt the [coding style](coding_style.md) of the team, or at least have a consistent coding style. Only comment when necessary and up-date the comments when the code changes.
 
 1.	Build  
 You need `devTools` and `Rtools` to build the package.
