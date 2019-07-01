@@ -1,9 +1,9 @@
 # SticsRpacks Coding Style
 
 
-## Introduction 
+## Introduction
 
-This document aims at providing rules for the development of the [SticsRpacks](https://github.com/SticsRPacks) packages. 
+This document aims at providing rules for the development of the [SticsRpacks](https://github.com/SticsRPacks) packages.
 
 It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley Wickham, extended with specific topics related to our organisation.
 
@@ -26,14 +26,14 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 * Variables/objects names contain nouns (not verbs)
 *	Avoid using names of existing variables or built in functions
     +	T, F
-    +	c 
+    +	c
     +	...
     +	sum, mean, ...
 
 ## Syntax
 
 ### Spacing
-*	Insert spaces around operators: +, -, *, <, ... and assignement <-, =
+*	Insert spaces around operators: +, -, \*, <, ... and assignement <-, =
 *	... but neither around : nor ::  
     + `X <- 1:10`
     +	`package::func_name`
@@ -80,3 +80,5 @@ Indentation
 *	Argument type must be checked but only for main functions
 
 
+---------------  
+Back to [Table of contents](README.md)

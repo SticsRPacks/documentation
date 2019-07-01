@@ -13,6 +13,9 @@ Here is a step-by-step checklist for reviewing the code of other contributors:
 + New tests have been added on the package to prove the fix is effective or the new feature works
 + New and existing unit tests pass locally and remotely with those changes
 
-The reviewer should always be nice to the contributor, regardless of the quality of the contribution. Everyone should have a chance to contribute, even begginers that do not have acquired yet the necessary knowledge to contribute nicely. The answer should always be positive, but also constructive. If the contributor made a mistake, try to guide him/her as much as possible on how to fix the issue. 
+The reviewer should always be nice to the contributor, regardless of the quality of the contribution. Everyone should have a chance to contribute, even begginers that do not have acquired yet the necessary knowledge to contribute nicely. The answer should always be positive, but also constructive. If the contributor made a mistake, try to guide him/her as much as possible on how to fix the issue.
 
 A more visual exemple of the reviewing workflow on github can be found in the sandbox vignette [here](https://sticsrpacks.github.io/sandbox/articles/use-git-and-github.html#review).
+
+---------------  
+Back to [Table of contents](README.md)
