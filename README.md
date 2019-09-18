@@ -8,6 +8,7 @@ Welcome to the documentation of the `SticsRPacks` project.
 + The [`sandbox`](https://github.com/SticsRPacks/sandbox/blob/master/README.md) - an example project to introduce step by step all the tools described in the `SticsRPacks` documentation with use cases. The users can clone this project and use the tools. It is strongly recommanded to read the documents in this project before doing anything.    
 + The [reviewing process](reviewing.md) - a tutorial on how to review other contributors changes.  
 + The [coding style](coding_style.md) - the coding style guide for our project.  
++ The [optimum data structures](data_structure.md) - evaluation of different data structures such as `data.frame`, `data.table`, `tibble`, `list`, multi-dimensional `arrays` for their performance (memory, execution time, ease of use) in read/write, selection, computation, etc...  
 
 ## Package documentation
 
