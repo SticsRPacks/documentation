@@ -129,7 +129,8 @@ with obj being either sim or obs.
 * A list of `data.frame`s (or `tibble`):
   + obj$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct), col3= stage(character vector), col4= plant(integer), col5=varValues]
   + Or in another format data$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct),col3= stage(character vector), col4= plant, col5=obsValues,col6=simValues]
-  + Or a big `data.frame` (or `tibble`) with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:
+  + Or a big `data.frame` (or `tibble`) with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:  
+
   |USM   | DOE|origin | plant|Date       |stage   | LAI|
   |:-----|---:|:------|-----:|:----------|:-------|---:|
   |usm_1 |   1|obs    |     1|2009-01-01 |rep     |   0|
@@ -144,6 +145,7 @@ with obj being either sim or obs.
   |usm_2 |   1|sim    |     2|2009-12-31 |mat     |   1|
   |usm_1 |   2|sim    |     2|2009-12-31 |NA      |   1|
   |usm_2 |   2|sim    |     2|2009-12-31 |rep mat |   1|
+  
 
 > NB: a `data.frame` or a `tibble` can contain a list inside a element, e.g.:
 ```r
