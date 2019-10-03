@@ -55,7 +55,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
     &emsp;&emsp;`}`
 
 ### Line length and bloc formatting
-*	Better to limit line length to 80 characters (more comfortable for editing and printing). It is possible to add a delimitation line in `RStudio` at a given
+*	It is recommended to limit line length to 80 characters (more comfortable for editing and printing). It is possible to add a delimitation line in `RStudio` at a given
 character length: Tools -> Global Options -> Code -> Display -> Show margin.
 
 Indentation:  
@@ -66,6 +66,11 @@ Indentation:
 
 ### Assignment
 *	The common assignment sign is <-, but we allow to use =
+
+## External packages
+
+* Add external packages using `usethis` as follows: `usethis::use_package("package_name")`.     
+* Use functions from external packages as follows: `package_name::some_function()`. This format increase readability and maintenance.  
 
 ## Organization
 
