@@ -57,7 +57,8 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 ### Line length and bloc formatting
 *	Better to limit line length to 80 characters (more comfortable for editing and printing). It is possible to add a delimitation line in `RStudio` at a given
 character length: Tools -> Global Options -> Code -> Display -> Show margin.
-Indentation
+
+Indentation:  
 *	Indent code with 2 spaces
 *	Except for a multi line function call, lines must be aligned under the function definition start  
     &emsp;&emsp;`functionName(a= .....,`  
