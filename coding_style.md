@@ -23,13 +23,19 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 
 ### Object/variable names
 *	As for file names words must be separated exclusively with "_" (snake case)
-* Variables/objects names contain nouns (not verbs)
+*   Variables/objects names contain nouns (not verbs)
 *	Avoid using names of existing variables or built in functions
     +	T, F
     +	c
     +	...
     +	sum, mean, ...
 
+###	Function definitions
+*   Function definitions first list arguments without default values, followed by those with default values.
+    + GOOD: rnorm <- function(n, mean=0, sd=1)
+	+ BAD: rnorm <- function(mean=0, sd=1, n)           # n should be listed first
+
+	
 ## Syntax
 
 ### Spacing
