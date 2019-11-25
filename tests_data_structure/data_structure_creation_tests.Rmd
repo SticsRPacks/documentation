@@ -10,18 +10,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Description
 
-We made some primary tests on USMs and especially on what kind of structure is the best to use
-with it. We tested 4 structures that are list, reference class, data frame and tibble.
-These tests are basic, in the way that they just create a non pre-allocated list,
-a pre-allocated vector and a pre-allocated list. Each of them contains the same usm, but have not 
-the same length (10 000, 100 000, 1 000 000).
-We also tested the copy-on-modifying on each of these structures.
+In this document, are the tests concerning the creation of different data structure and their filling.
+We have 5 types, a list composed of objects, a class which has a list composed of objects, a data frame
+based on an object and composed of an objects' list, a tibble based on a data frame and composed of
+an objects' list and a data table also based on a data frame and composed of an objects' list.
+
+The tests consist in filling these structures, in the purpose that they will contain 10K, 100K or 1M
+objects.
+There are 3 types of test. The first is a non pre-allocated list, the second is a pre-allocated 
+vector and the last one is a pre-allocated list using the lapply method.
 
 # Constructors
 
 ````{r constructors}
 ## functions file
-source("functions_data_structure_v2.R")
+source("data_structure_functions.R")
 
 ########################### LIBRARIES & GLOBAL VARIABLES/FUNCTIONs ################################
 library(microbenchmark)
@@ -95,6 +98,12 @@ dt <- data.table(df)
 
 ## number of element
 num_elem = 100
+
+## creation of list used for barplot
+
+size = list()
+elements = list()
+weight = list()
 ```
 
 # Tests
@@ -148,6 +157,10 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl <- ost1
 
+size <- append(size,"10 000")
+elements <- append(elements,"class")
+weight <- append(weight,min_weight_cl)
+
 test_plot = microbenchmark(test_NPA_list(num_elem,Sugarcane),
                            test_PA_vector_list_and_class(num_elem,Sugarcane),
                            test_PA_List_list_and_class(num_elem,Sugarcane),
@@ -173,6 +186,10 @@ graph <- ggplot(data = plot_df,aes(x = tests, y=weight)) + geom_bar(stat = "iden
 graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df <- ost2
+
+size <- append(size,"10 000")
+elements <- append(elements,"data frame")
+weight <- append(weight,min_weight_df)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
                            test_PA_List_Df_and_Tb(num_elem,df),
@@ -200,6 +217,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb <- ost2
 
+size <- append(size,"10 000")
+elements <- append(elements,"tibble")
+weight <- append(weight,min_weight_tb)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
                            test_PA_List_Df_and_Tb(num_elem,tb),
@@ -227,6 +247,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt <- ost2
 
+size <- append(size,"10 000")
+elements <- append(elements,"data table")
+weight <- append(weight,min_weight_dt)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
                            test_PA_List_Df_and_Tb(num_elem,dt),
@@ -306,6 +329,10 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl <- ost1
 
+size <- append(size,"100 000")
+elements <- append(elements,"class")
+weight <- append(weight,min_weight_cl)
+
 test_plot = microbenchmark(test_NPA_list(num_elem,Sugarcane),
                            test_PA_vector_list_and_class(num_elem,Sugarcane),
                            test_PA_List_list_and_class(num_elem,Sugarcane),
@@ -331,6 +358,10 @@ graph <- ggplot(data = plot_df,aes(x = tests, y=weight)) + geom_bar(stat = "iden
 graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df <- ost2
+
+size <- append(size,"100 000")
+elements <- append(elements,"data frame")
+weight <- append(weight,min_weight_df)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
                            test_PA_List_Df_and_Tb(num_elem,df),
@@ -358,6 +389,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb <- ost2
 
+size <- append(size,"100 000")
+elements <- append(elements,"tibble")
+weight <- append(weight,min_weight_tb)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
                            test_PA_List_Df_and_Tb(num_elem,tb),
@@ -386,6 +420,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt <- ost2
 
+size <- append(size,"100 000")
+elements <- append(elements,"data table")
+weight <- append(weight,min_weight_tb)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
                            test_PA_List_Df_and_Tb(num_elem,dt),
@@ -467,6 +504,10 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl <- ost2
 
+size <- append(size,"1 000 000")
+elements <- append(elements,"class")
+weight <- append(weight,min_weight_cl)
+
 test_plot = microbenchmark(test_PA_vector_list_and_class(num_elem,Sugarcane),
                            test_PA_List_list_and_class(num_elem,Sugarcane),
                            times = time
@@ -492,6 +533,10 @@ graph <- ggplot(data = plot_df,aes(x = tests, y=weight)) + geom_bar(stat = "iden
 graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df <- ost2
+
+size <- append(size,"1 000 000")
+elements <- append(elements,"data frame")
+weight <- append(weight,min_weight_df)
 
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
                            test_PA_List_Df_and_Tb(num_elem,df),
@@ -520,6 +565,10 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb <- ost2
 
+size <- append(size,"1 000 000")
+elements <- append(elements,"tibble")
+weight <- append(weight,min_weight_tb)
+
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
                            test_PA_List_Df_and_Tb(num_elem,tb),
                            times = time
@@ -547,6 +596,10 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt <- ost2
 
+size <- append(size,"1 000 000")
+elements <- append(elements,"data table")
+weight <- append(weight,min_weight_dt)
+
 test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
                            test_PA_List_Df_and_Tb(num_elem,dt),
                            times = time
@@ -558,10 +611,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 #Recap
 ```{r recap 1M}
 
-plot_df_recap <- data.frame(structures = c("Class","DataFrame","Tibble","DataTable"),
-                      weight = c(min_weight_cl,min_weight_df,min_weight_tb,min_weight_dt))
+plot_df_recap <- data.frame(size,weight,elements)
 
-graph_recap <- ggplot(data = plot_df_recap,aes(x = structures, y=weight)) + geom_bar(stat = "identity")
+graph_recap <- ggplot(data = plot_df_recap,aes(x = size, y=weight, fill = elements)) + 
+               geom_bar(stat = "identity", position = position_dodge())
 graph_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
 
 recap_test = microbenchmark(test_PA_List_list_and_class(num_elem,usm_sugarCane),
