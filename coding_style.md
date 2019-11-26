@@ -10,15 +10,16 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 
 ## Naming conventions
 
-### File names and extensions
-
-*	File names should exactly corresponds to the function name it includes (if only one function per file, preferred)
-*	Files names are always written in english
-*	File names must be meaningful (using [nouns and then] verbs,...)
-    + e.g. a set of action verbs to be used: set, get, select, filter, read, write, ...
+### Function names
+*	Function names are always written in english
+*	Function names must be meaningful, mostly with a format: [verb]_[noun], e.g. a set of action verbs to be used: set_param, get_param,read_param...
 *	... but they must not be too long (<20 characters if possible)
 *	Special characters are prohibited
 *	Words must be separated exclusively with "_" (snake case)
+
+### File names and extensions
+
+*	File names should exactly corresponds to the function name it includes (if only one function per file, which is preferred)
 *	The file extension is always : .R
 
 ### Object/variable names
