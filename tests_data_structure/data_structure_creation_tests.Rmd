@@ -113,13 +113,13 @@ num_elem = 10000
 # Tests
 
 ```{r tests list 10K}
-test <- test_NPA_list(num_elem,usm_sugarCane)
+test <- NPA_list(num_elem,usm_sugarCane)
 ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,usm_sugarCane)
+test <- PA_vector_list_and_class(num_elem,usm_sugarCane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,usm_sugarCane)
+test <- PA_List_list_and_class(num_elem,usm_sugarCane)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("NPA list","PA Vector","lapply"),
@@ -131,9 +131,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
  
 min_weight_li_10 <- ost1
 
-test_plot = microbenchmark(test_NPA_list(num_elem,usm_sugarCane),
-                           test_PA_vector_list_and_class(num_elem,usm_sugarCane),
-                           test_PA_List_list_and_class(num_elem,usm_sugarCane),
+test_plot = microbenchmark(NPA_list(num_elem,usm_sugarCane),
+                           PA_vector_list_and_class(num_elem,usm_sugarCane),
+                           PA_List_list_and_class(num_elem,usm_sugarCane),
                            times = time
 )
 
@@ -150,13 +150,13 @@ ggplot2::autoplot(test_plot) + ggtitle(sprintf("%s %d %s","Duration tests for a 
 ```{r test class 10K}
 
 ########## CLASS ############
-test <- test_NPA_list(num_elem,Sugarcane)
+test <- NPA_list(num_elem,Sugarcane)
 ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,Sugarcane)
+test <- PA_vector_list_and_class(num_elem,Sugarcane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,Sugarcane)
+test <- PA_List_list_and_class(num_elem,Sugarcane)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("NPA list","PA Vector","lapply"),
@@ -167,9 +167,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl_10 <- ost1
 
-test_plot = microbenchmark(test_NPA_list(num_elem,Sugarcane),
-                           test_PA_vector_list_and_class(num_elem,Sugarcane),
-                           test_PA_List_list_and_class(num_elem,Sugarcane),
+test_plot = microbenchmark(NPA_list(num_elem,Sugarcane),
+                           PA_vector_list_and_class(num_elem,Sugarcane),
+                           PA_List_list_and_class(num_elem,Sugarcane),
                            times = time
 )
 
@@ -185,10 +185,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 ```{r tests data frame 10K}
 
 ######### DATA FRAME ##########
-test <- test_PA_vector_Df_and_Tb(num_elem,df)
+test <- PA_vector_Df_and_Tb(num_elem,df)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,df)
+test <- PA_List_Df_and_Tb(num_elem,df)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -199,8 +199,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df_10 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
-                           test_PA_List_Df_and_Tb(num_elem,df),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
+                           PA_List_Df_and_Tb(num_elem,df),
                            times = time
 )
 
@@ -217,10 +217,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ######### TIBBLE ##############
 
-test <- test_PA_vector_Df_and_Tb(num_elem,tb)
+test <- PA_vector_Df_and_Tb(num_elem,tb)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,tb)
+test <- PA_List_Df_and_Tb(num_elem,tb)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -231,8 +231,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb_10 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
-                           test_PA_List_Df_and_Tb(num_elem,tb),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
+                           PA_List_Df_and_Tb(num_elem,tb),
                            times = time
 )
 
@@ -249,10 +249,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ################ DATA TABLE #########################
 
-test <- test_PA_vector_Df_and_Tb(num_elem,dt)
+test <- PA_vector_Df_and_Tb(num_elem,dt)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,dt)
+test <- PA_List_Df_and_Tb(num_elem,dt)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -263,8 +263,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt_10 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
-                           test_PA_List_Df_and_Tb(num_elem,dt),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
+                           PA_List_Df_and_Tb(num_elem,dt),
                            times = time
 )
 
@@ -286,11 +286,11 @@ plot_df_recap <- data.frame(structures = c("list","Class","DataFrame","Tibble","
 graph_recap <- ggplot(data = plot_df_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
 graph_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
 
-recap_test = microbenchmark(test_PA_List_list_and_class(num_elem,usm_sugarCane),
-                            test_PA_vector_list_and_class(num_elem,Sugarcane),
-                            test_PA_List_Df_and_Tb(num_elem,df),
-                            test_PA_List_Df_and_Tb(num_elem,tb),
-                            test_PA_List_Df_and_Tb(num_elem,dt),
+recap_test = microbenchmark(PA_List_list_and_class(num_elem,usm_sugarCane),
+                            PA_vector_list_and_class(num_elem,Sugarcane),
+                            PA_List_Df_and_Tb(num_elem,df),
+                            PA_List_Df_and_Tb(num_elem,tb),
+                            PA_List_Df_and_Tb(num_elem,dt),
                             times = time
 )
 
@@ -308,13 +308,13 @@ ggplot2::autoplot(recap_test) + ggtitle("Time recap")
 num_elem = num_elem * 10
 
 # This takes too much time 
-# test <- test_NPA_list(num_elem,usm_sugarCane)
+# test <- NPA_list(num_elem,usm_sugarCane)
 # ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,usm_sugarCane)
+test <- PA_vector_list_and_class(num_elem,usm_sugarCane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,usm_sugarCane)
+test <- PA_List_list_and_class(num_elem,usm_sugarCane)
 ost3 <- object.size(test)
 
 min_weight_li_100 <- ost2
@@ -325,8 +325,8 @@ plot_df <- data.frame(tests = c("PA Vector","lapply"),
 graph <- ggplot(data = plot_df,aes(x = tests, y=weight)) + geom_bar(stat = "identity")
 graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
 
-test_plot = microbenchmark(test_PA_vector_list_and_class(num_elem,usm_sugarCane),
-                           test_PA_List_list_and_class(num_elem,usm_sugarCane),
+test_plot = microbenchmark(PA_vector_list_and_class(num_elem,usm_sugarCane),
+                           PA_List_list_and_class(num_elem,usm_sugarCane),
                            times = time
 )
 
@@ -344,13 +344,13 @@ ggplot2::autoplot(test_plot) + ggtitle(sprintf("%s %d %s","Duration tests for a 
 
 ########## CLASS ############
 
-test <- test_NPA_list(num_elem,Sugarcane)
+test <- NPA_list(num_elem,Sugarcane)
 ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,Sugarcane)
+test <- PA_vector_list_and_class(num_elem,Sugarcane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,Sugarcane)
+test <- PA_List_list_and_class(num_elem,Sugarcane)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("NPA list","PA Vector","lapply"),
@@ -361,9 +361,9 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl_100 <- ost1
 
-test_plot = microbenchmark(test_NPA_list(num_elem,Sugarcane),
-                           test_PA_vector_list_and_class(num_elem,Sugarcane),
-                           test_PA_List_list_and_class(num_elem,Sugarcane),
+test_plot = microbenchmark(NPA_list(num_elem,Sugarcane),
+                           PA_vector_list_and_class(num_elem,Sugarcane),
+                           PA_List_list_and_class(num_elem,Sugarcane),
                            times = time
 )
 
@@ -379,10 +379,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 ```{r tests data frame 100K}
 
 ######### DATA FRAME ##########
-test <- test_PA_vector_Df_and_Tb(num_elem,df)
+test <- PA_vector_Df_and_Tb(num_elem,df)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,df)
+test <- PA_List_Df_and_Tb(num_elem,df)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -393,8 +393,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df_100 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
-                           test_PA_List_Df_and_Tb(num_elem,df),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
+                           PA_List_Df_and_Tb(num_elem,df),
                            times = time
 )
 
@@ -413,10 +413,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 num_elem = num_elem * 10
 
-test <- test_PA_vector_Df_and_Tb(num_elem,tb)
+test <- PA_vector_Df_and_Tb(num_elem,tb)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,tb)
+test <- PA_List_Df_and_Tb(num_elem,tb)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -427,8 +427,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb_100 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
-                           test_PA_List_Df_and_Tb(num_elem,tb),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
+                           PA_List_Df_and_Tb(num_elem,tb),
                            times = time
 )
 
@@ -446,10 +446,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ################ DATA TABLE #########################
 
-test <- test_PA_vector_Df_and_Tb(num_elem,dt)
+test <- PA_vector_Df_and_Tb(num_elem,dt)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,dt)
+test <- PA_List_Df_and_Tb(num_elem,dt)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -460,8 +460,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt_100 <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
-                           test_PA_List_Df_and_Tb(num_elem,dt),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
+                           PA_List_Df_and_Tb(num_elem,dt),
                            times = time
 )
 
@@ -484,11 +484,11 @@ plot_df_recap <- data.frame(structures = c("List","Class","DataFrame","Tibble","
 graph_recap <- ggplot(data = plot_df_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
 graph_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
 
-recap_test = microbenchmark(test_PA_List_list_and_class(num_elem,usm_sugarCane),
-                            test_PA_vector_list_and_class(num_elem,Sugarcane),
-                            test_PA_List_Df_and_Tb(num_elem,df),
-                            test_PA_List_Df_and_Tb(num_elem,tb),
-                            test_PA_List_Df_and_Tb(num_elem,dt),
+recap_test = microbenchmark(PA_List_list_and_class(num_elem,usm_sugarCane),
+                            PA_vector_list_and_class(num_elem,Sugarcane),
+                            PA_List_Df_and_Tb(num_elem,df),
+                            PA_List_Df_and_Tb(num_elem,tb),
+                            PA_List_Df_and_Tb(num_elem,dt),
                             times = time
 )
 
@@ -504,13 +504,13 @@ ggplot2::autoplot(recap_test) + ggtitle("Time recap")
 num_elem = num_elem * 10
 
 # this takes too much time 
-# test <- test_NPA_list(num_elem,usm_sugarCane)
+# test <- NPA_list(num_elem,usm_sugarCane)
 # ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,usm_sugarCane)
+test <- PA_vector_list_and_class(num_elem,usm_sugarCane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,usm_sugarCane)
+test <- PA_List_list_and_class(num_elem,usm_sugarCane)
 ost3 <- object.size(test)
 
 min_weight_li_1m = ost3
@@ -521,8 +521,8 @@ plot_df <- data.frame(tests = c("PA Vector","lapply"),
 graph <- ggplot(data = plot_df,aes(x = tests, y=weight)) + geom_bar(stat = "identity")
 graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
 
-test_plot = microbenchmark(test_PA_vector_list_and_class(num_elem,usm_sugarCane),
-                           test_PA_List_list_and_class(num_elem,usm_sugarCane),
+test_plot = microbenchmark(PA_vector_list_and_class(num_elem,usm_sugarCane),
+                           PA_List_list_and_class(num_elem,usm_sugarCane),
                            times = time
 )
 
@@ -541,13 +541,13 @@ ggplot2::autoplot(test_plot) + ggtitle(sprintf("%s %d %s","Duration tests for a 
 ########## CLASS ############
 
 # this takes too much time
-# test <- test_NPA_list(num_elem,Sugarcane)
+# test <- NPA_list(num_elem,Sugarcane)
 # ost1 <- object.size(test)
 
-test <- test_PA_vector_list_and_class(num_elem,Sugarcane)
+test <- PA_vector_list_and_class(num_elem,Sugarcane)
 ost2 <- object.size(test)
 
-test <- test_PA_List_list_and_class(num_elem,Sugarcane)
+test <- PA_List_list_and_class(num_elem,Sugarcane)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -558,8 +558,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
 
 min_weight_cl_1m <- ost2
 
-test_plot = microbenchmark(test_PA_vector_list_and_class(num_elem,Sugarcane),
-                           test_PA_List_list_and_class(num_elem,Sugarcane),
+test_plot = microbenchmark(PA_vector_list_and_class(num_elem,Sugarcane),
+                           PA_List_list_and_class(num_elem,Sugarcane),
                            times = time
 )
 
@@ -576,10 +576,12 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ######### DATA FRAME ##########
 
-test <- test_PA_vector_Df_and_Tb(num_elem,df)
+num_elem = 1000000
+
+test <- PA_vector_Df_and_Tb(num_elem,df)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,df)
+test <- PA_List_Df_and_Tb(num_elem,df)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -590,8 +592,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
 
 min_weight_df_1m <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,df),
-                           test_PA_List_Df_and_Tb(num_elem,df),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
+                           PA_List_Df_and_Tb(num_elem,df),
                            times = time
 )
 
@@ -609,10 +611,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ######### TIBBLE ##############
 
-test <- test_PA_vector_Df_and_Tb(num_elem,tb)
+test <- PA_vector_Df_and_Tb(num_elem,tb)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,tb)
+test <- PA_List_Df_and_Tb(num_elem,tb)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -623,8 +625,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
 
 min_weight_tb_1m <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,tb),
-                           test_PA_List_Df_and_Tb(num_elem,tb),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
+                           PA_List_Df_and_Tb(num_elem,tb),
                            times = time
 )
 
@@ -642,10 +644,10 @@ ggplot2::autoplot(test_plot)  + ggtitle(sprintf("%s %d %s","Duration tests for a
 
 ################ DATA TABLE #########################
 
-test <- test_PA_vector_Df_and_Tb(num_elem,dt)
+test <- PA_vector_Df_and_Tb(num_elem,dt)
 ost2 <- object.size(test)
 
-test <- test_PA_List_Df_and_Tb(num_elem,dt)
+test <- PA_List_Df_and_Tb(num_elem,dt)
 ost3 <- object.size(test)
 
 plot_df <- data.frame(tests = c("PA Vector","lapply"),
@@ -656,8 +658,8 @@ graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
 
 min_weight_dt_1m <- ost2
 
-test_plot = microbenchmark(test_PA_vector_Df_and_Tb(num_elem,dt),
-                           test_PA_List_Df_and_Tb(num_elem,dt),
+test_plot = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
+                           PA_List_Df_and_Tb(num_elem,dt),
                            times = time
 )
 
@@ -682,10 +684,10 @@ graph_recap <- ggplot(data = plot_df_recap,aes(x = structures, y=weight_log10)) 
                geom_bar(stat = "identity")
 graph_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
 
-recap_test <- microbenchmark(test_PA_List_list_and_class(num_elem,Sugarcane),
-                            test_PA_List_Df_and_Tb(num_elem,df),
-                            test_PA_List_Df_and_Tb(num_elem,tb),
-                            test_PA_List_Df_and_Tb(num_elem,dt),
+recap_test <- microbenchmark(PA_List_list_and_class(num_elem,Sugarcane),
+                            PA_List_Df_and_Tb(num_elem,df),
+                            PA_List_Df_and_Tb(num_elem,tb),
+                            PA_List_Df_and_Tb(num_elem,dt),
                             times = time
 )
 
