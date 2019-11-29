@@ -113,7 +113,10 @@ num_elem = 10000
 # Tests
 
 ```{r tests list 10K}
+
 test <- NPA_list(num_elem,usm_sugarCane)
+
+#OST stands for Object Size Test
 ost1 <- object.size(test)
 
 test <- PA_vector_list_and_class(num_elem,usm_sugarCane)
