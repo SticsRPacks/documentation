@@ -1,6 +1,8 @@
 ---
 title: "Data Structure Slice Tests"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -105,25 +107,21 @@ num_elem = 1
 
 ```{r list}
 
-########### LIST #############
+########### LIST ############
 
-test <- NPA_list(num_elem,usm_sugarCane)
-test_bis <- NPA_list(num_elem,usm_potato)
+test <- PA_vector_list_and_class(num_elem,usm_sugarCane)
+test_bis <- PA_vector_list_and_class(num_elem,usm_potato)
 test <- append(test,test_bis)
 
-# we get the first usm (there are 15 elements in one usm)
-test[1:15]
+# we get all the name of the usms
+unlist(lapply(test, function(x) x$name))
+
+# we get the first usm
+test[[1]]
 
 # we get the first usm's name
-test[1:15]$name
+test[[1]]$name
 
-# we get the usms' names (here there are 2 usm) using their index
-test[1]
-test[16]
-
-# we try to get all the usms' names
-test$name
-# but it's not working and gives the first usm's name
 
 ```
 
@@ -131,8 +129,8 @@ test$name
 ``` {r class}
 
 ########### CLASS  ############
-test_class <- NPA_list(num_elem,Sugarcane)
-test_class2 <- NPA_list(num_elem,Potato)
+test_class <- PA_vector_list_and_class(num_elem,Sugarcane)
+test_class2 <- PA_vector_list_and_class(num_elem,Potato)
 test_class <- append(test_class,test_class2)
 
 # we get the first usm
@@ -184,6 +182,8 @@ select(test_df,name,date_begin)
 
 # we're selectionning all the usms without their fields "name" and "date_begin"
 select(test_df,-name,-date_begin)
+
+slice(tibble::rownames_to_column(test_df),1L)
 
 ```
 

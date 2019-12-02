@@ -90,6 +90,7 @@ test <- test_PA_List_Df_and_Tb_WCOM(num_elem,dts)
 test
 
 recursive_fun= function(struct, i, n, new_val){
+  tracemem(struct)
   if(i<n){
     recursive_fun(struct, i+1L, n,new_val)
   }else{
