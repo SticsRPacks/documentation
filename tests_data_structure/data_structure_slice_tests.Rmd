@@ -1,5 +1,5 @@
 ---
-title: "data_structure_slice_tests"
+title: "Data Structure Slice Tests"
 output: html_document
 ---
 
@@ -7,22 +7,20 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-Ce document présente les tests de manipulation, dérécupération et de modification d'usm.
+This document is composed of some tests made in order to try differents ways to access data from
+differents structure types and to choose the simplier way to access it. Also, these tests 
+represent way to extract sub-list of usms.
 
-
-```{r constructors}
-
+```{r header,message = FALSE, warning = FALSE}
 source("data_structure_functions.R")
 
 ########################### LIBRARIES & GLOBAL VARIABLES/FUNCTIONs ################################
-library(microbenchmark)
-library(ggplot2)
 library(tibble)
 library(data.table)
 library(dplyr)
+```
 
-# microbenchmark execution number
-time = 100                                                                
+```{r constructors}
 
 # function that creates a 300 elem long list of elements that can be modified
 num_list = function() {
@@ -112,16 +110,20 @@ num_elem = 1
 test <- NPA_list(num_elem,usm_sugarCane)
 test_bis <- NPA_list(num_elem,usm_potato)
 test <- append(test,test_bis)
-# on rÃ©cupÃ¨re la premiÃ¨re usm (15 elements dans une usm)
+
+# we get the first usm (there are 15 elements in one usm)
 test[1:15]
-# on rÃ©cupÃ¨re le nom de la premiÃ¨re usm
+
+# we get the first usm's name
 test[1:15]$name
-# on recupÃ¨re les noms des usms directement avec leurs indices
+
+# we get the usms' names (here there are 2 usm) using their index
 test[1]
 test[16]
-# on recupere tous les noms de la liste
+
+# we try to get all the usms' names
 test$name
-# mais cela ne fonctionne pas et ne retourne que le premier
+# but it's not working and gives the first usm's name
 
 ```
 
@@ -132,13 +134,19 @@ test$name
 test_class <- NPA_list(num_elem,Sugarcane)
 test_class2 <- NPA_list(num_elem,Potato)
 test_class <- append(test_class,test_class2)
-# on recupere les infos de la premiere usm
+
+# we get the first usm
 test_class[1]
-# on rÃ©cupÃ¨re le nom de la seconde usm
+
+# we get the first two usms
+test_class[1:2]
+
+# we get the second usm's name
 test_class[[2]]$name
-# on recupere un valeur de la liste de parametres de la seconde usm
+
+# we get the parameters list's second value from the second usm
 test_class[[2]]$parametres_list[[2]]
-# cela fonctionne avec simple crochet aussi
+# it also works with simple square brackets '[]'
 
 ```
 
@@ -150,24 +158,31 @@ test_class[[2]]$parametres_list[[2]]
 test_df <- PA_vector_Df_and_Tb(num_elem,df_sugarcane)
 test_df_potato <- PA_vector_Df_and_Tb(num_elem,df_potato)
 test_df <- rbind(test_df,test_df_potato)
-# retourne la premiere ligne
+
+# we get the first line which corresponds to the first usm
 test_df[1]
-# retourne les deux premières lignes
+
+# we get the first two lines (they are only two usm in this case)
 test_df[1:2]
-# retourne toutes les informations dans la premiÃ¨re colonne
+
+# we get the first column's informations
 test_df[[1]]
-# retourne le second element dans la colonne 1, fonctionne aussi avec double crochets
+
+# we get the first column's second element, it also works with double square brackets '[[]]'
 test_df[[1]][2]
-# retourne le deuxiÃ¨me element de la premiÃ¨re ligne
+
+# we get the first usm's second element
 test_df[1][[2]]
 
-# On peut aussi s'aider du package "dplyr" en qui concerne la manipulation de data frame
+# We can also use the "dplyr" package for data frame manipulation
 
-# on selectionne les les lignes du tableau dont le champ "name" est égal à "potato"
+# we're selectionning usms where their field "name" is equal to "potato"
 filter(test_df,name =="potato")
-# on selectionne les champs "name" et "date_begin"
+
+# we're selectionning all the usms' "name" and "date_begin" fields
 select(test_df,name,date_begin)
-# on exclut les champs "name" et "date_begin"
+
+# we're selectionning all the usms without their fields "name" and "date_begin"
 select(test_df,-name,-date_begin)
 
 ```
@@ -181,23 +196,34 @@ test_tb <- PA_vector_Df_and_Tb(num_elem,tb_sugarcane)
 test_tb_potato <- PA_vector_Df_and_Tb(num_elem,tb_potato)
 test_tb <- rbind(test_tb,test_tb_potato)
 
-# on peux accéder aux valeurs de la même façon que pour les data frame et l'on peut aussi y accéder
-# en passant le nom du champ voulu
+# we can access tibble's datas the same way as data frame but we cal also access its by using 
+# the field's name wanted
 
-# on veut le nom de la seconde ligne
+# we're getting the second usm's name
 test_tb[2,name]
-# on veut la date de début de la première ligne
+
+# we're getting the first usm's date_begin
 test_tb[1,date_begin]
 
-# de plus, peut meme recupérer plusieurs elements d'une ou plusieurs lignes
-# par exemple, on veut récupérer le nom et la deta de debut de toutes les lignes
+# furthermore, we can get a list of many elements from one to all the usms
+# here, we want to get the name and begin date all of the usms
 test_tb[,.(name,date_begin)]
 
 ```
 
-On peut bien sur appliquer aussi cela à la structure data Table
+All of the ways to access data for Data Frames and Tibbles can be used to access Data Tables' datas
 
 # CONCLUSION
 
-Il me reste à pourvoir utiliser la fonction slice du package dplyr sinon les types de structure tels
-que data frame, tibble et data table semblent les plus aptes à une manipulation faciles des données
+In the "data_structure_creation_tests" Rmd, we saw that the class structure had better results 
+considering the memory weight and the speed.
+
+Now, we see that the ways to access class' data are easy but we don't have a method to do research
+on these datas like the filter method (dplyr package).
+
+However, we can suppose that structure types like Data Frame, Tibble or Data Table can be used for
+the Designs of Experiments because due to the dplyr packages and its methods we can easily search 
+and get the wanted datas.
+
+The next step is to know how to use the slice method from the dplyr package, because it's the most
+important method considering the huge amount of usms we can possibly work with.
