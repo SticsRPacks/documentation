@@ -1,8 +1,8 @@
 ---
 title: "Data Structure Slice Tests"
 output:
-  pdf_document: default
   html_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -119,9 +119,11 @@ unlist(lapply(test, function(x) x$name))
 # we get the first usm
 test[[1]]
 
-# we get the first usm's name
-test[[1]]$name
+# we get the first usm's fstation
+test[[1]]$fstation
 
+# we get tje second usm's date_begin
+test[[2]]$date_begin
 
 ```
 

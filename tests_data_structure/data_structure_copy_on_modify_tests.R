@@ -86,21 +86,5 @@ dtp <- data.table(dfp)
 # number of element
 num_elem = 1
 
-test <- test_PA_List_Df_and_Tb_WCOM(num_elem,dts)
-test
-
-recursive_fun= function(struct, i, n, new_val){
-  tracemem(struct)
-  if(i<n){
-    recursive_fun(struct, i+1L, n,new_val)
-  }else{
-    struct[1]= new_val
-    tracemem(struct)
-  }
-}
-
-st= list(a= 1, b=2)
-tracemem(st)
-recursive_fun(st,1,1000,56.0)
-tracemem(st)
-st
+df <- PA_vector_Df_and_Tb(num_elem,dfs)
+trace

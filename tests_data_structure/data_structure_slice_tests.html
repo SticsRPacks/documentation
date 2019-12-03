@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html>
 
 <head>
 
 <meta charset="utf-8" />
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
 <meta name="generator" content="pandoc" />
 <meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
 
@@ -145,6 +144,7 @@ summary {
   border: none;
   display: inline-block;
   border-radius: 4px;
+  background-color: transparent;
 }
 
 .tabset-dropdown > .nav-tabs.nav-tabs-open > li {
@@ -266,14 +266,17 @@ dt_potato &lt;- data.table(df_potato)
 num_elem = 1</code></pre>
 <div id="tests" class="section level1">
 <h1>TESTS</h1>
-<pre class="r"><code>########### LIST #############
+<pre class="r"><code>########### LIST ############
 
-test &lt;- NPA_list(num_elem,usm_sugarCane)
-test_bis &lt;- NPA_list(num_elem,usm_potato)
+test &lt;- PA_vector_list_and_class(num_elem,usm_sugarCane)
+test_bis &lt;- PA_vector_list_and_class(num_elem,usm_potato)
 test &lt;- append(test,test_bis)
 
-# we get the first usm (there are 15 elements in one usm)
-test[1:15]</code></pre>
+# we get all the name of the usms
+unlist(lapply(test, function(x) x$name))</code></pre>
+<pre><code>## [1] &quot;SugarCane&quot; &quot;potato&quot;</code></pre>
+<pre class="r"><code># we get the first usm
+test[[1]]</code></pre>
 <pre><code>## $name
 ## [1] &quot;SugarCane&quot;
 ## 
@@ -342,22 +345,11 @@ test[1:15]</code></pre>
 ## $parametres_list[[3]]
 ## [1] 3</code></pre>
 <pre class="r"><code># we get the first usm's name
-test[1:15]$name</code></pre>
+test[[1]]$name</code></pre>
 <pre><code>## [1] &quot;SugarCane&quot;</code></pre>
-<pre class="r"><code># we get the usms' names (here there are 2 usm) using their index
-test[1]</code></pre>
-<pre><code>## $name
-## [1] &quot;SugarCane&quot;</code></pre>
-<pre class="r"><code>test[16]</code></pre>
-<pre><code>## $name
-## [1] &quot;potato&quot;</code></pre>
-<pre class="r"><code># we try to get all the usms' names
-test$name</code></pre>
-<pre><code>## [1] &quot;SugarCane&quot;</code></pre>
-<pre class="r"><code># but it's not working and gives the first usm's name</code></pre>
 <pre class="r"><code>########### CLASS  ############
-test_class &lt;- NPA_list(num_elem,Sugarcane)
-test_class2 &lt;- NPA_list(num_elem,Potato)
+test_class &lt;- PA_vector_list_and_class(num_elem,Sugarcane)
+test_class2 &lt;- PA_vector_list_and_class(num_elem,Potato)
 test_class &lt;- append(test_class,test_class2)
 
 # we get the first usm
@@ -546,38 +538,33 @@ test_df &lt;- rbind(test_df,test_df_potato)
 
 # we get the first line which corresponds to the first usm
 test_df[1]</code></pre>
-<pre><code>##         name date_begin date_end         finit ground_name
-## 1: SugarCane        286      650 canne_ini.xml    solcanne
-##            fstation        fclim1        fclim2 culturean nb_plant
-## 1: climcanj_sta.xml climcanj.1998 climcanj.1999         0        1
-##    simulation_code  plant_dominance_1.fplt plant_dominance_1.ftec
-## 1:               0 proto_sugarcane_plt.xml          canne_tec.xml
-##    plant_dominance_1.flai plant_dominance_2.fplt plant_dominance_2.ftec
+<pre><code>##         name date_begin date_end         finit ground_name         fstation
+## 1: SugarCane        286      650 canne_ini.xml    solcanne climcanj_sta.xml
+##           fclim1        fclim2 culturean nb_plant simulation_code
+## 1: climcanj.1998 climcanj.1999         0        1               0
+##     plant_dominance_1.fplt plant_dominance_1.ftec plant_dominance_1.flai
+## 1: proto_sugarcane_plt.xml          canne_tec.xml                   null
+##    plant_dominance_2.fplt plant_dominance_2.ftec plant_dominance_2.flai
 ## 1:                   null                   null                   null
-##    plant_dominance_2.flai observation_file parametres_list.1L
-## 1:                   null         file.obs                  1
-##    parametres_list.2L parametres_list.3L
-## 1:                  2                  3</code></pre>
+##    observation_file parametres_list.1L parametres_list.2L parametres_list.3L
+## 1:         file.obs                  1                  2                  3</code></pre>
 <pre class="r"><code># we get the first two lines (they are only two usm in this case)
 test_df[1:2]</code></pre>
-<pre><code>##         name date_begin date_end          finit ground_name
-## 1: SugarCane        286      650  canne_ini.xml    solcanne
-## 2:    potato        133      256 patate_ini.xml   solpatate
-##            fstation        fclim1        fclim2 culturean nb_plant
-## 1: climcanj_sta.xml climcanj.1998 climcanj.1999         0        1
-## 2: climcanj_sta.xml climcanj.1998 climcanj.1999         0        1
-##    simulation_code  plant_dominance_1.fplt plant_dominance_1.ftec
-## 1:               0 proto_sugarcane_plt.xml          canne_tec.xml
-## 2:               0 proto_sugarcane_plt.xml          canne_tec.xml
-##    plant_dominance_1.flai plant_dominance_2.fplt plant_dominance_2.ftec
+<pre><code>##         name date_begin date_end          finit ground_name         fstation
+## 1: SugarCane        286      650  canne_ini.xml    solcanne climcanj_sta.xml
+## 2:    potato        133      256 patate_ini.xml   solpatate climcanj_sta.xml
+##           fclim1        fclim2 culturean nb_plant simulation_code
+## 1: climcanj.1998 climcanj.1999         0        1               0
+## 2: climcanj.1998 climcanj.1999         0        1               0
+##     plant_dominance_1.fplt plant_dominance_1.ftec plant_dominance_1.flai
+## 1: proto_sugarcane_plt.xml          canne_tec.xml                   null
+## 2: proto_sugarcane_plt.xml          canne_tec.xml                   null
+##    plant_dominance_2.fplt plant_dominance_2.ftec plant_dominance_2.flai
 ## 1:                   null                   null                   null
 ## 2:                   null                   null                   null
-##    plant_dominance_2.flai observation_file parametres_list.1L
-## 1:                   null         file.obs                  1
-## 2:                   null         file.obs                  1
-##    parametres_list.2L parametres_list.3L
-## 1:                  2                  3
-## 2:                  2                  3</code></pre>
+##    observation_file parametres_list.1L parametres_list.2L parametres_list.3L
+## 1:         file.obs                  1                  2                  3
+## 2:         file.obs                  1                  2                  3</code></pre>
 <pre class="r"><code># we get the first column's informations
 test_df[[1]]</code></pre>
 <pre><code>## [1] SugarCane potato   
@@ -601,10 +588,8 @@ filter(test_df,name ==&quot;potato&quot;)</code></pre>
 ## 1 proto_sugarcane_plt.xml          canne_tec.xml                   null
 ##   plant_dominance_2.fplt plant_dominance_2.ftec plant_dominance_2.flai
 ## 1                   null                   null                   null
-##   observation_file parametres_list.1L parametres_list.2L
-## 1         file.obs                  1                  2
-##   parametres_list.3L
-## 1                  3</code></pre>
+##   observation_file parametres_list.1L parametres_list.2L parametres_list.3L
+## 1         file.obs                  1                  2                  3</code></pre>
 <pre class="r"><code># we're selectionning all the usms' &quot;name&quot; and &quot;date_begin&quot; fields
 select(test_df,name,date_begin)</code></pre>
 <pre><code>##         name date_begin
@@ -615,21 +600,31 @@ select(test_df,-name,-date_begin)</code></pre>
 <pre><code>##    date_end          finit ground_name         fstation        fclim1
 ## 1:      650  canne_ini.xml    solcanne climcanj_sta.xml climcanj.1998
 ## 2:      256 patate_ini.xml   solpatate climcanj_sta.xml climcanj.1998
-##           fclim2 culturean nb_plant simulation_code
-## 1: climcanj.1999         0        1               0
-## 2: climcanj.1999         0        1               0
-##     plant_dominance_1.fplt plant_dominance_1.ftec plant_dominance_1.flai
-## 1: proto_sugarcane_plt.xml          canne_tec.xml                   null
-## 2: proto_sugarcane_plt.xml          canne_tec.xml                   null
-##    plant_dominance_2.fplt plant_dominance_2.ftec plant_dominance_2.flai
-## 1:                   null                   null                   null
-## 2:                   null                   null                   null
-##    observation_file parametres_list.1L parametres_list.2L
-## 1:         file.obs                  1                  2
-## 2:         file.obs                  1                  2
-##    parametres_list.3L
-## 1:                  3
-## 2:                  3</code></pre>
+##           fclim2 culturean nb_plant simulation_code  plant_dominance_1.fplt
+## 1: climcanj.1999         0        1               0 proto_sugarcane_plt.xml
+## 2: climcanj.1999         0        1               0 proto_sugarcane_plt.xml
+##    plant_dominance_1.ftec plant_dominance_1.flai plant_dominance_2.fplt
+## 1:          canne_tec.xml                   null                   null
+## 2:          canne_tec.xml                   null                   null
+##    plant_dominance_2.ftec plant_dominance_2.flai observation_file
+## 1:                   null                   null         file.obs
+## 2:                   null                   null         file.obs
+##    parametres_list.1L parametres_list.2L parametres_list.3L
+## 1:                  1                  2                  3
+## 2:                  1                  2                  3</code></pre>
+<pre class="r"><code>slice(tibble::rownames_to_column(test_df),1L)</code></pre>
+<pre><code>##   rowname      name date_begin date_end         finit ground_name
+## 1       1 SugarCane        286      650 canne_ini.xml    solcanne
+##           fstation        fclim1        fclim2 culturean nb_plant
+## 1 climcanj_sta.xml climcanj.1998 climcanj.1999         0        1
+##   simulation_code  plant_dominance_1.fplt plant_dominance_1.ftec
+## 1               0 proto_sugarcane_plt.xml          canne_tec.xml
+##   plant_dominance_1.flai plant_dominance_2.fplt plant_dominance_2.ftec
+## 1                   null                   null                   null
+##   plant_dominance_2.flai observation_file parametres_list.1L parametres_list.2L
+## 1                   null         file.obs                  1                  2
+##   parametres_list.3L
+## 1                  3</code></pre>
 <pre class="r"><code>############ TIBBLE ###########
 
 # on peux aussi user des noms des colonnes pour selectionner les elements voulus
