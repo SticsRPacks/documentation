@@ -84,7 +84,21 @@ dtp <- data.table(dfp)
 ############## TESTS #################################################################
 
 # number of element
-num_elem = 1
+num_elem = 10
 
+# LIST
+
+sprintf("%s %s","tracemem usm sugarcance : ",tracemem(usm_sugarCane))
+list <- PA_vector_list_and_class(num_elem,usm_sugarCane)
+print(sprintf("%s %s","tracemem list ",tracemem(list)))
+
+list <- append(list,usm_potato)
+print(sprintf("%s %s","tracemem list ",tracemem(list)))
+
+print(sprintf("%s %s","tracemem usm potato : ",tracemem(usm_potato)))
+list <- PA_List_list_and_class(num_elem,usm_potato)
+
+# CLASS
+
+print(sprintf("%s %s","tracemem dfs",tracemem(dfs)))
 df <- PA_vector_Df_and_Tb(num_elem,dfs)
-trace
