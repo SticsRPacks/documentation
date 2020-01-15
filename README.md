@@ -34,9 +34,9 @@ The `SticsOnR` package was designed to control STICS from R *e.g.* create USMs a
 + [Project](https://github.com/SticsRPacks/SticsOnR) - the github repository
 + [Website](https://sticsrpacks.github.io/SticsOnR/) - the repository website
 
-### SticsOptimizR
+### CroptimizR
 
 A package for parameter estimation, uncertainty / sensitivity analysis for the STICS model using R.
 
-+ [Project](https://github.com/SticsRPacks/SticsOptimizR) - the github repository
-+ [Website](https://sticsrpacks.github.io/SticsOptimizR/) - the repository website
++ [Project](https://github.com/SticsRPacks/CroptimizR) - the github repository
++ [Website](https://sticsrpacks.github.io/CroptimizR/) - the repository website
