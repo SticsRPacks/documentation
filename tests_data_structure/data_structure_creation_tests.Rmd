@@ -42,7 +42,7 @@ library(dplyr)
 time = 100                                                                
 
 # function that creates a 300 elem long list of elements that can be modified
-**SHOULD BE A NAMED VECTOR (param1=1, param2=2, ...)** 
+**SHOULD BE A NAMED LIST (param1=1, param2=2, ...)** 
 
 num_list = function() {
   li <- lapply(1:300,function(i) i)
