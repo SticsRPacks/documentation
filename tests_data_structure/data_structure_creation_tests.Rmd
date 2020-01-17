@@ -12,22 +12,18 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In this document, are the tests concerning the creation of different data structure and their filling.
 We have 5 types, a list composed of objects, a class which has a list composed of objects, a data frame
-based on an object and composed of an objects' list, a tibble based on a data frame and composed of
+composed of an objects' list, a tibble based on a data frame and composed of
 an objects' list and a data table also based on a data frame and composed of an objects' list.
 
-The tests consist in filling these structures, in the purpose that they will contain 10K, 100K or 1M
-objects.
-
-Each object is composed of a name (character), a beginning and end date (numeric), a xml document (character),
-a ground_name (character),a fstation (character),a fclim1 (character),a fclim2 (character),
-a culturean (numeric), a number of plant (numeric), a simulation code (numeric), a data's list for the
-first dominant plant (character) and the same goes for the second dominant plant, an observation file (character)
-and the last is an element list that can be modify as we want.
-
-The dominant plants lists are composed of a fplt (character), a ftec (character) and a flai (character)
+An object refer here to a Stics USM. It is composed of a name (character), a beginning and end simulation date (numeric), 
+the name of the xml file containing initial values (finit, character), the name of the soil (ground_name, character), the name of the xml file containing the description of the weather station (fstation, character), the names of the files containing the weather data (fclim1 and fclim2, character), some option codes (culturean and simulation_code, numerics), a number of plants (numeric), a list of data for the first and second dominant plant (names of plant, technical and lai files: fplt, ftec, flai), an observation file (observation_file, character)
+and the last is a named vector contaning values of Stics input parameters that must be modified. 
 
 There are 3 types of test. The first is a non pre-allocated list, the second is a pre-allocated 
 vector and the last one is a pre-allocated list using the lapply method.
+
+The tests consist in filling these structures, in the purpose that they will contain 10K, 100K or 1M
+objects. Functions used (e.g. NPA_list_list, PA_vector_list, ...) are defined in the file data_structure_functions.R
 
 # Constructors
 
@@ -46,6 +42,8 @@ library(dplyr)
 time = 100                                                                
 
 # function that creates a 300 elem long list of elements that can be modified
+**SHOULD BE A NAMED VECTOR (param1=1, param2=2, ...)** 
+
 num_list = function() {
   li <- lapply(1:300,function(i) i)
   return(li)
@@ -68,7 +66,6 @@ usm_sugarCane <- list(name = "SugarCane",date_begin = 286,date_end = 650,finit =
                       fclim2 = "climcanj.1999",culturean = 0,nb_plant = 1,simulation_code = 0,
                       plant_dominance_1 = pld_sugarCane1,plant_dominance_2 = pld_sugarCane2,
                       observation_file = "file.obs",elements_list = elem_list) 
-
 
 
 ############################# CLASS ########################################
@@ -110,6 +107,10 @@ dt <- data.table(df)
 num_elem = 10000
 ```
 
+**Tes noms de variables ne sont pas très explicite : usm_sugarCane pour la liste, Sugarcane pour la class, df pour data.frame, tb, et dt ...**
+**Il serait plus judicieux de mettre usm_list, usm_class, usm_df, usm_tb et usm_dt ...**
+
+
 # Tests
 
 Before beginning the tests, let's declare some variables that will be used in graphs.
@@ -130,7 +131,7 @@ test <- PA_vector_list(num_elem,usm_sugarCane)
 all_weight <- append(weight,object.size(test))
 
 test <- PA_List_list(num_elem,usm_sugarCane)
-all_weight <- appedn(weight,object.size(test))
+all_weight <- append(weight,object.size(test))
 
 plot_weight <- data.frame(Instanciation_modes = Instances_modes,
                       weights = all_weight)
