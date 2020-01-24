@@ -12,18 +12,22 @@ knitr::opts_chunk$set(echo = TRUE)
 
 In this document, are the tests concerning the creation of different data structure and their filling.
 We have 5 types, a list composed of objects, a class which has a list composed of objects, a data frame
-composed of an objects' list, a tibble based on a data frame and composed of
+based on an object and composed of an objects' list, a tibble based on a data frame and composed of
 an objects' list and a data table also based on a data frame and composed of an objects' list.
 
-An object refer here to a Stics USM. It is composed of a name (character), a beginning and end simulation date (numeric), 
-the name of the xml file containing initial values (finit, character), the name of the soil (ground_name, character), the name of the xml file containing the description of the weather station (fstation, character), the names of the files containing the weather data (fclim1 and fclim2, character), some option codes (culturean and simulation_code, numerics), a number of plants (numeric), a list of data for the first and second dominant plant (names of plant, technical and lai files: fplt, ftec, flai), an observation file (observation_file, character)
-and the last is a named vector contaning values of Stics input parameters that must be modified. 
+The tests consist in filling these structures, in the purpose that they will contain 10K, 100K or 1M
+objects.
+
+Each object is composed of a name (character), a beginning and end date (numeric), a xml document (character),
+a ground_name (character),a fstation (character),a fclim1 (character),a fclim2 (character),
+a culturean (numeric), a number of plant (numeric), a simulation code (numeric), a data's list for the
+first dominant plant (character) and the same goes for the second dominant plant, an observation file (character)
+and the last is an element list that can be modify as we want.
+
+The dominant plants lists are composed of a fplt (character), a ftec (character) and a flai (character)
 
 There are 3 types of test. The first is a non pre-allocated list, the second is a pre-allocated 
 vector and the last one is a pre-allocated list using the lapply method.
-
-The tests consist in filling these structures, in the purpose that they will contain 10K, 100K or 1M
-objects. Functions used (e.g. NPA_list_list, PA_vector_list, ...) are defined in the file data_structure_functions.R
 
 # Constructors
 
@@ -41,680 +45,235 @@ library(dplyr)
 # microbenchmark execution number
 time = 100                                                                
 
-# function that creates a 300 elem long list of elements that can be modified
-**SHOULD BE A NAMED LIST (param1=1, param2=2, ...)** 
-
-num_list = function() {
-  li <- lapply(1:300,function(i) i)
-  return(li)
-}
-
-############################### LIST ##############################
-
-# "plant dominance 1" list creation
-pld_sugarCane1 = list("fplt" = "proto_sugarcane_plt.xml","ftec" = "canne_tec.xml","flai" = "null") 
-
-# "plant dominance 2" list creation
-pld_sugarCane2 = list("fplt" = "null","ftec" = "null","flai" = "null")     
- 
-# 300 elem long list which can be modified
-elem_list = num_list()                                                                               
-
-# sugarCane usm creation
-usm_sugarCane <- list(name = "SugarCane",date_begin = 286,date_end = 650,finit = "canne_ini.xml",
-                      ground_name = "solcanne",fstation = "climcanj_sta.xml",fclim1 = "climcanj.1998",
-                      fclim2 = "climcanj.1999",culturean = 0,nb_plant = 1,simulation_code = 0,
-                      plant_dominance_1 = pld_sugarCane1,plant_dominance_2 = pld_sugarCane2,
-                      observation_file = "file.obs",elements_list = elem_list) 
-
-
-############################# CLASS ########################################
-
-# usm class declaration
-usm <- setRefClass("usm",
-                   fields = list(name = "character",date_begin = "numeric",date_end = "numeric",
-                                 finit = "character",ground_name = "character",fstation = "character",
-                                 fclim1 = "character",fclim2 = "character",culturean = "numeric",
-                                 nb_plant = "numeric",simulation_code = "numeric",
-                                 plant_dominance_1 = "list",plant_dominance_2 = "list",
-                                 observation_file = "character",elements_list = "list")
-)
-
-# usm class object Sugarcane instanciation
-Sugarcane <- usm(name = "SugarCane",date_begin = 286,date_end = 650,finit = "canne_ini.xml",
-                 ground_name = "solcanne",fstation = "climcanj_sta.xml",fclim1 = "climcanj.1998",
-                 fclim2 = "clilmcanj.1999",nb_plant = 0,simulation_code = 1,
-                 plant_dominance_1 = pld_sugarCane1,plant_dominance_2 = pld_sugarCane2,
-                 observation_file = "file.obs",elements_list = elem_list)
-
-
-################ DATA FRAME ################################################
-
-# creation data frame df using list usm_sugarCane
-df <- data.frame(usm_sugarCane)
-
-############### TIBBLE #####################################################
-
-#creation tibble tb using data frame df
-tb <- tibble::as_tibble(df)
-
-############## DATA TABLE #############
-
-#creation data table using data frame df
-dt <- data.table(df)
-
 ## number of element
 num_elem = 10000
 ```
-
-**Tes noms de variables ne sont pas très explicite : usm_sugarCane pour la liste, Sugarcane pour la class, df pour data.frame, tb, et dt ...**
-**Il serait plus judicieux de mettre usm_list, usm_class, usm_df, usm_tb et usm_dt ...**
-
 
 # Tests
 
 Before beginning the tests, let's declare some variables that will be used in graphs.
 
 ```{r variables}
+# used for graph
 structs <- c("list","Class","DataFrame","Tibble","DataTable")
+Instances_modes <- c("PA Vector","lapply")
 
-Instances_modes <- c("NPA list","PA Vector","lapply")
+all_weight <- list() # all the differents wiehgts from instances
+all_time <- list() # used to store all the instances generation time
+
 ```
 
-```{r tests list 10K}
+```{r tests}
 
-test <- NPA_list_list(num_elem,usm_sugarCane)
-#OST stands for Object Size Test
-all_weight <- object.size(test)
+cpt <- 0
+while (cpt < 3) {
+  
+  ######## LIST ########## 
 
-test <- PA_vector_list(num_elem,usm_sugarCane)
-all_weight <- append(weight,object.size(test))
-
-test <- PA_List_list(num_elem,usm_sugarCane)
-all_weight <- append(weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weights = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
+  test <- vector_usm_list(num_elem)
+  instance_weight <- object.size(test)
+  
+  test <- lapply_usm_list(num_elem)
+  instance_weight <- append(instance_weight,object.size(test))
+  
+  plot_weight <- data.frame(Instanciation_modes = Instances_modes,weights = instance_weight)
+  
+  graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
+  
+   
+  loop_weight <- min(instance_weight)
+  all_weight <- append(all_weight,min(instance_weight))
+  
+  benchmark <- microbenchmark(vector_usm_list(num_elem),lapply_usm_list(num_elem),times = time)
+  
+  loop_time <- min(summary(benchmark)$mean)
+  all_time <- append(all_time,min(summary(benchmark)$mean))
+  
+  plot_time <- data.frame(Instanciation_modes = Instances_modes,
+                        times = log10(summary(benchmark)$mean))
+  
+  graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
+  
+  ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s","Duration tests for a ",
+                                                 num_elem," elements List"))
+  
+  ############# CLASS ###############
+  
+  test <- vector_usm_class(num_elem)
+  instance_weight <- object.size(test)
+  
+  test <- lapply_usm_class(num_elem)
+  instance_weight <- append(instance_weight,object.size(test))
+  
+  plot_weight <- data.frame(Instanciation_modes = Instances_modes,weight = instance_weight)
+  
+  graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
+  
+  loop_weight <- append(loop_weight,min(instance_weight))
+  all_weight <- append(all_weight,min(instance_weight))
+  
+  benchmark <- microbenchmark(vector_usm_class(num_elem),lapply_usm_class(num_elem),times = time)
+  
+  loop_time <- append(loop_time,min(summary(benchmark)$mean))
+  all_time <- append(all_time,min(summary(benchmark)$mean))
+  
+  plot_time <- data.frame(Instanciation_modes = Instances_modes,
+                        times = summary(benchmark)$mean)
+  
+  graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
+  
+  ggplot2::autoplot(benchmark)  + 
+    ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Class"))
  
-min_weight_10 <- min(all_weight)
-
-benchmark <- microbenchmark(NPA_list_list(num_elem,usm_sugarCane),
-                           PA_vector_list(num_elem,usm_sugarCane),
-                           PA_List_list(num_elem,usm_sugarCane),
-                           times = time
-)
-
-min_time_10 <- min(summary(benchmark)$mean)
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = log10(summary(plot_time)$mean))
-
-graph <- ggplot(data = plot_df,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
-ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements List"))
-
-```
-
-
-```{r test class 10K}
-
-########## CLASS ############
-test <- NPA_list_class(num_elem,Sugarcane)
-all_weight <- object.size(test)
-
-test <- PA_vector_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-test <- PA_List_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-min_weight_10 <- append(min_weight_10,min(all_weight))
-
-benchmark <- microbenchmark(NPA_list_class(num_elem,Sugarcane),
-                           PA_vector_class(num_elem,Sugarcane),
-                           PA_List_class(num_elem,Sugarcane),
-                           times = time
-)
-
-min_time_10 <- append(min_time_10,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = sumarry(benchmark)$mean)
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Class"))
-
-```
-
-From this point, Instances_modes will no longer contains "NPA_list" because this instanciation takes
-too much time to be generated
-
-```{r change variables}
-
-Instances_modes <- c("PA Vector","lapply") 
-
-```
-
-
-```{r tests data frame 10K}
-
-######### DATA FRAME ##########
-test <- PA_vector_Df_and_Tb(num_elem,df)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,df)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                          weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-min_weight_10 <- append(min_weight_10,min(all_weight))
-
-benchmark <- microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
-                           PA_List_Df_and_Tb(num_elem,df),
-                           times = time
-)
-
-min_time_10 <- append(min_time_10,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataFrame"))
-
-```
-
-```{r tests tibble 10K}
-
-######### TIBBLE ##############
-
-test <- PA_vector_Df_and_Tb(num_elem,tb)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,tb)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciattion_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-min_weight_10 <- append(min_weight_10,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
-                           PA_List_Df_and_Tb(num_elem,tb),
-                           times = time
-)
-
-min_time_10 = append(min_time_10,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Intanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Tibble"))
-
-```
-
-```{r data table 10k}
-
-################ DATA TABLE #########################
-
-test <- PA_vector_Df_and_Tb(num_elem,dt)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,dt)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Intanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-min_weight_10 <- append(min_weight_10,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
-                           PA_List_Df_and_Tb(num_elem,dt),
-                           times = time
-)
-
-min_time_10 = append(min_time_10,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataTable"))
-
-```
-
-#Recap
-```{r recap 10K}
-plot_weight_recap <- data.frame(structures = structs,
-                                weight_log10 = log10(min_weight_10))
-
-graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
-graph_weight_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
-
-
-plot_time_recap <- data.frame(structures = structs,
-                      times_log10 = log10(min_time_10))
-
-graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) + geom_bar(stat = "identity")
-graph_time_recap + ggtitle(sprintf("%d %s",num_elem," elements Structures"))
-```
-
-
-```{r tests list 100K}
-test <- PA_vector_list(num_elem,usm_sugarCane)
-all_weight <- append(weight,object.size(test))
-
-test <- PA_List_list(num_elem,usm_sugarCane)
-all_weight <- appedn(weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weights = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
- 
-min_weight_100 <- min(all_weight)
-
-benchmark = microbenchmark(PA_vector_list(num_elem,usm_sugarCane),
-                           PA_List_list(num_elem,usm_sugarCane),
-                           times = time
-)
-
-min_time_100 = min(summary(benchmark)$mean)
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = log10(summary(plot_time)$mean))
-
-graph <- ggplot(data = plot_df,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
-ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements List"))
-
-```
-
-
-```{r test class 100K}
-
-########## CLASS ############
-test <- PA_vector_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-test <- PA_List_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                          weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-min_weight_100 <- append(min_weight_100,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_class(num_elem,Sugarcane),
-                           PA_List_class(num_elem,Sugarcane),
-                           times = time
-)
-
-min_time_100 = append(min_time_100,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                        times = sumarry(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Class"))
-
-```
-
-```{r tests data frame 100K}
-
-######### DATA FRAME ##########
-test <- PA_vector_Df_and_Tb(num_elem,df)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,df)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                          weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-min_weight_100 <- append(min_weight_100,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
-                           PA_List_Df_and_Tb(num_elem,df),
-                           times = time
-)
-
-min_time_100 = append(min_time_100,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataFrame"))
-
-```
-
-```{r tests tibble 100K}
-
-######### TIBBLE ##############
-
-test <- PA_vector_Df_and_Tb(num_elem,tb)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,tb)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-min_weight_100 <- append(min_weight_100,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
-                           PA_List_Df_and_Tb(num_elem,tb),
-                           times = time
-)
-
-min_time_100 = append(min_time_100,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Intanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Tibble"))
-
-```
-
-```{r data table 100k}
-
-################ DATA TABLE #########################
-
-test <- PA_vector_Df_and_Tb(num_elem,dt)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,dt)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-min_weight_100 <- append(min_weight_100,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
-                           PA_List_Df_and_Tb(num_elem,dt),
-                           times = time
-)
-
-min_time_100 = append(min_time_100,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataTable"))
-
-```
-
-#Recap
-```{r recap 100K}
-plot_weight_recap <- data.frame(structures = structs,
-                                weight_log10 = log10(min_weight_100))
-
-graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
-graph_weight_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
-
-
-plot_time_recap <- data.frame(structures = structs,
-                      times_log10 = log10(min_time_100))
-
-graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) + geom_bar(stat = "identity")
-graph_time_recap + ggtitle(sprintf("%d %s",num_elem," elements Structures"))
-```
-
-```{r tests list 1M}
-test <- PA_vector_list(num_elem,usm_sugarCane)
-all_weight <- append(weight,object.size(test))
-
-test <- PA_List_list(num_elem,usm_sugarCane)
-all_weight <- appedn(weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weights = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
- 
-min_weight_1M <- min(all_weight)
-
-benchmark = microbenchmark(PA_vector_list(num_elem,usm_sugarCane),
-                           PA_List_list(num_elem,usm_sugarCane),
-                           times = time
-)
-
-min_time_1M = min(summary(benchmark)$mean)
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = log10(summary(plot_time)$mean))
-
-graph <- ggplot(data = plot_df,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements List"))
-
-ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements List"))
-
-```
-
-
-```{r test class 1M}
-
-########## CLASS ############
-test <- PA_vector_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-test <- PA_List_class(num_elem,Sugarcane)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-min_weight_1M <- append(min_weight_1M,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_class(num_elem,Sugarcane),
-                           PA_List_class(num_elem,Sugarcane),
-                           times = time
-)
-
-min_time_1M = append(min_time_1M,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = sumarry(benchmark)$mean)
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Class"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Class"))
-
-```
-
-```{r tests data frame 1M}
-
-######### DATA FRAME ##########
-test <- PA_vector_Df_and_Tb(num_elem,df)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,df)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciation_modes = Instances_modes,
-                          weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-min_weight_1M <- append(min_weight_1M,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,df),
-                           PA_List_Df_and_Tb(num_elem,df),
-                           times = time
-)
-
-min_time_1M = append(min_time_1M,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataFrame"))
-
-```
-
-```{r tests tibble 1M}
-
-######### TIBBLE ##############
-
-test <- PA_vector_Df_and_Tb(num_elem,tb)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,tb)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Instanciattion_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-min_weight_1M <- append(min_weight_1M,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,tb),
-                           PA_List_Df_and_Tb(num_elem,tb),
-                           times = time
-)
-
-min_time_1M = append(min_time_1M,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Intanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements Tibble"))
-
-```
-
-```{r data table 1M}
-
-################ DATA TABLE #########################
-
-test <- PA_vector_Df_and_Tb(num_elem,dt)
-all_weight <- object.size(test)
-
-test <- PA_List_Df_and_Tb(num_elem,dt)
-all_weight <- append(all_weight,object.size(test))
-
-plot_weight <- data.frame(Intanciation_modes = Instances_modes,
-                      weight = all_weight)
-
-graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-min_weight_1M <- append(min_weight_1M,min(all_weight))
-
-benchmark = microbenchmark(PA_vector_Df_and_Tb(num_elem,dt),
-                           PA_List_Df_and_Tb(num_elem,dt),
-                           times = time
-)
-
-min_time_1M = append(min_time_1M,min(summary(benchmark)$mean))
-
-plot_time <- data.frame(Instanciation_modes = Instances_modes,
-                      times = summary(benchmark)$mean)
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + geom_bar(stat = "identity")
-graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
-
-ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",num_elem," elements DataTable"))
-
-```
-
-#Recap
-```{r recap 1M}
-plot_weight_recap <- data.frame(structures = structs,
-                                weight_log10 = log10(min_weight_1M))
-
-graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
-graph_weight_recap + ggtitle(sprintf("%d %s",num_elem," elements structures"))
-
-
-plot_time_recap <- data.frame(structures = structs,
-                      times_log10 = log10(min_time_1M))
-
-graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) + geom_bar(stat = "identity")
-graph_time_recap + ggtitle(sprintf("%d %s",num_elem," elements Structures"))
+  
+  ######### DATA FRAME ##########
+  
+  test <- vector_usm_dataframe(num_elem)
+  instance_weight <- object.size(test)
+  
+  test <- lapply_usm_dataframe(num_elem)
+  instance_weight <- append(instance_weight,object.size(test))
+  
+  plot_weight <- data.frame(Instanciation_modes = Instances_modes, weight = instance_weight)
+  
+  graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
+  
+  loop_weight <- append(loop_weight,min(instance_weight))
+  all_weight <- append(all_weight,min(instance_weight))
+  
+  benchmark <- microbenchmark(vector_usm_dataframe(num_elem),lapply_usm_dataframe(num_elem),
+                             times = time)
+  
+  loop_time <- append(loop_time,min(summary(benchmark)$mean))
+  all_time <- append(all_time,min(summary(benchmark)$mean))
+  
+  plot_time <- data.frame(Instanciation_modes = Instances_modes,
+                        times = summary(benchmark)$mean)
+  
+  graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements DataFrame"))
+  
+  ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",
+                                                  num_elem," elements DataFrame"))
+  
+  ######### TIBBLE ##############
+
+  test <- vector_usm_tibble_from_usm_dataframe(num_elem)
+  instance_weight <- object.size(test)
+  
+  test <- lapply_usm_tibble_from_usm_dataframe(num_elem)
+  instance_weight <- append(instance_weight,object.size(test))
+  
+  plot_weight <- data.frame(Instanciattion_modes = Instances_modes,weight = instance_weight)
+  
+  graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
+  
+  loop_weight <- append(loop_weight,min(instance_weight))
+  all_weight <- append(all_weight,min(instance_weight))
+  
+  benchmark = microbenchmark(vector_usm_tibble_from_usm_dataframe(num_elem),
+                             lapply_usm_tibble_from_usm_dataframe(num_elem),times = time)
+  
+  loop_time <- append(loop_time,min(summary(benchmark)$mean))
+  all_time = append(all_time,min(summary(benchmark)$mean))
+  
+  plot_time <- data.frame(Intanciation_modes = Instances_modes,
+                        times = summary(benchmark)$mean)
+  
+  graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements Tibble"))
+  
+  ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",
+                                                  num_elem," elements Tibble"))
+  
+     
+  ################ DATA TABLE #########################
+
+  test <- vector_usm_datatable_from_usm_dataframe(num_elem)
+  instance_weight <- object.size(test)
+  
+  test <- lapply_usm_datatable_from_usm_dataframe(num_elem)
+  instance_weight <- append(instance_weight,object.size(test))
+  
+  plot_weight <- data.frame(Intanciation_modes = Instances_modes,
+                        weight = instance_weight)
+  
+  graph <- ggplot(data = plot_weight,aes(x = Instanciation_modes, y=weight)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
+  
+  loop_weight <- appedn(loop_weight,min(instance_weight))
+  all_weight <- append(all_weight,min(instance_weight))
+  
+  benchmark = microbenchmark(vector_usm_datatable_from_usm_dataframe(num_elem),
+                             lapply_usm_datatable_from_usm_dataframe(num_elem),times = time)
+  
+  loop_time - append(loop_time,min(summary(benchmark)$mean))
+  all_time = append(all_time,min(summary(benchmark)$mean))
+  
+  plot_time <- data.frame(Instanciation_modes = Instances_modes,
+                        times = summary(benchmark)$mean)
+  graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=times)) + 
+    geom_bar(stat = "identity")
+  graph + ggtitle(sprintf("%d %s",num_elem," elements DataTable"))
+  
+  ggplot2::autoplot(benchmark)  + ggtitle(sprintf("%s %d %s","Duration tests for a ",
+                                                  num_elem," elements DataTable"))
+  
+  # LOOP RECAP
+  
+  plot_weight_recap <- data.frame(structures = structs,
+                                  weight_log10 = log10(loop_weight))
+  
+  graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + 
+    geom_bar(stat = "identity")
+  graph_weight_recap + ggtitle(sprintf("%s %d %s","Weight recap for ",
+                                       num_elem," elements structures"))
+  
+  
+  plot_time_recap <- data.frame(structures = structs,
+                        times_log10 = log10(loop_time))
+  
+  graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) + 
+    geom_bar(stat = "identity")
+  graph_time_recap + ggtitle(sprintf("%s %d %s","time recap for ",
+                                     num_elem," elements Structures"))
+
+  
+  num_elem <- num_elem * 10
+  cpt <- cpt + 1
+}
 ```
 
 
 ``` {r final recap}
 plot_weight_recap <- data.frame(structures = rep(structs,3),
-                                weight_log10 = log10(min_weight_10,min_weight_100,min_weight_1M))
+                                weight_log10 = log10(all_weight))
 
-graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + geom_bar(stat = "identity")
+graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) + 
+  geom_bar(stat = "identity")
 graph_weight_recap + ggtitle(sprintf("%s","weight recap graph"))
 
 
 plot_time_recap <- data.frame(structures = rep(structs,3),
-                      times_log10 = log10(min_time_10,min_time_100,min_time_1M))
+                      times_log10 = log10(all_time))
 
-graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) + geom_bar(stat = "identity")
+graph_time_recap <- ggplot(data = plot_df,aes(x = structures, y=times_log10)) +
+  geom_bar(stat = "identity")
 graph_time_recap + ggtitle(sprintf("%s"," time recap graph"))
 
 ```
