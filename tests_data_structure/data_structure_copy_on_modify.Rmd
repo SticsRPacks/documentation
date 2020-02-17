@@ -1,0 +1,98 @@
+---
+title: "Copy-on-modify"
+author: "ROBINE Thomas"
+date: "17 fevrier 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+# Abstract
+
+In this document, we're demonstrating the copy-on-modify between Reference Classes and the other 
+datatype structures (e.g List,DataFrame,DataTable and Tibble). Our initial hypothesis is that when 
+we modify a Reference Class' instance, we modify the instance itself and not a copy as the others
+datatypes do.
+The tests are designed in this way. First we check the address (using tracemem) and the name of the instance.
+Then we do the same actions in the function.
+Finally we repeat the same actions again after the function.
+
+``` {r code}
+source("data_structure_functions.R")
+library(tibble)
+library(data.table)
+
+usm_list <- vector_usm_list(1)
+
+usm_class <- vector_usm_class(1)
+
+usm_df <- vector_usm_dataframe(1)
+
+usm_dt <- vector_usm_datatable_from_usm_dataframe(1)
+
+usm_tb <- vector_usm_tibble_from_usm_dataframe(1)
+
+change_name = function(structure) {
+  structure$name <- "name_changed"
+  print("inside function")
+  print(structure$name)
+  tracemem(structure)
+}
+
+print("list")
+print("before function")
+tracemem(usm_list)
+usm_list[[1]][1]
+change_name(usm_list)
+print("after function")
+tracemem(usm_list)
+usm_list[[1]][1]
+
+
+print("class")
+print("before function")
+tracemem(usm_class)
+usm_class[[1]]$name
+change_name(usm_class)
+print("after function")
+tracemem(usm_class)
+usm_class[[1]]$name
+
+
+print("data frame")
+print("before function")
+tracemem(usm_df)
+usm_df[[1]][1]
+change_name(usm_df)
+print("after function")
+tracemem(usm_df)
+usm_df[[1]][1]
+
+
+print("data table")
+print("before function")
+tracemem(usm_dt)
+usm_dt[[1]][1]
+change_name(usm_dt)
+print("after function")
+tracemem(usm_dt)
+usm_dt[[1]][1]
+
+
+print("tibble")
+print("before function")
+tracemem(usm_tb)
+usm_tb[[1]][1]
+change_name(usm_tb)
+print("after function ")
+tracemem(usm_tb)
+usm_tb[[1]][1]
+
+```
+# Conclusion
+
+As we can see, the Reference Class type is the only datatype to keep the same object's address when
+the object is modified, which means we modify directly the object itself. Which is not the case with
+the others datatypes. Our initial hypothesis was good.
