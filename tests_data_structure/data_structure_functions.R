@@ -138,7 +138,7 @@ vector_usm_dataframe = function(usmNumber) {
 }
 
 # function that creates dynamicly a dataframe from a vector
-vector_usm_datatable_from_usm_dataframe = function(usmNumber) {
+vector_usm_datatable = function(usmNumber) {
   # vec = vector("list",usmNumber)
   # for (i in 1:usmNumber) {
   #   ground_name <- sample(ground_names_vector,1)
@@ -151,7 +151,7 @@ vector_usm_datatable_from_usm_dataframe = function(usmNumber) {
 }
 
 # function that creates dynamicly a tibble from a vector
-vector_usm_tibble_from_usm_dataframe = function(usmNumber) {
+vector_usm_tibble = function(usmNumber) {
   # vec = vector("list",usmNumber)
   # for (i in 1:usmNumber) {
   #   vec[[i]] <- tibble::as_tibble(usm_dataframe(paste("usm_",i,sep="")))
@@ -195,13 +195,13 @@ lapply_usm_dataframe = function(usmNumber) {
   return(rbindlist(li))
 }
 
-lapply_usm_datatable_from_usm_dataframe = function(usmNumber) {
+lapply_usm_datatable = function(usmNumber) {
   # li <- lapply(1:usmNumber,function(i) usm_dataframe(paste("usm_",i,sep="")))
   # return(rbindlist(li))
   return(data.table(lapply_usm_dataframe(usmNumber)))
 }
 
-lapply_usm_tibble_from_usm_dataframe = function(usmNumber) {
+lapply_usm_tibble = function(usmNumber) {
   # li <- lapply(1:usmNumber,function(i) usm_dataframe(paste("usm_",i,sep="")))
   # return(rbindlist(li))
   return(tibble::as_tibble(lapply_usm_dataframe(usmNumber)))
@@ -232,13 +232,6 @@ random_extract_for_usm_df_dt_tb = function(usmNumber,structure) {
   return(structure[vec])
 }
 
-## Extract by usm position
-# 
-# random_sub_list = function(nb_usm,structure) {
-#   indices <- sample(1:length(structure),nb_usm)
-#   li <- lapply(indices, function(x) structure[[x]])
-#   return(li)
-# }
 
 ################# CRITERIA EXTRACT ###################################
 
@@ -251,14 +244,3 @@ criteria_extract_for_usm_list_class = function(structure,criteria,wanted) {
 criteria_extract_for_usm_df_dt_tb = function(structure,criteria,wanted) {
   eval(parse(text=paste("return(filter(structure,",criteria," == wanted))",sep="")))
 }
-
-################ INDEX EXTRACT #####################################
-
-
-# extract_between_index_for_list_class = function(structure,begin_index,end_index) {
-#   return(structure[begin_index:end_index])
-# }
-# 
-# extract_between_index_for_df_dt_tb = function(structure,begin_index,end_index) {
-#   return(slice(structure,begin_index,end_index))
-# }
