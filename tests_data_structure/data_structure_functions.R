@@ -24,8 +24,8 @@ usm_class_definiton <- setRefClass("usm",fields = list(name = "character",date_b
                                                        simulation_code = "numeric",
                                                        plant_dominance_1 = "list",
                                                        plant_dominance_2 = "list",
-                                                       observation_file = "character",
-                                                       elements_list = "list"))
+                                                       observation_file = "character"))
+                                                       #elements_list = "list"))
 
 ground_names_vector <- c("sol_canne","potato_sol","courgette_sol")
 
@@ -33,8 +33,8 @@ ground_names_vector <- c("sol_canne","potato_sol","courgette_sol")
 
 # function that creates dynamicly an usm_list instance
 # it takes as parameters only the usm's name for now, later it will take all the usm's param
-usm_list = function(usm_name,date_b,date_e,ground_n) {
-  return (list(name = usm_name,date_begin = date_b,date_end = date_e,finit = "canne_ini.xml",
+usm_list = function(usm_name,ground_n) {
+  return (list(name = usm_name,date_begin = 256,date_end = 384,finit = "canne_ini.xml",
                ground_name = ground_n,fstation = "climcanj_sta.xml",fclim1 = "climcanj.1998",
                fclim2 = "climcanj.1999",culturean = 0,nb_plant = 1,simulation_code = 0,
                plant_dominance_1 = pld_sugarCane1,plant_dominance_2 = pld_sugarCane2,
@@ -44,28 +44,28 @@ usm_list = function(usm_name,date_b,date_e,ground_n) {
 
 # function that creates dynamicly an usm_class instance
 # it takes as parameters only the usm's name for now, later it will take all the usm's param
-usm_class = function (usm_name,date_b,date_e,ground_n) {
-  return(usm_class_definiton(name = usm_name,date_begin = date_b,date_end = date_e,
+usm_class = function (usm_name,ground_n) {
+  return(usm_class_definiton(name = usm_name,date_begin = 256,date_end = 384,
                              finit = "canne_ini.xml", ground_name = ground_n, 
                              fstation = "climcanj_sta.xml", fclim1 = "climcanj.1998",
                              fclim2 = "clilmcanj.1999",culturean = 0, nb_plant = 0,
                              simulation_code = 1,plant_dominance_1 = pld_sugarCane1,
-                             plant_dominance_2 = pld_sugarCane2,observation_file = "file.obs",
-                             elements_list = num_list()))
+                             plant_dominance_2 = pld_sugarCane2,observation_file = "file.obs"))
+                             #elements_list = num_list()))
   
 }
 
 
 # function that create dynamicly an usm_dataframe instance
 # it takes as parameters only the usm's name for now, later it will take all the usm's param
-usm_dataframe = function(usm_name,date_b,date_e,ground_n) {
-  return (data.frame("name" = usm_name,"date_begin" = date_b,"date_end" = date_e,
+usm_dataframe = function(usm_name,ground_n) {
+  return (data.frame("name" = usm_name,"date_begin" = 286,"date_end" = 384,
                      "finit" = "canne_ini.xml", "ground_name" = ground_n, 
                      "fstation" = "climcanj_sta.xml", "fclim1" = "climcanj.1998",
                      "fclim2" = "climcanj.1999","culturean" = 0, "nb_plant" = 1,
                      "simulation_code" = 0,"plant_dominance_1" = pld_sugarCane1,
-                     "plant_dominance_2" = pld_sugarCane2,"observation_file" = "file.obs",
-                     "elements_list" = num_list()))
+                     "plant_dominance_2" = pld_sugarCane2,"observation_file" = "file.obs"))
+                     #"elements_list" = num_list()))
 }
 
 ##################################### FONCTIONS ################################################
@@ -104,9 +104,7 @@ vector_usm_list = function(usmNumber) {
   vec = vector("list",usmNumber)
   for (i in 1:usmNumber) {
     ground_name <- sample(ground_names_vector,1)
-    date_begin <- sample(1:300,1)
-    date_end <- sample(301:600,1)
-    vec[[i]] <- usm_list(paste("usm_",i,sep=""),date_begin,date_end,ground_name)
+    vec[[i]] <- usm_list(paste("usm_",i,sep=""),ground_name)
   }
   return(vec)
 }
@@ -117,9 +115,7 @@ vector_usm_class = function(usmNumber) {
   vec = vector("list",usmNumber)
   for (i in 1:usmNumber) {
     ground_name <- sample(ground_names_vector,1)
-    date_begin <- sample(1:300,1)
-    date_end <- sample(301:600,1)
-    vec[i] <- usm_class(paste("usm_",i,sep=""),date_begin,date_end,ground_name)
+    vec[i] <- usm_class(paste("usm_",i,sep=""),ground_name)
   }
   return (vec)
 }
@@ -130,9 +126,7 @@ vector_usm_dataframe = function(usmNumber) {
   vec = vector("list",usmNumber)
   for (i in 1:usmNumber) {
     ground_name <- sample(ground_names_vector,1)
-    date_begin <- sample(1:300,1)
-    date_end <- sample(301:600,1)
-    vec[[i]] <- usm_dataframe(paste("usm_",i,sep=""),date_begin,date_end,ground_name)
+    vec[[i]] <- usm_dataframe(paste("usm_",i,sep=""),ground_name)
   }
   return(rbindlist(vec))
 }
@@ -166,10 +160,7 @@ vector_usm_tibble = function(usmNumber) {
 #it takes as parameters n, number of usm_list in the list
 lapply_usm_list = function(usmNumber) {
   ground_name <- sample(ground_names_vector,1)
-  date_begin <- sample(1:300,1)
-  date_end <- sample(301:600,1)
-  li <- lapply(1:usmNumber,function(x) usm_list(paste("usm_",x,sep=""),date_begin,date_end,
-                                                ground_name))
+  li <- lapply(1:usmNumber,function(x) usm_list(paste("usm_",x,sep=""),ground_name))
   return (li)
 }
 
@@ -177,10 +168,7 @@ lapply_usm_list = function(usmNumber) {
 # the same list or class instanciation (struct)
 lapply_usm_class = function(usmNumber) {  
   ground_name <- sample(ground_names_vector,1)
-  date_begin <- sample(1:300,1)
-  date_end <- sample(301:600,1)
-  li <- lapply(1:usmNumber,function(i) usm_class(paste("usm_",i,sep=""),date_begin,date_end,
-                                                 ground_name))                                   
+  li <- lapply(1:usmNumber,function(i) usm_class(paste("usm_",i,sep=""),ground_name))                                   
   return(li)
 }
 
@@ -188,10 +176,7 @@ lapply_usm_class = function(usmNumber) {
 # the same data frame or tibble (struct)
 lapply_usm_dataframe = function(usmNumber) { 
   ground_name <- sample(ground_names_vector,1)
-  date_begin <- sample(1:300,1)
-  date_end <- sample(301:600,1)
-  li <- lapply(1:usmNumber,function(i) usm_dataframe(paste("usm_",i,sep=""),date_begin,date_end,
-                                                     ground_name))                                      
+  li <- lapply(1:usmNumber,function(i) usm_dataframe(paste("usm_",i,sep=""),ground_name))                                      
   return(rbindlist(li))
 }
 
