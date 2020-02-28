@@ -25,7 +25,7 @@ library(memuse)
 library(lobstr)
 options(warn=-1)
 
-size <- c(10000,100000,1000000)
+size <- c(10000,100000)#,1000000)
 
 for (i in size) {
   liste <- vector_usm_list(i)
