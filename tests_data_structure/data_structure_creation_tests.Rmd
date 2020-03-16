@@ -382,37 +382,30 @@ for (i in num_elem) {
       }
       else {
         
-        test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_",Structures_types[j],
-                                      "(",i,")",sep="")))
-        instance_weight <- object.size(test)
-        
         if (j == 3) {  # Dataframe  
           
           test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_vector(",i,")",
                                         sep="")))
-          instance_weight <- append(instance_weight,object.size(test))
+          instance_weight <- object.size(test)
         
           test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_lapply(",i,")",
                                         sep="")))
           instance_weight <- append(instance_weight,object.size(test))
           
-          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods,
+          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_ter,
                                   weights = instance_weight)
       
           graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
             geom_bar(stat = "identity")
           print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
         
-          benchmark <- microbenchmark(Directly=eval(parse(text=paste("usm_",Structures_types[j],
-                                                                     "_by_",Structures_types[j],
-                                                                     "(",i,")",sep=""))),
-                                      Vector=eval(parse(text=paste("usm_",Structures_types[j],
+          benchmark <- microbenchmark(Vector=eval(parse(text=paste("usm_",Structures_types[j],
                                                                    "_by_vector(",i,")",sep=""))),
                                       Lapply=eval(parse(text=paste("usm_",Structures_types[j],
                                                                    "_by_lapply(",i,")",sep=""))),
                                       times = 3)
           
-          plot_time <- data.frame(Instanciation_modes = Instanciation_methods,
+          plot_time <- data.frame(Instanciation_modes = Instanciation_methods_ter,
                                   mean_times = log10(summary(benchmark)$mean))
         
           graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
@@ -445,35 +438,26 @@ for (i in num_elem) {
           
           test <- eval(parse(text=paste("usm_",Structures_types[j],
                                         "_by_usm_dataframe_by_vector(",i,")",sep="")))
-          instance_weight <- append(instance_weight,object.size(test))
+          instance_weight <- object.size(test)
           
           test <- eval(parse(text=paste("usm_",Structures_types[j],
                                         "_by_usm_dataframe_by_lapply(",i,")",sep="")))
           instance_weight <- append(instance_weight,object.size(test))
           
-          test <- eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_dataframe(",i,")",sep="")))
-          instance_weight <- append(instance_weight,object.size(test))
-          
-          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_bis,
+          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_ter,
                                   weights = instance_weight)
       
           graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
             geom_bar(stat = "identity")
           print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
         
-          benchmark <- microbenchmark(Directly=eval(parse(text=paste("usm_",Structures_types[j],
-                                                                     "_by_",Structures_types[j],
-                                                                     "(",i,")",sep=""))),
-                                      Vector=eval(parse(text=paste("usm_",Structures_types[j],
+          benchmark <- microbenchmark(Vector=eval(parse(text=paste("usm_",Structures_types[j],
                                         "_by_usm_dataframe_by_vector(",i,")",sep=""))),
                                       Lapply=eval(parse(text=paste("usm_",Structures_types[j],
                                         "_by_usm_dataframe_by_lapply(",i,")",sep=""))),
-                                      Df=eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_dataframe(",i,")",sep=""))),
                                       times = 3)
           
-          plot_time <- data.frame(Instanciation_modes = Instanciation_methods_bis,
+          plot_time <- data.frame(Instanciation_modes = Instanciation_methods_ter,
                                   mean_times = log10(summary(benchmark)$mean))
         
           graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
