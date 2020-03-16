@@ -19,7 +19,7 @@ library(memuse)
 library(lobstr)
 
 # list which store the differents instances' size
-num_elem <- c(1000,10000,100000)
+num_elem <- c(10000,100000,1000000)
 options(warn=-1)
 ```
 
@@ -130,6 +130,8 @@ Instanciation_methods <- c("NPA","Vector","Lapply")
 # main loop
 for (i in num_elem) {
   
+  i <- i/10
+  
   cat("\nNumber of elements : ",i,"\n")
   
   # loop that will take vector_method and lapply_method together for the same structure because
@@ -176,8 +178,7 @@ for (i in num_elem) {
 }
 ```
 
-
-The results are clear, the pre-allocated instanciation method is far better then the NPA.
+Even, if the NPA instanciation is 'lighter' than the others, its huge instanciation time makes that we will not use it. Indeed, during the tests, we must divide by hundred the number of usm the NPA contains because it will last more tha 3 days before it creates a 1M usms structure. 
 
 ### II.A.2 DataFrame, DataTable and Tibble
 
@@ -524,6 +525,7 @@ structures <- rep(Structures_types,3)
 times_log10 <- log10(all_time)
 weight_log10 <- log10(all_weight)
 size <- c(rep(num_elem[1],5),rep(num_elem[2],5),rep(num_elem[3],5))
+size <- as.character(size)
 
 global_plot_weight_recap <- data.frame(structures,weight_log10,size)
 
