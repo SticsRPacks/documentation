@@ -105,31 +105,19 @@ Tests:
 This data structure will store:
 * the simulations outputs (along with the variable names);
 * the date;
-* the observations (optional);
-* phenological stage (optional). If the outputs are expected at given stages (date + stage);
 * the SituationName names (i.e. USM for STICS);
 * design of experiment (DOE), a variation of one or several model input values. This is optional and typically used for sensitivity/uncertainty analyses. If not used, the size is 1;
+
+and maybe later:
+* the observations (optional);
+* phenological stage (optional). If the outputs are expected at given stages (date + stage);
 * The plant index (optional, for intercropping).
 
 The variables may change according to the SituationName and the dates along the SituationName and the variable (typically for observations).  
 
 Expected format (several possibilities):
-* A 4D Array:
-For example a replication of the cube (Fig. 2) for each row of the design of experiment.
-![Figure 2](www/3D_array_dt.png)
 
-* A named list of lists:
-  + obj$SituationName$VarName
-  + obj$SituationName$Data[DOE,dates,plant,var]
-  + obj$SituationName$Dates
-  + obj$SituationName$Stages, possibly with several values for each date, e.g. c("mat","rec").
-
-with obj being either sim or obs.
-
-* A list of `data.frame`s (or `tibble`):
-  + obj$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct), col3= stage(character vector), col4= plant(integer), col5=varValues]
-  + Or in another format data$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct),col3= stage(character vector), col4= plant, col5=obsValues,col6=simValues]
-  + Or a big `data.frame` (or `tibble`) with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:  
+* a big `tibble` with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:  
 
   |USM   | DOE|origin | plant|Date       |stage   | LAI|
   |:-----|---:|:------|-----:|:----------|:-------|---:|
@@ -146,6 +134,24 @@ with obj being either sim or obs.
   |usm_1 |   2|sim    |     2|2009-12-31 |NA      |   1|
   |usm_2 |   2|sim    |     2|2009-12-31 |rep mat |   1|
   
+* A list of `tibble`:
+  + obj$DOE$situationName: data.frame[col1=date(type POSIXct), col2-n=varValues] 
+
+* A 4D Array:
+For example a replication of the cube (Fig. 2) for each row of the design of experiment.
+![Figure 2](www/3D_array_dt.png)
+
+* A list of `tibble`:
+  + obj$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct), col3= stage(character vector), col4= plant(integer), col5=varValues]
+  + Or in another format data$situationName$VarName: data.frame[col1= DOE, col2=date(type POSIXct),col3= stage(character vector), col4= plant, col5=obsValues,col6=simValues]
+ 
+* A named list of lists:
+  + obj$SituationName$VarName
+  + obj$SituationName$Data[DOE,dates,plant,var]
+  + obj$SituationName$Dates
+  + obj$SituationName$Stages, possibly with several values for each date, e.g. c("mat","rec").
+
+with obj being either sim or obs.
 
 > NB: a `data.frame` or a `tibble` can contain a list inside a element, e.g.:
 ```r
@@ -174,12 +180,12 @@ Constraints: Highly efficient (many read/write, passing from functions to anothe
 Tests:
 Prerequisite: the simulation outputs and the observations will be read from two separate files and will be returned as a `data.frame`.
 
-* Test the making of the structure from the sim and obs `data.frame`s;
-* Modification of data DOE by DOE (or situation by situation).
+* Test the making of the structure from the sim [and obs] `tibble`s read in sequence by USM and DOE (all USMs for first line of DOE, then for second line, ...) => insert iteratively the results for new USMs and DOE into an existing data_structure (create an insert_data function taking in input the `tibble` read and append it in the (big) data-structure, see. SticsOnR::stics_wrapper and SticsOnR::get_daily_results).
 * Data extraction:
-  + one USM, one variable, all dates
-  + all USMs, one variable, one date
-* Conversion from data structure to standard type, e.g. from list of lists to `data.frame` or vectors.
+  + one DOE line, one USM, one variable, all dates
+  + one DOE line, all USMs, one variable, one date
+  + all DOE line, one USM, one variable, one date
+* Intersection with observations
 * Data extraction + mathematical operation:
   + sum of obs-sim squared on all USMs (`sqrt(obs-sim)`), all variables, all dates at once;  
   + the product of each sum of obs-sim of the USMs, all variables, all dates. So the sum is grouped by USM, and the product is done on all resulting sums. For `data.frames`, use either `dplyr` or `data.table`.
