@@ -119,20 +119,31 @@ Expected format (several possibilities):
 
 * a big `tibble` with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:  
 
-  |USM   | DOE|origin | plant|Date       |stage   | LAI|
-  |:-----|---:|:------|-----:|:----------|:-------|---:|
-  |usm_1 |   1|obs    |     1|2009-01-01 |rep     |   0|
-  |usm_2 |   1|obs    |     1|2009-01-01 |mat     |   0|
-  |usm_1 |   2|obs    |     1|2009-01-01 |NA      |   0|
-  |usm_2 |   2|obs    |     1|2009-01-01 |rep mat |   0|
-  |usm_1 |   1|sim    |     1|2009-01-01 |rep     |   0|
+  |USM   | DOE|origin | plant|Date       |stage   | lai_n| masec_n| ...
+  |:-----|---:|:------|-----:|:----------|:-------|-----:|-------:|
+  |usm_1 |   1|obs    |     1|2009-03-02 |NA      |   0.1|     2.1|
+  |usm_1 |   1|obs    |     1|2009-03-18 |NA      |   0.6|     3.4|
+  |usm_1 |   1|obs    |     1|2009-07-04 |mat     |   0.7|    12.3|
+  |usm_1 |   1|sim    |     1|2009-01-01 |NA      |     0|       0|
+  |usm_1 |   1|sim    |     1|2009-01-02 |NA      |     0|       0|
+  |usm_1 |   1|sim    |     1|2009-01-03 |NA      |     0|       0|
   ...
-  |usm_1 |   2|obs    |     2|2009-12-31 |NA      |   1|
-  |usm_2 |   2|obs    |     2|2009-12-31 |rep mat |   1|
-  |usm_1 |   1|sim    |     2|2009-12-31 |rep     |   1|
-  |usm_2 |   1|sim    |     2|2009-12-31 |mat     |   1|
-  |usm_1 |   2|sim    |     2|2009-12-31 |NA      |   1|
-  |usm_2 |   2|sim    |     2|2009-12-31 |rep mat |   1|
+  |usm_1 |   1|sim    |     1|2009-07-09 |mat     |  0.82|    13.6|
+  ...
+  |usm_1 |   1|sim    |     1|2009-12-31 |NA      |     0|    14.5|
+  |usm_2 |   1|obs    |     1|2010-03-12 |NA      |  0.11|     2.2|
+  |usm_2 |   1|obs    |     1|2010-03-21 |NA      |   0.7|     3.6|
+  |usm_2 |   1|obs    |     1|2010-07-02 |mat     |  0.75|    12.8|
+  |usm_2 |   1|sim    |     1|2010-01-01 |NA      |     0|       0|
+  |usm_2 |   1|sim    |     1|2010-01-02 |NA      |     0|       0|
+  |usm_2 |   1|sim    |     1|2010-01-03 |NA      |     0|       0|
+  ...
+  |usm_2 |   1|sim    |     1|2010-07-05 |mat     |  0.85|    13.8|
+  ...
+  |usm_2 |   1|sim    |     1|2010-12-31 |NA      |     0|    14.7|
+
+(this case is for an optimization-like case (only one DOE) and for a single crop, but DOE and plant may take different values for other cases).
+
   
 * A list of `tibble`:
   + obj$DOE$situationName: data.frame[col1=date(type POSIXct), col2-n=varValues] 
@@ -182,9 +193,9 @@ Prerequisite: the simulation outputs and the observations will be read from two 
 
 * Test the making of the structure from the sim [and obs] `tibble`s read in sequence by USM and DOE (all USMs for first line of DOE, then for second line, ...) => insert iteratively the results for new USMs and DOE into an existing data_structure (create an insert_data function taking in input the `tibble` read and append it in the (big) data-structure, see. SticsOnR::stics_wrapper and SticsOnR::get_daily_results).
 * Data extraction:
-  + one DOE line, one USM, one variable, all dates
-  + one DOE line, all USMs, one variable, one date
-  + all DOE line, one USM, one variable, one date
+  + one DOE line, one USM, one variable, all dates (optimization)
+  + one DOE line, all USMs, one variable, one date (multi-simulation)
+  + all DOE line, one USM, one variable, one date  (Sensitivity / Uncertainty analysis)
 * Intersection with observations
 * Data extraction + mathematical operation:
   + sum of obs-sim squared on all USMs (`sqrt(obs-sim)`), all variables, all dates at once;  
