@@ -72,79 +72,95 @@ usm_dataframe = function(usm_name,ground_n) {
                      "simulation_code" = 0,"plant_dominance_1_fplt" = "proto_sugarcane_plt.xml",
                      "plant_dominance_1_ftec" = "canne_tec.xml","plant_dominance_1_flai" = "null",
                      "plant_dominance_2_fplt" = "null","plant_dominance_2_ftec" = "null",
-                     "plant_dominance_2_flai" = "null","observation_file" = "file.obs"))
+                     "plant_dominance_2_flai" = "null","observation_file" = "file.obs",stringsAsFactors = FALSE))
                      #"elements_list" = num_list()))
+}
+
+usm_datatable = function (usm_name,ground_n) {
+  return (data.table("name" = usm_name,"date_begin" = 286,"date_end" = 384,
+                     "finit" = "canne_ini.xml", "ground_name" = ground_n, 
+                     "fstation" = "climcanj_sta.xml", "fclim1" = "climcanj.1998",
+                     "fclim2" = "climcanj.1999","culturean" = 0, "nb_plant" = 1,
+                     "simulation_code" = 0,"plant_dominance_1_fplt" = "proto_sugarcane_plt.xml",
+                     "plant_dominance_1_ftec" = "canne_tec.xml","plant_dominance_1_flai" = "null",
+                     "plant_dominance_2_fplt" = "null","plant_dominance_2_ftec" = "null",
+                     "plant_dominance_2_flai" = "null","observation_file" = "file.obs",stringsAsFactors = FALSE))
+}
+
+usm_tibble = function(usm_name,ground_n) {
+  return(tibble("name" = usm_name,"date_begin" = 286,"date_end" = 384,
+                "finit" = "canne_ini.xml", "ground_name" = ground_n, 
+                "fstation" = "climcanj_sta.xml", "fclim1" = "climcanj.1998",
+                "fclim2" = "climcanj.1999","culturean" = 0, "nb_plant" = 1,
+                "simulation_code" = 0,"plant_dominance_1_fplt" = "proto_sugarcane_plt.xml",
+                "plant_dominance_1_ftec" = "canne_tec.xml","plant_dominance_1_flai" = "null",
+                "plant_dominance_2_fplt" = "null","plant_dominance_2_ftec" = "null",
+                "plant_dominance_2_flai" = "null","observation_file" = "file.obs"))
 }
 
 ##################################### FONCTIONS ################################################
 
-############################### NON PRE ALLOCATED ################################
+############### LIST ##########################
 
-# return a non pre-allocated list which contains a certain time (repetition) 
-# the same list or class instanciation (struct)
-# NPA stands for Non Pre-Allocated
-NPA_list_of_list = function(usmNumber) {                                                     
-  li = list()
-  for (i in 1:usmNumber) {
+# function that creates dynamicly a list of n usm_list
+#it takes as parameters n, number of usm_list in the list
+list_of_usm_list_by_lapply = function(usmNumber) {
+  li <- lapply(1:usmNumber,function(x) {
     ground_name <- sample(ground_names_vector,1)
-    li = append(li,usm_list(paste("usm_",i,sep=""),ground_name))
-  }
+    usm_list(paste("usm_",x,sep=""),ground_name)
+    })
+  names(li) <- paste("usm_",1:usmNumber,sep="")
+  return (li)
+}
+
+list_of_usm_list_by_PA_lapply = function(usmNumber) {
+  liste <- lapply(1:usmNumber,function(x) {
+    list(name = character(),date_begin = numeric(),date_end = numeric(),finit = character(),
+         ground_name = character(),fstation = character(),fclim1 = character(),
+         fclim2 = character(),culturean = numeric(),nb_plant =numeric(),simulation_code =numeric(),
+         plant_dominance_1_fplt = character(),plant_dominance_1_ftec = character(),
+         plant_dominance_1_flai = character(),
+         plant_dominance_2_fplt = character(),
+         plant_dominance_2_ftec = character(),
+         plant_dominance_2_flai = character(),
+         observation_file = character())
+    })
+  lapply(1:length(liste),function(x) {
+    ground_name <- sample(ground_names_vector,1)
+    liste[[x]] <<- usm_list(paste("usm_",x,sep=""),ground_name)
+  })
+  names(liste) <- paste("usm_",1:usmNumber,sep="")
+  return (liste)
+}
+
+############### CLASS ########################
+
+# return a non pre allocated list which contains a certain time (repetition)
+# the same list or class instanciation (struct)
+list_of_usm_class_by_lapply = function(usmNumber) {  
+  li <- lapply(1:usmNumber,function(i) {
+    ground_name <- sample(ground_names_vector,1)
+    usm_class(paste("usm_",i,sep=""),ground_name)                                   
+  })
+  names(li) <- paste("usm_",1:usmNumber,sep="")
   return(li)
 }
 
-# return a non pre-allocated list which contains a certain time (repetition) 
-# the same list or class instanciation (struct)
-# NPA stands for Non Pre-Allocated
-NPA_list_of_class = function(usmNumber) {                                                     
-  li = list()
-  for (i in 1:usmNumber) {
+list_of_usm_class_by_PA_lapply = function(usmNumber) {  
+  classe <- lapply(1:usmNumber,function(x) usm_class_definiton())
+  lapply(1:length(classe),function(x) {
     ground_name <- sample(ground_names_vector,1)
-    li = append(li,usm_class(paste("usm_",i,sep=""),ground_name))
-  }
-  return(li)
+    classe[[x]] <<- usm_class(paste("usm_",x,sep=""),ground_name)
+  })
+  names(classe) <- paste("usm_",1:usmNumber,sep="")
+  return(classe)
 }
-
-################################## PRE ALLOCATED ############################################
-
-############################# VECTOR #############################################
-
-# function that creates dynamicly a vector of n usm_list
-# it takes as parameters n, number of usm_list in the vector
-list_of_usm_list_by_vector = function(usmNumber) {
-  vec = vector("list",usmNumber)
-  for (i in 1:usmNumber) {
-    ground_name <- sample(ground_names_vector,1)
-    vec[[i]] <- usm_list(paste("usm_",i,sep=""),ground_name)
-  }
-  return(vec)
-}
-
-# function that creates dynamicly a vector of n usm_class
-#it takes as parameters n, number of usm_class in the vector
-list_of_usm_class_by_vector = function(usmNumber) {
-  vec = vector("list",usmNumber)
-  for (i in 1:usmNumber) {
-    ground_name <- sample(ground_names_vector,1)
-    vec[i] <- usm_class(paste("usm_",i,sep=""),ground_name)
-  }
-  return (vec)
-}
-
-# function that creates dynamicly a dataframe composed of n usm_dataframe
-# it takes as parameters n, number of usm_dataframe in the final dataframe
-usm_dataframe_by_vector = function(usmNumber) {
-  vec = vector("list",usmNumber)
-  for (i in 1:usmNumber) {
-    ground_name <- sample(ground_names_vector,1)
-    vec[[i]]<- usm_dataframe(paste("usm_",i,sep=""),ground_name)
-  }
-  return(rbindlist(vec))
-}
+############## DATA FRAME #################
 
 # function that creates dynamicly a dataframe composed of n usm_dataframe
 # it takes as parameters n, number of usm_dataframe in the final dataframe
 usm_dataframe_by_dataframe = function(usmNumber) {
-  df <- data.frame(Name=character(usmNumber),Date_begin=numeric(usmNumber),
+  df <- data.frame(name=character(usmNumber),Date_begin=numeric(usmNumber),
                    Date_end=numeric(usmNumber),Finit=character(usmNumber),
                    Ground_name=character(usmNumber),Fstation=character(usmNumber),
                    Fclim1=character(usmNumber),Fclim2=character(usmNumber),
@@ -155,12 +171,24 @@ usm_dataframe_by_dataframe = function(usmNumber) {
                    Pld2_flai = character(usmNumber),Observation_file=character(usmNumber),
                    #Elements_list=list(),
                    stringsAsFactors = FALSE)
-  for (i in 1:usmNumber) {
+  lapply(1:nrow(df),function(x) {
     ground_name <- sample(ground_names_vector,1)
-    df[i,] <- usm_list(paste("usm_",i,sep=""),ground_name)
-  }
+    df[x,] <<- usm_dataframe(paste("usm_",x,sep=""),ground_name)
+  })
   return(df)
 }
+
+# return a pre allocated list which contains a certain time (repetition)
+# the same data frame or tibble (struct)
+usm_dataframe_by_lapply = function(usmNumber) {
+  li <- lapply(1:usmNumber,function(i) {
+    ground_name <- sample(ground_names_vector,1)
+    usm_dataframe(paste("usm_",i,sep=""),ground_name)
+    })
+  return(rbindlist(li))
+}
+
+################### DATA TABLE ##############
 
 # function that creates a datatable
 usm_datatable_by_datatable = function(usmNumber) {
@@ -175,22 +203,22 @@ usm_datatable_by_datatable = function(usmNumber) {
                    Pld2_flai = character(usmNumber),Observation_file=character(usmNumber),
                    #Elements_list=list(),
                    stringsAsFactors = FALSE)
-  for (i in 1:usmNumber) {
+  lapply(1:nrow(dt),function(x) {
     ground_name <- sample(ground_names_vector,1)
-    dt[i,] <- usm_list(paste("usm_",i,sep=""),ground_name)
-  }
+    dt[x,] <<- usm_datatable(paste("usm_",x,sep=""),ground_name)
+  })
   return(dt)
 }
 
-# function that creates a datatable from a dataframe made with a vector
-usm_datatable_by_usm_dataframe_by_vector = function(usmNumber) {
-  return (data.table(usm_dataframe_by_vector(usmNumber)))
+usm_datatable_by_lapply = function(usmNumber) {
+  li <- lapply(1:usmNumber,function(i) {
+    ground_name <- sample(ground_names_vector,1)
+    usm_datatable(paste("usm_",i,sep=""),ground_name)
+  })
+  return(rbindlist(li))
 }
 
-# function that creates a datatable from a dataframe made with a dataframe
-usm_datatable_by_usm_dataframe_by_dataframe = function(usmNumber) {
-  return(data.table(usm_dataframe_by_dataframe(usmNumber)))
-}
+############ TIBBLE #################
 
 # function that creates a tibble 
 usm_tibble_by_tibble = function(usmNumber) {
@@ -202,58 +230,21 @@ usm_tibble_by_tibble = function(usmNumber) {
                Simulation_code=numeric(usmNumber),Pld1_fplt = character(usmNumber),
                Pld1_ftec = character(usmNumber),Pld1_flai = character(usmNumber),
                Pld2_fplt = character(usmNumber),Pld2_ftec = character(usmNumber),
-               Pld2_flai = character(usmNumber),Observation_file=character(usmNumber),
-               #Elements_list=list(),
-               stringsAsFactors = FALSE)
-  for (i in 1:usmNumber) {
+               Pld2_flai = character(usmNumber),Observation_file=character(usmNumber))
+               #Elements_list=list())
+  lapply(1:nrow(tb),function(x) {
     ground_name <- sample(ground_names_vector,1)
-    tb[i,] <- usm_list(paste("usm_",i,sep=""),ground_name)
-  }
+    tb[x,] <<- usm_tibble(paste("usm_",x,sep=""),ground_name)
+  })
   return(tb)
 }
 
-# function that creates a tibble from a dataframe made with a vector
-usm_tibble_by_usm_dataframe_by_vector = function(usmNumber) {
-  return (tibble::as_tibble(usm_dataframe_by_vector(usmNumber)))
-}
-
-# function that creates a tibble from a dataframe made with a dataframe
-usm_tibble_by_usm_dataframe_by_dataframe = function(usmNumber){
-  return(tibble::as_tibble(usm_dataframe_by_dataframe(usmNumber)))
-}
-
-############################### LAPPLY ##############################################
-
-# function that creates dynamicly a list of n usm_list
-#it takes as parameters n, number of usm_list in the list
-list_of_usm_list_by_lapply = function(usmNumber) {
-  ground_name <- sample(ground_names_vector,1)
-  li <- lapply(1:usmNumber,function(x) usm_list(paste("usm_",x,sep=""),ground_name))
-  return (li)
-}
-
-# return a pre allocated list which contains a certain time (repetition)
-# the same list or class instanciation (struct)
-list_of_usm_class_by_lapply = function(usmNumber) {  
-  ground_name <- sample(ground_names_vector,1)
-  li <- lapply(1:usmNumber,function(i) usm_class(paste("usm_",i,sep=""),ground_name))                                   
-  return(li)
-}
-
-# return a pre allocated list which contains a certain time (repetition)
-# the same data frame or tibble (struct)
-usm_dataframe_by_lapply = function(usmNumber) { 
-  ground_name <- sample(ground_names_vector,1)
-  li <- lapply(1:usmNumber,function(i) usm_dataframe(paste("usm_",i,sep=""),ground_name))                                      
+usm_tibble_by_lapply = function(usmNumber) {
+  li <- lapply(1:usmNumber,function(i) {
+    ground_name <- sample(ground_names_vector,1)
+    usm_tibble(paste("usm_",i,sep=""),ground_name)
+  })
   return(rbindlist(li))
-}
-
-usm_datatable_by_usm_dataframe_by_lapply = function(usmNumber) {
-  return(data.table(usm_dataframe_by_lapply(usmNumber)))
-}
-
-usm_tibble_by_usm_dataframe_by_lapply = function(usmNumber) {
-  return(tibble::as_tibble(usm_dataframe_by_lapply(usmNumber)))
 }
 
 ################# RANDOM EXTRACT ##################################
@@ -262,38 +253,40 @@ usm_tibble_by_usm_dataframe_by_lapply = function(usmNumber) {
 
 # function that takes randomly usmNumber elements in structure
 # structure = list and class
-random_extract_for_usm_list_class = function(usmNumber,structure) {
-  random_number_list <- sample.int(length(structure),usmNumber)
-  random_usm_name <- lapply(random_number_list, function(x) paste("usm_",x,sep=""))
-  vec <- unlist(lapply(structure, function(x) x[["name"]] %in% random_usm_name))
-  return(structure[vec])
+random_extract_for_usm_list_class = function(structure,random_usm_name) {
+  structure[names(structure) %in% random_usm_name]
 }
 
 # function that takes randomly usmNumber elements in structure
 # structure = data frame, data table and tibble
-random_extract_for_usm_df_dt_tb = function(usmNumber,structure) {
-  random_number_list <- sample.int(nrow(structure),usmNumber)
-  random_usm_name <- unlist(lapply(random_number_list,function(x) paste("usm_",x,sep="")))
-  vec <- unlist(lapply(1:nrow(structure), function(x) structure[x]$name %in% random_usm_name))
-  return(structure[vec])
+random_extract_for_usm_df_dt_tb = function(structure,random_usm_name) {
+  structure[structure$name %in% random_usm_name,]
+}
+
+random_extract_for_usm_df_dt_tb_filter = function(structure,random_usm_name) {
+  dplyr::filter(structure,name %in% random_usm_name)
 }
 
 ########### PURRR ########################
 
-create_name = function(x) {
-  return(paste("usm_",x,sep=""))
-}
-
-matching_name = function(elem,numbers) {
-  names <- map(numbers,create_name)
-  if (elem[["name"]] %in% names ) {
+matching_name = function(elem,random_names) {
+  if (elem[["name"]] %in% random_names ) {
     return(elem)
   }
 }
 
-map_random_extract = function(usmNumbers,struct) {
-  numbers <- sample(length(struct),usmNumbers)
-  return(map(struct,matching_name,numbers))
+map_random_extract = function(struct,random_names) {
+  return(map(struct,matching_name,random_names))
+}
+
+matching_criteria = function(elem,criteria,wanted) {
+  if (elem[[criteria]] == wanted) {
+    return(elem)
+  }
+}
+
+map_criteria_extract = function(struct,criteria,wanted) {
+  return(map(struct,matching_criteria,criteria,wanted))
 }
 
 ################# CRITERIA EXTRACT ###################################
@@ -305,5 +298,6 @@ criteria_extract_for_usm_list_class = function(structure,criteria,wanted) {
 }
 
 criteria_extract_for_usm_df_dt_tb = function(structure,criteria,wanted) {
-  eval(parse(text=paste("return(filter(structure,",criteria," == wanted))",sep="")))
+  criteria <- enquo(criteria)
+  dplyr::filter(structure,!!criteria == wanted)
 }
