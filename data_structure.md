@@ -119,7 +119,7 @@ Expected format (several possibilities):
 
 * a big `tibble` with one column for the USM, one column for the DOE, one column for the date, one column for the stage, one column for the plant index, one column for each variable (e.g. LAI, masec) and one column for the "origin" that is either measured or observed, e.g.:  
 
-  |USM   | DOE|origin | plant|Date       |stage   | lai_n| masec_n| ...
+  |USM   | DOE|origin | plant|Date       |stage   | lai_n| masec_n|
   |:-----|---:|:------|-----:|:----------|:-------|-----:|-------:|
   |usm_1 |   1|obs    |     1|2009-03-02 |NA      |   0.1|     2.1|
   |usm_1 |   1|obs    |     1|2009-03-18 |NA      |   0.6|     3.4|
