@@ -244,7 +244,7 @@ usm_tibble_by_lapply = function(usmNumber) {
     ground_name <- sample(ground_names_vector,1)
     usm_tibble(paste("usm_",i,sep=""),ground_name)
   })
-  return(rbindlist(li))
+  return(tibble(rbindlist(li)))
 }
 
 ################# RANDOM EXTRACT ##################################
