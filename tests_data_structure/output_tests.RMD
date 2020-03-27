@@ -13,15 +13,15 @@ knitr::opts_chunk$set(echo = TRUE,
 source("output_tests.R")
 ```
 
-#I. Introduction
+# I. Introduction
 
 In this document, we will implement two methods to store the model output. The first method will be a list of tibble, the second method is a single tibble.
 First there will be a brief description of each method. Then a brief explication of what each method do and how they works with the results they give.
 Then we will do some tests in order to decide which method is the best for the model output storage.
 
-#II. Methods presentation
+# II. Methods presentation
 
-##II.A First method's presentation
+## II.A First method's presentation
 
 The first method is a list of tibble, let's print it to see how it is !
 We'll print a list which contains 2 levels of DoE and 6 usms.
@@ -32,7 +32,7 @@ li <- create_list(USM_list_1996,2,6,stics_inputs_path)
 li
 ```
 
-##II.B Second method's presentation
+## II.B Second method's presentation
 
 The second method is a single tibble, let's print it to see how it is !
 We'll print a single tibble which contains two levels of DoE and 6 usms.
@@ -43,11 +43,11 @@ tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
 tb
 ```
 
-#III. Use cases examples and results
+# III. Use cases examples and results
 
 Now we'll see what gives each functions and how to call them.
 
-##III.A Optimization function
+## III.A Optimization function
 
 We're beginning with the optimization function.
 This function returns all the values for a variable with the dates.
@@ -63,7 +63,7 @@ li2
 
 ```
 
-##III.B Multi-simulation function
+## III.B Multi-simulation function
 
 This function returns the usm names with the variable values.
 It takes as parameters a DoE level, a variable name and a date.
@@ -78,7 +78,7 @@ li2
 
 ```
 
-##III.C Analysis function
+## III.C Analysis function
 
 This function returns the DoE levels and the variable values.
 It takes as parameters an usm name, a variable name and a date.
@@ -93,13 +93,13 @@ li2
 
 ```
 
-#IV. Tests
+# IV. Tests
 
 In this section we'll made two types of tests.
 First a generation test to determine for several DoE size which methods instanciation is the faster.
 Then we will do the same for the extractions functions previously shown.
 
-##IV.A Creation tests
+## IV.A Creation tests
 
 ```{r tests creation}
 
@@ -117,7 +117,7 @@ ggplot2::autoplot(benchmark)
 
 ```
 
-##IV.B Extraction tests
+## IV.B Extraction tests
 
 First, let's create the instances we will use for the following tests.
 
@@ -132,7 +132,7 @@ multi_li <- create_list(USM_list_1996,1,500,stics_inputs_path)
 analysis_li <- create_list(USM_list_1996,50,10,stics_inputs_path)
 ```
 
-###IV.B.1 Optimization's extraction test
+### IV.B.1 Optimization's extraction test
 
 ```{r opti tests extraction, message=FALSE,warning=FALSE}
 
@@ -146,7 +146,7 @@ ggplot2::autoplot(benchmark_opti)
 
 ```
 
-###IV.B.2 Multi-simulation's extraction test
+### IV.B.2 Multi-simulation's extraction test
 
 ```{r multi tests extraction, message=FALSE, warning=FALSE }
 
@@ -160,9 +160,9 @@ ggplot2::autoplot(benchmark_multi)
 
 ```
 
-###IV.B.3 Analysis' extraction test
+### IV.B.3 Analysis' extraction test
 
-```{r analysis tests extraction, message=FALSe, warning=FALSE}
+```{r analysis tests extraction, message=FALSE, warning=FALSE}
 
 benchmark_analysis <- microbenchmark(tb = tibble_get_DOE_and_var_values(analysis_tb,"bo96iN+_2","HR_3","1996-01-05"),
                                      li = list_get_DOE_and_var_values(analysis_li,"bo96iN+_2","HR_3",
