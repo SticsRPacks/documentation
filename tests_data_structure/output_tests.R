@@ -75,9 +75,7 @@ create_list = function(USM_list,doe_size,usm_number,stics_inputs_path) {
 ################# EXTRACTION ################################
 
 list_get_dates_and_var_values = function(structure,doe,usm_name,var) {
-  dates <- structure[[doe]][[usm_name]][,"Date"]
-  values <- structure[[doe]][[usm_name]][,var]
-  cbind(dates,values)
+  structure[[doe]][[usm_name]][,c("Date",var)]
 }
 
 tibble_get_dates_and_var_values = function(structure,doe,usm_name,var) {
@@ -94,12 +92,9 @@ list_get_usm_names_and_var_values = function(structure,doe,var,date) {
   names = vector("list",length(structure[[doe]]))
   values = vector("list",length(structure[[doe]]))
   lapply(1:length(structure[[doe]]), function(id_usm) {
-    lapply(1:length(structure[[doe]][[id_usm]]), function (id_var) {
-      if(structure[[doe]][[id_usm]][id_var,"Date"] == ymd_hms(date)) {
-        values[id_usm] <<- structure[[doe]][[id_usm]][id_var,var]
-        names[id_usm] <<- names(structure[[doe]][id_usm])
-      }
-    })
+    id_var <- which(structure[[doe]][[id_usm]]$Date == ymd_hms(date))
+    values[id_usm] <<- structure[[doe]][[id_usm]][id_var,var]
+    names[id_usm] <<- names(structure[[doe]][id_usm])
   })
   cbind(names,values)
 }
@@ -118,16 +113,10 @@ list_get_DOE_and_var_values = function(structure,usm_name,var,date) {
   DOE <- vector("list",length(structure))
   values <- vector("list",length(structure))
   lapply(1:length(structure), function(doe) {
-    lapply(1:length(structure[[doe]]), function(id_usm) {
-      if (names(structure[[doe]][id_usm]) == usm_name) {
-        lapply(1:length(structure[[doe]][[id_usm]]), function (id_var) {
-          if(structure[[doe]][[id_usm]][id_var,"Date"] == ymd_hms(date)) {
-            values[doe] <<- structure[[doe]][[id_usm]][id_var,var]
-            DOE[doe] <<- doe
-          }
-        })
-      }
-    })
+    id_usm <- which(names(structure[[doe]]) == usm_name)
+    id_var <- which(structure[[doe]][[id_usm]]$Date == ymd_hms(date))
+    values[doe] <<- structure[[doe]][[id_usm]][id_var,var]
+    DOE[doe] <<- doe
   })
   cbind(DOE,values)
 }
@@ -144,13 +133,11 @@ tibble_get_DOE_and_var_values = function(structure,usm_name,var,date) {
 
 # fonctionne
 # tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
-# tb
 # res <- tibble_get_dates_and_var_values(tb,1,"bo96iN+_2","HR_1")
 # res
 
 # fonctionne
 # li <- create_list(USM_list_1996,2,6,stics_inputs_path)
-# li
 # li2 <- list_get_dates_and_var_values(li,1,"bo96iN+_2","HR_1")
 # li2
 
