@@ -2,6 +2,7 @@ library(tidyverse)
 library(tibble)
 library(data.table)
 library(lubridate)
+library(microbenchmark)
 
 ################### DATAS ################################
 
@@ -50,22 +51,22 @@ create_tibble = function(USM_list,doe_size,usm_number,stics_inputs_path) {
 create_list = function(USM_list,doe_size,usm_number,stics_inputs_path) {
   li <- vector("list",doe_size)
   lapply(1:doe_size, function(doe) {
-    li2 = vector("list",usm_number)
-    names = list()
     cpt = 1
+    li2 = vector("list",length(USM_list)*floor(usm_number/length(USM_list)))
+    names_usm = vector("list",length(USM_list)*floor(usm_number/length(USM_list)))
     lapply(1:length(USM_list), function(usm) {
       tibble_res = SticsRFiles::get_daily_results(file.path(stics_inputs_path, USM_list[usm]), USM_list[usm])
       tibble_res = dplyr::select(tibble_res,Date,jul,lai_n,masec_n,mafruit,HR_1,HR_2,HR_3,HR_4,HR_5,resmes)
       tibble_res = dplyr::filter(tibble_res,Date >= ymd("1996/01/01") & Date <= ymd("1996/10/15"))
-      lapply(1:(usm_number/length(USM_list)), function(id) {
+      lapply(1:(usm_number/length(USM_list)), function (id) {
         Name = paste(USM_list[usm],"_",id,sep="")
-        names = append(names,Name)
-        li2[[cpt]] = tibble_res[,]
-        cpt = cpt+1
+        names_usm[[cpt]] <<- Name
+        li2[[cpt]] <<- tibble_res[,]
+        cpt <<- cpt+1
       })
     })
-    names(li2) = names
-    li[[doe]] <- li2
+    names(li2) <- names_usm
+    li[[doe]] <<- li2
   })
   names(li) <- 1:doe_size
   return(li)
@@ -142,34 +143,38 @@ tibble_get_DOE_and_var_values = function(structure,usm_name,var,date) {
 ############### TESTS ############################
 
 # fonctionne
-# tb <- create_tibble_optimization(USM_list_1996,2,6,stics_inputs_path)
+# tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
+# tb
 # res <- tibble_get_dates_and_var_values(tb,1,"bo96iN+_2","HR_1")
 # res
 
 # fonctionne
-# li <- create_list_optimization(USM_list_1996,2,6,stics_inputs_path)
+# li <- create_list(USM_list_1996,2,6,stics_inputs_path)
+# li
 # li2 <- list_get_dates_and_var_values(li,1,"bo96iN+_2","HR_1")
 # li2
 
 #########################
+
 # fonctionne
-# tb <- create_tibble_optimization(USM_list_1996,2,6,stics_inputs_path)
+# tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
 # res <- tibble_get_usm_names_and_var_values(tb,1,"HR_4","1996-01-05")
 # res
 
 # fonctionne
-# li <- create_list_optimization(USM_list_1996,2,6,stics_inputs_path)
+# li <- create_list(USM_list_1996,2,6,stics_inputs_path)
 # li2 <- list_get_usm_names_and_var_values(li,1,"HR_4","1996/01/05-00/00/00")
 # li2
 
 #########################
 
 # fonctionne
-# tb <- create_tibble_optimization(USM_list_1996,2,6,stics_inputs_path)
+# tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
 # res <- tibble_get_DOE_and_var_values(tb,"bo96iN+_2","HR_3","1996-01-05")
 # res
 
 # fonctionne
-# li <- create_list_optimization(USM_list_1996,2,6,stics_inputs_path)
+# li <- create_list(USM_list_1996,2,6,stics_inputs_path)
 # li2 <- list_get_DOE_and_var_values(li,"bo96iN+_1","HR_3","1996/01/05-00/00/00")
 # li2
+
