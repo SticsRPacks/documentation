@@ -10,8 +10,7 @@ output:
 knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE,
                       cache.lazy = TRUE,
-                      warn = -1,
-                      eval = FALSE)
+                      warn = -1)
 source("output_tests.R")
 ```
 
@@ -31,7 +30,7 @@ We'll print a list which contains 2 levels of DoE and 6 usms.
 
 ```{r print list}
 # DoE, usm_number
-li <- create_list(USM_list_1996,2,6,stics_inputs_path)
+li <- create_list(USM_list_1996,2,6,sim_data)
 li
 ```
 
@@ -42,7 +41,7 @@ We'll print a single tibble which contains two levels of DoE and 6 usms.
 
 ```{r print tibble}
 # DoE, usm_number
-tb <- create_tibble(USM_list_1996,2,6,stics_inputs_path)
+tb <- create_tibble(USM_list_1996,2,6,sim_data)
 tb
 ```
 
@@ -106,12 +105,18 @@ Then we will do the same for the extractions functions previously shown.
 
 ```{r tests creation}
 
-benchmark <- microbenchmark(tb1 = create_tibble(USM_list_1996,5,10,stics_inputs_path),
-                            tb2 = create_tibble(USM_list_1996,10,10,stics_inputs_path),
-                            tb3 = create_tibble(USM_list_1996,50,10,stics_inputs_path),
-                            li1 = create_list(USM_list_1996,5,10,stics_inputs_path),
-                            li2 = create_list(USM_list_1996,10,10,stics_inputs_path),
-                            li3 = create_list(USM_list_1996,50,10,stics_inputs_path),
+benchmark <- microbenchmark(tb1_1 = create_tibble(USM_list_1996,5,10,sim_data),
+                            tb1_2 = create_tibble(USM_list_1996,10,10,sim_data),
+                            tb1_3 = create_tibble(USM_list_1996,50,10,sim_data),
+                            li1_1 = create_list(USM_list_1996,5,10,sim_data),
+                            li1_2 = create_list(USM_list_1996,10,10,sim_data),
+                            li1_3 = create_list(USM_list_1996,50,10,sim_data),
+                            tb2_1 = create_tibble2(USM_list_1996,5,10,sim_data),
+                            tb2_2 = create_tibble2(USM_list_1996,10,10,sim_data),
+                            tb2_3 = create_tibble2(USM_list_1996,50,10,sim_data),
+                            li2_1 = create_list2(USM_list_1996,5,10,sim_data),
+                            li2_2 = create_list2(USM_list_1996,10,10,sim_data),
+                            li2_3 = create_list2(USM_list_1996,50,10,sim_data),
                             times = 100)
 
 benchmark
@@ -126,21 +131,29 @@ First, let's create the instances we will use for the following tests.
 
 ```{r instanciation for extraction}
 # DOE, usm_number
-opti_tb <- create_tibble(USM_list_1996,50,10,stics_inputs_path)
-multi_tb <- create_tibble(USM_list_1996,1,500,stics_inputs_path)
-analysis_tb <- create_tibble(USM_list_1996,50,10,stics_inputs_path)
+opti_tb1 <- create_tibble(USM_list_1996,50,10,sim_data)
+multi_tb1 <- create_tibble(USM_list_1996,1,500,sim_data)
+analysis_tb1 <- create_tibble(USM_list_1996,50,10,sim_data)
+opti_tb2 <- create_tibble2(USM_list_1996,50,10,sim_data)
+multi_tb2 <- create_tibble2(USM_list_1996,1,500,sim_data)
+analysis_tb2 <- create_tibble2(USM_list_1996,50,10,sim_data)
 
-opti_li <- create_list(USM_list_1996,50,10,stics_inputs_path)
-multi_li <- create_list(USM_list_1996,1,500,stics_inputs_path)
-analysis_li <- create_list(USM_list_1996,50,10,stics_inputs_path)
+opti_li1 <- create_list(USM_list_1996,50,10,sim_data)
+multi_li1 <- create_list(USM_list_1996,1,500,sim_data)
+analysis_li1 <- create_list(USM_list_1996,50,10,sim_data)
+opti_li2 <- create_list2(USM_list_1996,50,10,sim_data)
+multi_li2 <- create_list2(USM_list_1996,1,500,sim_data)
+analysis_li2 <- create_list2(USM_list_1996,50,10,sim_data)
 ```
 
 ### Optimization's extraction test
 
 ```{r opti tests extraction, message=FALSE,warning=FALSE}
 
-benchmark_opti <- microbenchmark(tb = tibble_get_dates_and_var_values(opti_tb,1,"bo96iN+_2","HR_1"),
-                                 li = list_get_dates_and_var_values(opti_li,1,"bo96iN+_2","HR_1"),
+benchmark_opti <- microbenchmark(tb1 = tibble_get_dates_and_var_values(opti_tb1,1,"bo96iN+_2","HR_1"),
+                                 tb2 = tibble_get_dates_and_var_values(opti_tb2,1,"bo96iN+_2","HR_1"),
+                                 li1 = list_get_dates_and_var_values(opti_li1,1,"bo96iN+_2","HR_1"),
+                                 li2 = list_get_dates_and_var_values(opti_li2,1,"bo96iN+_2","HR_1"),
                                  times = 100)
 
 benchmark_opti
@@ -153,8 +166,10 @@ ggplot2::autoplot(benchmark_opti)
 
 ```{r multi tests extraction, message=FALSE, warning=FALSE }
 
-benchmark_multi <- microbenchmark(tb = tibble_get_usm_names_and_var_values(multi_tb,1,"HR_4","1996-01-05"),
-                                  li = list_get_usm_names_and_var_values(multi_li,1,"HR_4","1996/01/05-00/00/00"),
+benchmark_multi <- microbenchmark(tb1 = tibble_get_usm_names_and_var_values(multi_tb1,1,"HR_4","1996-01-05"),
+                                  tb2 = tibble_get_usm_names_and_var_values(multi_tb2,1,"HR_4","1996-01-05"),
+                                  li1 = list_get_usm_names_and_var_values(multi_li1,1,"HR_4","1996/01/05-00/00/00"),
+                                  li2 = list_get_usm_names_and_var_values(multi_li2,1,"HR_4","1996/01/05-00/00/00"),
                                   times = 100)
 
 benchmark_multi
@@ -167,8 +182,11 @@ ggplot2::autoplot(benchmark_multi)
 
 ```{r analysis tests extraction, message=FALSE, warning=FALSE}
 
-benchmark_analysis <- microbenchmark(tb = tibble_get_DOE_and_var_values(analysis_tb,"bo96iN+_2","HR_3","1996-01-05"),
-                                     li = list_get_DOE_and_var_values(analysis_li,"bo96iN+_2","HR_3",
+benchmark_analysis <- microbenchmark(tb1 = tibble_get_DOE_and_var_values(analysis_tb1,"bo96iN+_2","HR_3","1996-01-05"),
+                                     tb2 = tibble_get_DOE_and_var_values(analysis_tb2,"bo96iN+_2","HR_3","1996-01-05"),
+                                     li1 = list_get_DOE_and_var_values(analysis_li1,"bo96iN+_2","HR_3",
+                                                                      "1996/01/05-00/00/00"),
+                                     li2 = list_get_DOE_and_var_values(analysis_li2,"bo96iN+_2","HR_3",
                                                                       "1996/01/05-00/00/00"),
                                      times = 100)
 
