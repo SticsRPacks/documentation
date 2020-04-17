@@ -70,7 +70,7 @@ li2
 This function returns the usm names with the variable values.
 It takes as parameters a DoE level, a variable name and a date.
 
-```{r multisim function}
+```{r multisim function,warning=FALSE}
 
 res <- tibble_get_usm_names_and_var_values(tb,1,"HR_4","1996-01-05")
 res
@@ -85,7 +85,7 @@ li2
 This function returns the DoE levels and the variable values.
 It takes as parameters an usm name, a variable name and a date.
 
-```{r analysis function}
+```{r analysis function, warning=FALSE}
 
 res <- tibble_get_DOE_and_var_values(tb,"bo96iN+_2","HR_3","1996-01-05")
 res
@@ -103,25 +103,117 @@ Then we will do the same for the extractions functions previously shown.
 
 ## Creation tests
 
-```{r tests creation}
+### Tibble Creation Tests
 
-benchmark <- microbenchmark(tb1_1 = create_tibble(USM_list_1996,5,10,sim_data),
-                            tb1_2 = create_tibble(USM_list_1996,10,10,sim_data),
-                            tb1_3 = create_tibble(USM_list_1996,50,10,sim_data),
-                            li1_1 = create_list(USM_list_1996,5,10,sim_data),
-                            li1_2 = create_list(USM_list_1996,10,10,sim_data),
-                            li1_3 = create_list(USM_list_1996,50,10,sim_data),
-                            tb2_1 = create_tibble2(USM_list_1996,5,10,sim_data),
-                            tb2_2 = create_tibble2(USM_list_1996,10,10,sim_data),
-                            tb2_3 = create_tibble2(USM_list_1996,50,10,sim_data),
-                            li2_1 = create_list2(USM_list_1996,5,10,sim_data),
-                            li2_2 = create_list2(USM_list_1996,10,10,sim_data),
-                            li2_3 = create_list2(USM_list_1996,50,10,sim_data),
+```{r tests creation tibble}
+
+tb_opti1 = create_tibble(USM_list_1996,5,10,sim_data)
+tb_weights <- object.size(tb_opti1)
+tb_opti2 = create_tibble2(USM_list_1996,5,10,sim_data)
+tb_weights <- append(tb_weights,object.size(tb_opti2))
+tb_multi1 = create_tibble(USM_list_1996,10,10,sim_data)
+tb_weights <- append(tb_weights,object.size(tb_multi1))
+tb_multi2 = create_tibble2(USM_list_1996,10,10,sim_data)
+tb_weights <- append(tb_weights,object.size(tb_multi2))
+tb_analysis1 = create_tibble(USM_list_1996,50,10,sim_data)
+tb_weights <- append(tb_weights,object.size(tb_analysis1))
+tb_analysis2 = create_tibble2(USM_list_1996,50,10,sim_data)
+tb_weights <- append(tb_weights,object.size(tb_analysis2))
+
+plot_weight <- data.frame(Instanciation_modes = c("tb_opti1","tb_opti2","tb_multi1","tb_multi2",
+                                                  "tb_analysis1","tb_analysis2"),
+                          weights = tb_weights)
+
+graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
+print(graph)
+
+benchmark <- microbenchmark(tb_opti1 = create_tibble(USM_list_1996,5,10,sim_data),
+                            tb_opti2 = create_tibble2(USM_list_1996,5,10,sim_data),
+                            tb_multi1 = create_tibble(USM_list_1996,10,10,sim_data),
+                            tb_multi2 = create_tibble2(USM_list_1996,10,10,sim_data),
+                            tb_analysis1 = create_tibble(USM_list_1996,50,10,sim_data),
+                            tb_analysis2 = create_tibble2(USM_list_1996,50,10,sim_data),
                             times = 100)
 
 benchmark
 
 ggplot2::autoplot(benchmark)
+
+```
+
+### List Creation Tests
+
+```{r tests creation list}
+
+li_opti1 = create_list(USM_list_1996,5,10,sim_data)
+li_weights <- object.size(li_opti1)
+li_opti2 = create_list2(USM_list_1996,5,10,sim_data)
+li_weights <- append(li_weights,object.size(li_opti2))
+li_multi1 = create_list(USM_list_1996,10,10,sim_data)
+li_weights <- append(li_weights,object.size(li_multi1))
+li_multi2 = create_list2(USM_list_1996,10,10,sim_data)
+li_weights <- append(li_weights,object.size(li_multi2))
+li_analysis1 = create_list(USM_list_1996,50,10,sim_data)
+li_weights <- append(li_weights,object.size(li_analysis1))
+li_analysis2 = create_list2(USM_list_1996,50,10,sim_data)
+li_weights <- append(li_weights,object.size(li_analysis2))
+
+plot_weight <- data.frame(Instanciation_modes = c("li_opti1","li_opti2","li_multi1","li_multi2",
+                                                  "li_analysis1","li_analysis2"),
+                          weights = li_weights)
+
+graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
+print(graph)
+
+benchmark <- microbenchmark(li_opti1 = create_list(USM_list_1996,5,10,sim_data),
+                            li_opti2 = create_list2(USM_list_1996,5,10,sim_data),
+                            li_multi1 = create_list(USM_list_1996,10,10,sim_data),
+                            li_multi2 = create_list2(USM_list_1996,10,10,sim_data),
+                            li_analysis1 = create_list(USM_list_1996,50,10,sim_data),
+                            li_analysis2 = create_list2(USM_list_1996,50,10,sim_data),
+                            times = 100)
+benchmark
+
+ggplot2::autoplot(benchmark)
+
+
+```
+
+### Best Creation Tests
+
+```{r tests creation best}
+
+tb_opti = create_tibble2(USM_list_1996,5,10,sim_data)
+weights <- object.size(tb_opti)
+li_opti = create_list2(USM_list_1996,5,10,sim_data)
+weights <- append(weights,object.size(li_opti))
+tb_multi = create_tibble2(USM_list_1996,10,10,sim_data)
+weights <- append(weights,object.size(tb_multi))
+li_multi = create_list2(USM_list_1996,10,10,sim_data)
+weights <- append(weights,object.size(li_multi))
+tb_analysis = create_tibble2(USM_list_1996,50,10,sim_data)
+weights <- append(weights,object.size(tb_analysis))
+li_analysis = create_list2(USM_list_1996,50,10,sim_data)
+weights <- append(weights,object.size(li_analysis))
+
+plot_weight <- data.frame(Instanciation_modes = c("tb_opti","li_opti","tb_multi","li_multi","tb_analysis",
+                                                  "li_analysis"),
+                          weights = weights)
+
+graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) + geom_bar(stat = "identity")
+print(graph)
+
+benchmark <- microbenchmark(tb_opti = create_tibble2(USM_list_1996,5,10,sim_data),
+                            li_opti = create_list2(USM_list_1996,5,10,sim_data),
+                            tb_multi = create_tibble2(USM_list_1996,10,10,sim_data),
+                            li_multi = create_list2(USM_list_1996,10,10,sim_data),
+                            tb_analysis = create_tibble2(USM_list_1996,50,10,sim_data),
+                            li_analysis = create_list2(USM_list_1996,50,10,sim_data),
+                            times = 100)
+benchmark
+
+ggplot2::autoplot(benchmark)
+
 
 ```
 
@@ -131,29 +223,30 @@ First, let's create the instances we will use for the following tests.
 
 ```{r instanciation for extraction}
 # DOE, usm_number
-opti_tb1 <- create_tibble(USM_list_1996,50,10,sim_data)
-multi_tb1 <- create_tibble(USM_list_1996,1,500,sim_data)
-analysis_tb1 <- create_tibble(USM_list_1996,50,10,sim_data)
-opti_tb2 <- create_tibble2(USM_list_1996,50,10,sim_data)
-multi_tb2 <- create_tibble2(USM_list_1996,1,500,sim_data)
-analysis_tb2 <- create_tibble2(USM_list_1996,50,10,sim_data)
-
-opti_li1 <- create_list(USM_list_1996,50,10,sim_data)
-multi_li1 <- create_list(USM_list_1996,1,500,sim_data)
-analysis_li1 <- create_list(USM_list_1996,50,10,sim_data)
-opti_li2 <- create_list2(USM_list_1996,50,10,sim_data)
-multi_li2 <- create_list2(USM_list_1996,1,500,sim_data)
-analysis_li2 <- create_list2(USM_list_1996,50,10,sim_data)
+opti_li <- create_list2(USM_list_1996,625,200,sim_data)
+```
+```{r tests multi li}
+multi_li <- create_list2(USM_list_1996,1,1000000,sim_data)
+```
+```{r tests analysis li}
+analysis_li <- create_list2(USM_list_1996,50000,100,sim_data)
+```
+```{r tests opti tb}
+opti_tb <- create_tibble2(USM_list_1996,50,10,sim_data)
+```
+```{r testts multi tb}
+multi_tb <- create_tibble2(USM_list_1996,1,500,sim_data)
+```
+```{r tests analysis tb}
+analysis_tb <- create_tibble2(USM_list_1996,50,10,sim_data)
 ```
 
 ### Optimization's extraction test
 
 ```{r opti tests extraction, message=FALSE,warning=FALSE}
 
-benchmark_opti <- microbenchmark(tb1 = tibble_get_dates_and_var_values(opti_tb1,1,"bo96iN+_2","HR_1"),
-                                 tb2 = tibble_get_dates_and_var_values(opti_tb2,1,"bo96iN+_2","HR_1"),
-                                 li1 = list_get_dates_and_var_values(opti_li1,1,"bo96iN+_2","HR_1"),
-                                 li2 = list_get_dates_and_var_values(opti_li2,1,"bo96iN+_2","HR_1"),
+benchmark_opti <- microbenchmark(tb = tibble_get_dates_and_var_values(opti_tb,1,"bo96iN+_2","HR_1"),
+                                 li = list_get_dates_and_var_values(opti_li,1,"bo96iN+_2","HR_1"),
                                  times = 100)
 
 benchmark_opti
@@ -166,10 +259,8 @@ ggplot2::autoplot(benchmark_opti)
 
 ```{r multi tests extraction, message=FALSE, warning=FALSE }
 
-benchmark_multi <- microbenchmark(tb1 = tibble_get_usm_names_and_var_values(multi_tb1,1,"HR_4","1996-01-05"),
-                                  tb2 = tibble_get_usm_names_and_var_values(multi_tb2,1,"HR_4","1996-01-05"),
-                                  li1 = list_get_usm_names_and_var_values(multi_li1,1,"HR_4","1996/01/05-00/00/00"),
-                                  li2 = list_get_usm_names_and_var_values(multi_li2,1,"HR_4","1996/01/05-00/00/00"),
+benchmark_multi <- microbenchmark(tb = tibble_get_usm_names_and_var_values(multi_tb,1,"HR_4","1996-01-05"),
+                                  li = list_get_usm_names_and_var_values(multi_li,1,"HR_4","1996/01/05-00/00/00"),
                                   times = 100)
 
 benchmark_multi
@@ -182,11 +273,9 @@ ggplot2::autoplot(benchmark_multi)
 
 ```{r analysis tests extraction, message=FALSE, warning=FALSE}
 
-benchmark_analysis <- microbenchmark(tb1 = tibble_get_DOE_and_var_values(analysis_tb1,"bo96iN+_2","HR_3","1996-01-05"),
-                                     tb2 = tibble_get_DOE_and_var_values(analysis_tb2,"bo96iN+_2","HR_3","1996-01-05"),
-                                     li1 = list_get_DOE_and_var_values(analysis_li1,"bo96iN+_2","HR_3",
-                                                                      "1996/01/05-00/00/00"),
-                                     li2 = list_get_DOE_and_var_values(analysis_li2,"bo96iN+_2","HR_3",
+benchmark_analysis <- microbenchmark(tb = 
+                                       tibble_get_DOE_and_var_values(analysis_tb,"bo96iN+_2","HR_3","1996-01-05"),
+                                     li = list_get_DOE_and_var_values(analysis_li,"bo96iN+_2","HR_3",
                                                                       "1996/01/05-00/00/00"),
                                      times = 100)
 

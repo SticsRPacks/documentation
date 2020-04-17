@@ -2,9 +2,9 @@
 
 ################### DATA STRUCTURES CREATION ############################
 
-# Date = function(size) {
-#   return(structure(rep(NA_real_,size),class="POSIXct"))
-# }
+Date = function(size) {
+  return(structure(rep(NA_real_,size),class="POSIXct"))
+}
 
 # fonction qui cr?e l'alternative tibble
 # elle prend en param?tres :
@@ -13,9 +13,13 @@
 # _ usm_number qui est le nombre d'USMS diff?rentes, ici 6
 # _ stics_inputs_path pour get_daily_result
 create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
-  tb <<- tibble(Name=character(),DoE=numeric(),Date=Date(),Jul=numeric(),
-                Lai_n=double(),Masec_n=double(),Mafruit=double(),Hr_1=double(),
-                Hr_2=double(),Hr_3=double(),Hr_4=double(),Hr_5=double(),Resmes=double())
+  size = doe_size*usm_number*nrow(sim_data[[1]])
+  tb <- tibble(Name=character(size),DoE=numeric(size),Date=Date(size),
+                jul=numeric(size), lai_n=double(size),masec_n=double(size),
+                mafruit=double(size), HR_1=double(size), HR_2=double(size),
+                HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size))
+  begin_id = 1
+  end_id = nrow(sim_data[[1]])
   lapply(1:doe_size, function(doe) {
     lapply(USM_list, function(usm) {
       #tibble_res = SticsRFiles::get_daily_results(file.path(stics_inputs_path, USM_list[usm]), USM_list[usm])
@@ -28,7 +32,9 @@ create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
       lapply(1:(usm_number/length(USM_list)), function(id) {
         Name = rep(paste(usm,"_",id,sep=""),nrow(tibble_res))
         tibble_res[,1] = Name
-        tb <<- rbind(tb,tibble_res)
+        tb[begin_id:end_id,] <<- tibble_res
+        begin_id <<- end_id + 1
+        end_id <<- end_id + nrow(tibble_res)
       })
     })
   })
@@ -66,6 +72,7 @@ create_tibble2 = function(USM_list,doe_size,usm_number,sim_data) {
   
   return(tb)
 }
+
 
 
 create_list = function(USM_list,doe_size,usm_number,sim_data) {
