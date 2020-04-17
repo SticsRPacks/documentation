@@ -36,11 +36,14 @@ create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
         tb[begin_id:end_id,2:12] <<- sim_data[[usm]]
         tb[begin_id:end_id,13] <<- rep(doe,size_bis)
         #tb[begin_id:end_id,] <<- cbind(rep(paste(usm,"_",id,sep=""),size_bis),sim_data[[usm]],rep(doe,size_bis))
+        # la commande précédente ne veut pas s'executer, le champs "Name" est égal a "1" pour chaque ligne
         begin_id <<- end_id + 1
         end_id <<- end_id + size_bis
       })
     })
   })
+  # cette ligne sert à mettre les dates au format suivant : 1996-01-01 00:00:00 car auparavant elles etaient au
+  # format : 1996-01-01 01:00:00
   setattr(tb$Date,'tzone','UTC')
   # Patrice
   # changing tibble to as_tibble 
