@@ -2,9 +2,9 @@
 
 ################### DATA STRUCTURES CREATION ############################
 
-Date = function(size) {
-  return(structure(rep(NA_real_,size),class="POSIXct"))
-}
+# Date = function(size) {
+#   return(structure(rep(NA_real_,size),class="POSIXct"))
+# }
 
 # fonction qui cr?e l'alternative tibble
 # elle prend en param?tres :
@@ -14,30 +14,34 @@ Date = function(size) {
 # _ stics_inputs_path pour get_daily_result
 create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
   size = doe_size*usm_number*nrow(sim_data[[1]])
-  tb <- tibble(Name=character(size),DoE=numeric(size),Date=Date(size),
-                jul=numeric(size), lai_n=double(size),masec_n=double(size),
+  tb <- tibble(Name=character(size),Date=as.POSIXct.default((rep("1996-10-15",size))),
+                jul=integer(size), lai_n=double(size),masec_n=double(size),
                 mafruit=double(size), HR_1=double(size), HR_2=double(size),
-                HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size))
+                HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size),DoE=integer(size))
+  print(tb)
   begin_id = 1
   end_id = nrow(sim_data[[1]])
+  size_bis = nrow(sim_data[[1]])
   lapply(1:doe_size, function(doe) {
     lapply(USM_list, function(usm) {
       #tibble_res = SticsRFiles::get_daily_results(file.path(stics_inputs_path, USM_list[usm]), USM_list[usm])
-      tibble_res = sim_data[[usm]]
+      #tibble_res = sim_data[[usm]]
       # tibble_res = dplyr::select(tibble_res,Date,jul,lai_n,masec_n,mafruit,HR_1,HR_2,HR_3,HR_4,HR_5,resmes)
       # tibble_res = dplyr::filter(tibble_res,Date >= ymd("1996/01/01") & Date <= ymd("1996/10/15"))
-      Name = rep(NA,nrow(tibble_res))
-      DoE = rep(doe,nrow(tibble_res))
-      tibble_res = cbind(Name,DoE,tibble_res)
+      #Name = rep(NA,nrow(tibble_res))
+      #DoE = rep(doe,nrow(tibble_res))
+      #tibble_res = cbind(Name,DoE,tibble_res)
       lapply(1:(usm_number/length(USM_list)), function(id) {
-        Name = rep(paste(usm,"_",id,sep=""),nrow(tibble_res))
-        tibble_res[,1] = Name
-        tb[begin_id:end_id,] <<- tibble_res
+        tb[begin_id:end_id,1] <<- rep(paste(usm,"_",id,sep=""),size_bis)
+        tb[begin_id:end_id,2:12] <<- sim_data[[usm]]
+        tb[begin_id:end_id,13] <<- rep(doe,size_bis)
+        #tb[begin_id:end_id,] <<- cbind(rep(paste(usm,"_",id,sep=""),size_bis),sim_data[[usm]],rep(doe,size_bis))
         begin_id <<- end_id + 1
-        end_id <<- end_id + nrow(tibble_res)
+        end_id <<- end_id + size_bis
       })
     })
   })
+  setattr(tb$Date,'tzone','UTC')
   # Patrice
   # changing tibble to as_tibble 
   return(as_tibble(tb))
