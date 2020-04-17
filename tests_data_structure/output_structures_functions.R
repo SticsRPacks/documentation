@@ -18,7 +18,6 @@ create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
                 jul=integer(size), lai_n=double(size),masec_n=double(size),
                 mafruit=double(size), HR_1=double(size), HR_2=double(size),
                 HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size),DoE=integer(size))
-  print(tb)
   begin_id = 1
   end_id = nrow(sim_data[[1]])
   size_bis = nrow(sim_data[[1]])
