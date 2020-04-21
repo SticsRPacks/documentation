@@ -12,12 +12,13 @@ library("SticsRFiles")
 source("output_structures_functions.R")
 
 # Download the example USMs:
-#data_dir= file.path(SticsRFiles::download_data(),"study_case_1","V9.0")
+data_dir= file.path(SticsRFiles::download_data(),"study_case_1","V9.0")
 # NB: all examples are now in data_dir
 
 # DEFINE THE PATH TO YOUR LOCALLY INSTALLED VERSION OF JAVASTICS
 ####################################################################################
 path_to_JavaStics="C:/Users/Thomas/Documents/GitHub/SticsRTests/inst/stics"  ############ A MODIFIER #####################
+path_to_JavaStics="D:\\Home\\sbuis\\Documents\\GitHub\\CroptimizR\\vignettes"  ############ A MODIFIER #####################
 ####################################################################################
 javastics_path=file.path(path_to_JavaStics,"JavaSTICS-1.41-stics-9.0")
 stics_path=file.path(javastics_path,"bin/stics_modulo.exe")
@@ -28,8 +29,14 @@ stics_path=file.path(javastics_path,"bin/stics_modulo.exe")
 #' climat.txt, ...) stored per USMs in different directories (which names must be the USM names).
 #' `stics_inputs_path` is here the path of the directory that will contain these USMs folders.
 stics_inputs_path = "C:/Users/Thomas/Documents/V9.0/TxtFiles"
-#stics_inputs_path=file.path(data_dir,"TxtFiles")
+javastics_workspace_path=file.path(data_dir,"XmlFiles")
+stics_inputs_path=file.path(data_dir,"TxtFiles")
 dir.create(stics_inputs_path)
+
+gen_usms_xml2txt(javastics_path = javastics_path, workspace_path = javastics_workspace_path,
+                 target_path = stics_inputs_path, display = TRUE)
+
+
 #' ## Run the model before optimization for a prior evaluation
 # Set the model options (see '? stics_wrapper_options' for details)
 model_options=stics_wrapper_options(stics_path,stics_inputs_path,
@@ -214,6 +221,6 @@ analysis_li <- create_list2(USM_list_1996,50000,100,sim_data)
 
 opti_tb <- create_tibble(USM_list_1996,50000,500,sim_data)
 
-multi_tb <- create_tibble2(USM_list_1996,1,1000000,sim_data)
+multi_tb <- create_tibble(USM_list_1996,1,1000000,sim_data)
 
 analysis_tb <- create_tibble(USM_list_1996,50000,100,sim_data)
