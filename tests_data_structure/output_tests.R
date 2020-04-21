@@ -62,20 +62,17 @@ sim_data <- lapply(sim_data, function(x)
   dplyr::select(x,Date,jul,lai_n,masec_n,mafruit,HR_1,HR_2,HR_3,HR_4,HR_5,resmes) %>% 
     dplyr::filter(Date >= ymd("1996/01/01") & Date <= ymd("1996/10/15")))
 
-# Creating tibble and list instances
+#Creating tibble and list instances
 # tb <- create_tibble(USM_list_1996,2,6,sim_data)
 # tb2 <- create_tibble2(USM_list_1996,2,6,sim_data)
 # identical(tb, tb2)
 # tb
 # tb2
-
+# 
 # li <- create_list(USM_list_1996,2,6,sim_data)
 # li2 <- create_list2(USM_list_1996,2,6,sim_data)
 # identical(li, li2)
-# 
-# 
-# 
-# 
+
 # #########################
 # # fonctionne
 # tb_dates_val <- tibble_get_dates_and_var_values(tb,doe = 1,usm_name = "bo96iN+_2",var = "HR_1")
@@ -205,15 +202,37 @@ sim_data <- lapply(sim_data, function(x)
 # # 1 1      26.0
 # # 2 2      26.0
 
-opti_li <- create_list2(USM_list_1996,50000,500,sim_data)
-#opti_li[50000]
 
-multi_li <- create_list2(USM_list_1996,1,1000000,sim_data)
+# opti_li <- create_list2(USM_list_1996,50000,500,sim_data)
+# opti_li[50000]
+# 
+# multi_li <- create_list2(USM_list_1996,1,1000000,sim_data)
+# 
+# analysis_li <- create_list2(USM_list_1996,50000,100,sim_data)
 
-analysis_li <- create_list2(USM_list_1996,50000,100,sim_data)
 
-opti_tb <- create_tibble(USM_list_1996,50000,500,sim_data)
+# once you allocated memory, if your pc freeze or bug because of the new allocated memory for R
+# just restart your R session and the memory will be reset to its initial value
 
-multi_tb <- create_tibble2(USM_list_1996,1,1000000,sim_data)
+#memory.limit(size = 16000000000)
+#memory.size(max = 16000000000) # memory.size() = 8078.93 ert ne va pas au dela
+#memory.size()
+#memory.limit()
+#memory.limit() # en octets je pense. Lui par contre est est a 16Go
 
-analysis_tb <- create_tibble(USM_list_1996,50000,100,sim_data)
+# taille max : 15.8 Go (DoE -> 50K, Usms -> 446). Au dela de 446 Usms -> erreur : vecteur de longeur négative interdite
+# meme en allouant 16Go de mémoire, j'obtiens l'erreur :impossible d'allouer un vecteur de taille 15.8 Go
+# opti_tb <- create_tibble2(USM_list_1996,50000,446,sim_data)
+# opti_tb
+# gc() 
+
+# taille : 735 Mo
+# La aussi, j'obtiens l'erreur : impossible d'allouer un vecteur de taille 735.0 Mo alors que j'overkill le besoin mémoire
+# multi_tb <- create_tibble2(USM_list_1996,1,1000000,sim_data)
+# multi_tb
+# gc()
+
+# Taille : 10.7 Go
+# analysis_tb <- create_tibble2(USM_list_1996,50000,100,sim_data)
+# analysis_tb
+# gc()
