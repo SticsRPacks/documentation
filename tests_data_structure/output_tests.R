@@ -65,8 +65,8 @@ sim_data <- sim_before_optim$sim_list[[1]][USM_list_1996]
 
 
 # Selecting needed data
-sim_data <- lapply(sim_data, function(x) 
-  dplyr::select(x,Date,jul,lai_n,masec_n,mafruit,HR_1,HR_2,HR_3,HR_4,HR_5,resmes) %>% 
+sim_data <- lapply(sim_data, function(x)
+  dplyr::select(x,Date,jul,lai_n,masec_n,mafruit,HR_1,HR_2,HR_3,HR_4,HR_5,resmes) %>%
     dplyr::filter(Date >= ymd("1996/01/01") & Date <= ymd("1996/10/15")))
 
 #Creating tibble and list instances
@@ -209,37 +209,63 @@ sim_data <- lapply(sim_data, function(x)
 # # 1 1      26.0
 # # 2 2      26.0
 
-
-# opti_li <- create_list2(USM_list_1996,50000,500,sim_data)
-# opti_li[50000]
-# 
-# multi_li <- create_list2(USM_list_1996,1,1000000,sim_data)
-# 
-# analysis_li <- create_list2(USM_list_1996,50000,100,sim_data)
-
-
 # once you allocated memory, if your pc freeze or bug because of the new allocated memory for R
 # just restart your R session and the memory will be reset to its initial value
 
-#memory.limit(size = 16000000000)
-#memory.size(max = 16000000000) # memory.size() = 8078.93 ert ne va pas au dela
-#memory.size()
-#memory.limit()
-#memory.limit() # en octets je pense. Lui par contre est est a 16Go
+# memory.limit(size = 4196000000000)
+# memory.limit()
+# gc()
 
-# taille max : 15.8 Go (DoE -> 50K, Usms -> 446). Au dela de 446 Usms -> erreur : vecteur de longeur négative interdite
-# meme en allouant 16Go de mémoire, j'obtiens l'erreur :impossible d'allouer un vecteur de taille 15.8 Go
-# opti_tb <- create_tibble2(USM_list_1996,50000,446,sim_data)
+# opti_tb <- create_tibble2(USM_list_1996,50000,40,sim_data)
+# save(opti_tb , file ="Optimisation_tibble.RData")
 # opti_tb
 # gc() 
 
-# taille : 735 Mo
-# La aussi, j'obtiens l'erreur : impossible d'allouer un vecteur de taille 735.0 Mo alors que j'overkill le besoin mémoire
-# multi_tb <- create_tibble2(USM_list_1996,1,1000000,sim_data)
-# multi_tb
+# multi_tb <- create_tibble2(USM_list_1996,1,500000,sim_data)
+# save(multi_tb, file="MultiSimulation_tibble.RData")
 # gc()
+# load(file = "MultiSimulation_tibble.RData")
+# res = tibble_get_dates_and_var_values(multi_tb,1,"lu96iN+_133","HR_1")
+# res
 
-# Taille : 10.7 Go
-# analysis_tb <- create_tibble2(USM_list_1996,50000,100,sim_data)
+# analysis_tb <- create_tibble2(USM_list_1996,50000,20,sim_data)
+# save(analysis_tb, file = "Analysis_tibble.RData")
 # analysis_tb
-# gc()
+# gc()?
+
+memory.limit(size=1024000000000)
+
+load(file = "Analysis_tibble.RData")
+
+analysis_li <- create_list2(USM_list_1996,50000,20,sim_data)
+
+# on va utiliser le meme tibble pour l'extraction dans les cas d'optimisation et d'analyse
+
+benchmark_opti <- microbenchmark(list_get_dates_and_var_values(analysis_li,20000,"lu96iN6_2","HR_2"),
+                            tibble_get_dates_and_var_values(analysis_tb,20000,"lu96iN6_2","HR_2"),
+                            times = 10)
+benchmark_opti
+
+ggplot2::autoplot(benchmark_opti)
+
+
+
+# benchmark_analysis <- microbenchmark(list_get_DOE_and_var_values(analysis_li,"lu96iN6_2","HR_3","1996/01/05-00/00/00"),
+#                                      list_get_DOE_and_var_values2(analysis_li,"lu96iN6_2","HR_3","1996/01/05-00/00/00"),
+#                                      tibble_get_DOE_and_var_values(analysis_tb,"lu96iN6_2","HR_3","1996-01-05"),
+#                                      times = 10)
+# 
+# benchmark_analysis
+# 
+# ggplot2::autoplot(benchmark_analysis)
+# 
+# 
+# 
+# load(file = "MultiSimulation_tibble.RData")
+# 
+# multi_li <- create_list2(USM_list_1996,1,500000,sim_data)
+# 
+# benchmark_multi <- microbenchmark(list_get_usm_names_and_var_values(multi_li,1,"resmes","1996/01/05-00/00/00"),
+#                                   list_get_usm_names_and_var_values2(multi_li,1,"resmes","1996/01/05-00/00/00"),
+#                                   tibble_get_usm_names_and_var_values(multi_tb,1,"resmes","1996-01-05"),
+#                                   times = 10)
