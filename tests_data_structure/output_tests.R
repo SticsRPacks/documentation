@@ -212,42 +212,32 @@ sim_data <- lapply(sim_data, function(x)
 # once you allocated memory, if your pc freeze or bug because of the new allocated memory for R
 # just restart your R session and the memory will be reset to its initial value
 
-# memory.limit(size = 4196000000000)
-# memory.limit()
-# gc()
-
-# opti_tb <- create_tibble2(USM_list_1996,50000,40,sim_data)
-# save(opti_tb , file ="Optimisation_tibble.RData")
-# opti_tb
-# gc() 
+# memory.limit(size = 8000000000000)
 
 # multi_tb <- create_tibble2(USM_list_1996,1,500000,sim_data)
+# tibble_get_usm_names_and_var_values(multi_tb,1,"resmes","1996-01-05")
 # save(multi_tb, file="MultiSimulation_tibble.RData")
 # gc()
 # load(file = "MultiSimulation_tibble.RData")
 # res = tibble_get_dates_and_var_values(multi_tb,1,"lu96iN+_133","HR_1")
 # res
 
-# analysis_tb <- create_tibble2(USM_list_1996,50000,20,sim_data)
+# analysis_tb <- create_tibble2(USM_list_1996,50000,10,sim_data)
 # save(analysis_tb, file = "Analysis_tibble.RData")
 # analysis_tb
 # gc()?
 
-memory.limit(size=1024000000000)
-
-load(file = "Analysis_tibble.RData")
-
-analysis_li <- create_list2(USM_list_1996,50000,20,sim_data)
+# load(file = "Analysis_tibble.RData")
+# analysis_li <- create_list2(USM_list_1996,50000,500,sim_data)
 
 # on va utiliser le meme tibble pour l'extraction dans les cas d'optimisation et d'analyse
-
-benchmark_opti <- microbenchmark(list_get_dates_and_var_values(analysis_li,20000,"lu96iN6_2","HR_2"),
-                            tibble_get_dates_and_var_values(analysis_tb,20000,"lu96iN6_2","HR_2"),
-                            times = 10)
-benchmark_opti
-
-ggplot2::autoplot(benchmark_opti)
-
+# 
+# benchmark_opti <- microbenchmark(list_get_dates_and_var_values(analysis_li,20000,"lu96iN6_2","HR_2"),
+#                             tibble_get_dates_and_var_values(analysis_tb,20000,"lu96iN6_2","HR_2"),
+#                             times = 10)
+# benchmark_opti
+# 
+# ggplot2::autoplot(benchmark_opti)
 
 
 # benchmark_analysis <- microbenchmark(list_get_DOE_and_var_values(analysis_li,"lu96iN6_2","HR_3","1996/01/05-00/00/00"),
@@ -258,14 +248,16 @@ ggplot2::autoplot(benchmark_opti)
 # benchmark_analysis
 # 
 # ggplot2::autoplot(benchmark_analysis)
-# 
-# 
-# 
+
+
 # load(file = "MultiSimulation_tibble.RData")
-# 
 # multi_li <- create_list2(USM_list_1996,1,500000,sim_data)
-# 
+
 # benchmark_multi <- microbenchmark(list_get_usm_names_and_var_values(multi_li,1,"resmes","1996/01/05-00/00/00"),
 #                                   list_get_usm_names_and_var_values2(multi_li,1,"resmes","1996/01/05-00/00/00"),
 #                                   tibble_get_usm_names_and_var_values(multi_tb,1,"resmes","1996-01-05"),
 #                                   times = 10)
+# 
+# benchmark_multi
+#
+# ggplot2::autoplot(benchmark_multi)
