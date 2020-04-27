@@ -224,14 +224,18 @@ sim_data <- lapply(sim_data, function(x)
 # analysis_li <- create_list2(USM_list_1996,50000,500,sim_data)
 
 # on va utiliser le meme tibble pour l'extraction dans les cas d'optimisation et d'analyse
+memory.limit(size = 8000000000000)
+# analysis_tb <- create_tibble2(USM_list_1996,50000,10,sim_data)
+# analysis_li <- create_list2(USM_list_1996,50000,10,sim_data)
+# 
 # 
 # benchmark_opti <- microbenchmark(list_get_dates_and_var_values(analysis_li,20000,"lu96iN6_2","HR_2"),
 #                             tibble_get_dates_and_var_values(analysis_tb,20000,"lu96iN6_2","HR_2"),
+#                             tibble_get_dates_and_var_values5(analysis_tb,20000,"lu96iN6_2","HR_2"),
 #                             times = 10)
 # benchmark_opti
 # 
 # ggplot2::autoplot(benchmark_opti)
-
 
 # benchmark_analysis <- microbenchmark(list_get_DOE_and_var_values(analysis_li,"lu96iN6_2","HR_3","1996/01/05-00/00/00"),
 #                                      list_get_DOE_and_var_values2(analysis_li,"lu96iN6_2","HR_3","1996/01/05-00/00/00"),
@@ -252,5 +256,15 @@ sim_data <- lapply(sim_data, function(x)
 #                                   times = 10)
 # 
 # benchmark_multi
-#
+# 
 # ggplot2::autoplot(benchmark_multi)
+
+
+# benchmark <- microbenchmark(create_tibble(USM_list_1996,10,500,sim_data),
+#                             create_tibble2(USM_list_1996,10,500,sim_data),
+#                             create_tibble3(USM_list_1996,10,500,sim_data),
+#                             times = 10)
+# 
+# benchmark
+# 
+# ggplot2::autoplot(benchmark)

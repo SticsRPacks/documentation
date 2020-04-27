@@ -49,10 +49,6 @@ create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
   return(as_tibble(tb))
 }
 
-
-
-
-
 create_tibble2 = function(USM_list,doe_size,usm_number,sim_data) {
   # USM_list: vecteur des noms d'usm (parmi les noms de la liste sim_data) 
   # doe_size: nombre d'échantillons du doe
@@ -70,16 +66,36 @@ create_tibble2 = function(USM_list,doe_size,usm_number,sim_data) {
     names(usm_sub_list) <- paste(rep(USM_list[x],usm_names_nb), 1:usm_names_nb, sep="_")
     bind_rows(usm_sub_list, .id = "Name")
   })
-  
   # Replicating one_doe_tb doe_size times; conversion to tibble
   tb <- bind_rows(rep(one_doe_tb, doe_size))
+
   # adding doe identifiers to tb
   tb$DoE = sort(rep(1:doe_size,nrow(tb)/doe_size))
   
   return(tb)
 }
 
-
+create_tibble3 = function(USM_list,doe_size,usm_number,sim_data) {
+  size = doe_size*usm_number
+  li <- vector("list", size)
+  nb_usms <- length(USM_list)
+  nbdates = nrow(sim_data[[1]])
+  
+  cnt <- 1
+  for (doe in 1:doe_size) {
+    for (usm_id in 1:usm_number) {
+      usm_id_loc <- usm_id %% nb_usms + 1
+      li[[cnt]] <- bind_cols(DoE=rep(doe,nbdates),
+                             Name=rep(paste(USM_list[usm_id_loc],"_",
+                                            (usm_id %/% nb_usms) + 1,sep=""),
+                                      nbdates),
+                             sim_data[[usm_id_loc]])
+      cnt <- cnt + 1
+    }
+  }
+  
+  tb <- bind_rows(li)
+}
 
 create_list = function(USM_list,doe_size,usm_number,sim_data) {
   li <- vector("list",doe_size)
@@ -151,6 +167,9 @@ tibble_get_dates_and_var_values = function(structure,doe,usm_name,var) {
   dplyr::filter(structure, DoE == doe,Name == usm_name) %>% dplyr::select(Date,!!var)
 }
 
+tibble_get_dates_and_var_values5 = function(structure,doe,usm_name,var) {
+  subset(structure[structure$DoE==doe,c("Date","Name",var)],Name == usm_name)[-2]
+}
 ########################################
 
 list_get_usm_names_and_var_values = function(structure,doe,var,date) {
@@ -175,7 +194,7 @@ list_get_usm_names_and_var_values2 = function(structure,doe,var,date) {
   # lapply(structure_doe, function(x) {filter(x, Date == ymd(date)) %>% select(var)})
   
   # renvoie un tibble
-  bind_rows(lapply(structure_doe, function(x) {filter(x, Date == ymd(date)) %>% select(var)}),.id = "Name")
+  bind_rows(lapply(structure_doe, function(x) {filter(x, Date == ymd(date)) %>% select(!!var)}),.id = "Name")
   
 }
 
