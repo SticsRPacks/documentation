@@ -1,0 +1,87 @@
+---
+title: "Copy-on-modify"
+author: "ROBINE Thomas"
+date: "17 fevrier 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+options(warn =-1)
+```
+
+# Abstract
+
+In this document, we're demonstrating the copy-on-modify between Reference Classes and the other 
+datatype structures (e.g List,DataFrame,DataTable and Tibble). Our initial hypothesis is that when 
+we modify a Reference Class' instance, we modify the instance itself and not a copy as the others
+datatypes do.
+The tests are designed in this way. First we check the address (using tracemem) and the name of the instance.
+Then we do the same actions in the function.
+Finally we repeat the same actions again after the function.
+
+``` {r code}
+source("data_structure_functions.R")
+library(tibble)
+library(data.table)
+
+Structures_types <- c("list","class","dataframe","datatable","tibble")
+
+change_name = function(structure,index) {
+  print("inside function")
+  print("tracemem :")
+  print(tracemem(structure))
+  print("name :")
+  if (index == 1) { # list
+    structure[[1]][1] <- "name_changed"
+    print(structure[[1]][1])
+  }
+  else if (index == 2) { # class
+    structure[[1]]$name <- "name_changed"
+    print(structure[[1]]$name)
+  }
+  else { # dataframe, datatable, tibble
+    structure$name <- "name_changed"
+    print(structure$name)
+  }
+}
+
+for (i in 1:5) {
+  struct <- eval(parse(text=paste("vector_usm_",Structures_types[i],"(",1,")",sep="")))
+  print(Structures_types[i])
+  print("before function :")
+  print("tracemem :")
+  print(tracemem(struct))
+  print("name :")
+  if (i == 1) { # list
+    print(struct[[1]][1])
+  }
+  else if (i == 2) { # class
+    print(struct[[1]]$name)
+  }
+  else { # dataframe,datatable,tibble
+     print(struct$name)
+  }
+  change_name(struct,i)
+  print("after function")
+  print("tracemem :")
+  print(tracemem(struct))
+  print("name :")
+   if (i == 1) { # list
+    print(struct[[1]][1])
+  }
+  else if (i == 2) { # class
+    print(struct[[1]]$name)
+  }
+  else { # dataframe,datatable,tibble
+     print(struct$name)
+  }
+  cat("\n\n")
+}
+
+```
+# Conclusion
+
+As we can see, the "class" type is the only type of data to do the modification on the original 
+object when the original object is modified. The others types modify only a copy of the original 
+object.
