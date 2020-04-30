@@ -1,0 +1,133 @@
+---
+title: "Complex data structures"
+author: "Robine Thomas"
+date: "09/05/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+# Lists
+
+```{r test}
+vector1 = c(2,3,5) 
+vector2 = c("aa","bb", "cc") 
+vector3 = c(TRUE, FALSE, TRUE) 
+li = list(vector1,vector2,vector3)
+li
+li[[1]][3] = "22"
+li
+```
+Good point : we can modify an element easily. If the list is named, we can access its elements by another method which is `$elem_name`
+
+Drawback : if you change an element type and the new type is string, then all the element in the same vector will be string typed. It only works if the origin type is not string.
+
+# Data frames, data tables and tibbles
+
+## Data frames
+
+Drawback : all the vector in the data frame should have the same length.
+``` {r testbis}
+df = data.frame(vector1,vector2,vector3)
+df
+```
+
+## Tibbles
+
+Drawback : more strict than data frames, don't allow type changing.
+
+```{r testter}
+tb <- tibble::as_tibble(df)
+colnames(tb) <- c("column1","column2","column3")
+tb
+result <- tb$column1
+result
+```
+
+Good points : those types have package like "dplyr" which permits an easier use of them. Moreover, "tidylog" package allows us to have a record of all the actions that occured on the dplyr package.
+Another thing is that all the values can be accessed by the colnames and the rownames (tb$column1 or tb[[column1]]) instead of number.
+
+
+## Data tables
+
+Good point : we can make request as in SQL in order to select datas.
+
+```{r testdatatable}
+DT = data.table::data.table(
+  Col = c("attention","opinion","incredible","attention"),
+  Col2 = 1:4,
+  Col3 = 5:8
+)
+DT
+dt <- DT[Col == "attention"]
+dt
+```
+
+# Arrays and matrix
+
+## Arrays 
+```{r testtableaux}
+ar <- array(c(vector1,vector2,vector3),dim = c(3,3,1))
+rownames(ar) <- c("line1", "line2", "line3")
+ar
+```
+
+## Matrix
+
+```{r testmatrix}
+mat <- matrix(c(vector1,vector2,vector3),nrow = 3,ncol = 3)
+mat
+mat <- matrix(c(vector1,vector2,vector3),nrow = 3,ncol = 3,byrow = T)
+colnames(mat) <- c("column1","column2","column3")
+mat
+```
+
+Drawbacks : those types can only contains one type of datas, which is a huge drawback. Furthermore, we can't access the data the same easy way as we can do for data frames, data tables and tibbles.
+
+# R6/References classes
+
+```{r testclasses}
+test <- setRefClass("test", fields = list(vector1 = "vector", vector2 = "vector", vector3 = "vector"))
+testclass <- test(vector1 = c(2,3,5), vector2 = c("aa","bb","cc"), vector3 = c(TRUE,FALSE,TRUE))
+testclass
+```
+
+They have a main problem, which is for a referenced object, only a single copy of it exists. Which means,if two variables contains the same referenced object, if one variable is modified then the other is modified too.
+
+```{r testclassesmodifications}
+testclassmodifications <- testclass
+testclassmodifications
+testclassmodifications$vector1 <- c(2,3,4)
+testclassmodifications
+testclass
+```
+
+However, this could be solved using the "$copy()" method
+
+```{r testclassesmodificationssolutions}
+testclassmodificationssolutions <- testclass$copy()
+testclassmodificationssolutions
+testclassmodificationssolutions$vector2 <- c("ee","ff","gg")
+testclassmodificationssolutions
+testclass
+```
+
+# Graph
+
+```{r plot}
+osli <- object.size(li)
+osdf <- object.size(df)
+ostdt <- object.size(DT)
+ostb <- object.size(tb)
+osar <- object.size(ar)
+osmat <- object.size(mat)
+osclass <- object.size(testclass)
+ostotal <- object.size(vector1)+object.size(vector2)+object.size(vector3)
+collection = c(osli,osdf,ostb,osar,osmat,osclass,ostotal)
+plot(collection,
+     main = "types weight comparison",
+     xlab = "list / data frame / data table / tibble / array / matrix / reference class / total",
+     ylab = "memory weight (bytes)"
+     )
+```

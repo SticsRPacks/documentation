@@ -1,0 +1,77 @@
+---
+title: "Comparative methods for measuring memory weight"
+author: "ROBINE Thomas"
+date: "20 février 2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,
+                      cache = TRUE,
+                      cache.lazy = TRUE)
+```
+
+# Introduction
+
+We want to know the best way to determine the memory weight of a datatype structure, especially for the "Reference Class" type, which is quite difficult to evaluate. Currently, we're using the object.size() method in order to calculate the memory weight of the datatype structure in the "data_structure_creations_tests.Rmd" document and we're searching for a new and more efficient method. For that we have 3 differents ways to measure it (object.size() from utils package, obj_size() from lobstr package and memuse from itself package).
+
+``` {r code}
+source("data_structure_functions.R")
+library(tibble)
+library(data.table)
+library(tidyverse)
+library(microbenchmark)
+library(dplyr)
+library(ggplot2)
+library(memuse)
+library(lobstr)
+options(warn=-1)
+
+size <- c(10000,100000)#,1000000)
+
+for (i in size) {
+  liste <- list_of_usm_list_by_vector(i)
+  classe <- list_of_usm_list_by_vector(i)
+  df <- usm_dataframe_by_vector(i)
+  dt <- usm_datatable_by_usm_dataframe_by_vector(i)
+  tb <- usm_tibble_by_usm_dataframe_by_vector(i)
+  
+  all_weight <- object.size(liste)
+  all_weight <- append(all_weight,object.size(classe))
+  all_weight <- append(all_weight,object.size(df))
+  all_weight <- append(all_weight,object.size(dt))
+  all_weight <- append(all_weight,object.size(tb))
+  
+  all_weight <- append(all_weight,obj_size(liste))
+  all_weight <- append(all_weight,obj_size(classe))
+  all_weight <- append(all_weight,obj_size(df))
+  all_weight <- append(all_weight,obj_size(dt))
+  all_weight <- append(all_weight,obj_size(tb))
+  
+  all_weight <- append(all_weight,as.numeric(memuse(liste)))
+  all_weight <- append(all_weight,as.numeric(memuse(classe)))
+  all_weight <- append(all_weight,as.numeric(memuse(df)))
+  all_weight <- append(all_weight,as.numeric(memuse(dt)))
+  all_weight <- append(all_weight,as.numeric(memuse(tb)))
+  
+  Structures_types <- c("List","Class","Dataframe","Datatable","Tibble")
+  structures <- rep(Structures_types,3)
+  weight_log10 <- log10(all_weight)
+  methods <- c(rep("object.size",5),rep("obj_size",5),rep("memuse",5))
+  
+  global_plot_weight_recap <- data.frame(structures,weight_log10,methods)
+  
+  global_graph_weight_recap <- ggplot(data = global_plot_weight_recap,aes(x = methods, y=weight_log10, fill = structures)) +
+    geom_bar(position = "dodge", stat = "identity")
+  print(global_graph_weight_recap + ggtitle(sprintf("%s %d","weight measure method recap graph for size =",i)))
+}
+
+
+
+```
+
+# Conclusion
+
+Firstly, the "Reference Class" type was the datatype structure with the lower memory weight, but due to some modifications in the generation functions in "data_structure_functions.R", it is not the case anymore. To conclude, we can still continue to use object.size().
