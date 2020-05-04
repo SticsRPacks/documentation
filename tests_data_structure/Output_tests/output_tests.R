@@ -216,15 +216,16 @@ sim_data_289 <- lapply(sim_data, function(x)
 # just restart your R session and the memory will be reset to its initial value
 
 # memory.limit(size = 8000000000000)
-
-# multi_tb <- create_tibble2(USM_list_1996,1,500000,sim_data)
+# memory.limit()
+# gc()
+# multi_tb <- create_tibble2(USM_list_1996,1,150000,sim_data_289)
+# gc()
 # tibble_get_usm_names_and_var_values(multi_tb,1,"resmes","1996-01-05")
 # save(multi_tb, file="MultiSimulation_tibble.RData")
 # gc()
 # load(file = "MultiSimulation_tibble.RData")
 # res = tibble_get_dates_and_var_values(multi_tb,1,"lu96iN+_133","HR_1")
 # res
-
 # analysis_tb <- create_tibble2(USM_list_1996,50000,10,sim_data)
 # save(analysis_tb, file = "Analysis_tibble.RData")
 # analysis_tb
