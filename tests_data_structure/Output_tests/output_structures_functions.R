@@ -82,8 +82,8 @@ create_tibble3 = function(USM_list,doe_size,usm_number,sim_data) {
   nbdates = nrow(sim_data[[1]])
   
   cnt <- 1
-  for (doe in 1:doe_size) {
-    for (usm_id in 1:usm_number) {
+  for (usm_id in 1:usm_number) {
+    for (doe in 1:doe_size) {
       usm_id_loc <- usm_id %% nb_usms + 1
       li[[cnt]] <- bind_cols(DoE=rep(doe,nbdates),
                              Name=rep(paste(USM_list[usm_id_loc],"_",
