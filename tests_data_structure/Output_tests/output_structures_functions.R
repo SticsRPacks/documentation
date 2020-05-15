@@ -241,7 +241,7 @@ tibble_get_DOE_and_var_values = function(structure,usm_name,var,date) {
 
 
 
-############### extraction functions #############################
+############### extraction tests functions #############################
 
 bench_get_dates_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name, usm_name, times = 100  ) {
   n_doe <- length(doe_samp)
