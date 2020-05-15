@@ -15,9 +15,9 @@
 create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
   size = doe_size*usm_number*nrow(sim_data[[1]])
   tb <- tibble(Name=character(size),Date=as.POSIXct.default((rep("1996-10-15",size))),
-                jul=integer(size), lai_n=double(size),masec_n=double(size),
-                mafruit=double(size), HR_1=double(size), HR_2=double(size),
-                HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size),DoE=integer(size))
+               jul=integer(size), lai_n=double(size),masec_n=double(size),
+               mafruit=double(size), HR_1=double(size), HR_2=double(size),
+               HR_3=double(size),HR_4=double(size), HR_5=double(size), resmes=double(size),DoE=integer(size))
   begin_id = 1
   end_id = nrow(sim_data[[1]])
   size_bis = nrow(sim_data[[1]])
@@ -35,13 +35,13 @@ create_tibble = function(USM_list,doe_size,usm_number,sim_data) {
         tb[begin_id:end_id,2:12] <<- sim_data[[usm]]
         tb[begin_id:end_id,13] <<- rep(doe,size_bis)
         #tb[begin_id:end_id,] <<- cbind(rep(paste(usm,"_",id,sep=""),size_bis),sim_data[[usm]],rep(doe,size_bis))
-        # la commande précédente ne veut pas s'executer, le champs "Name" est égal a "1" pour chaque ligne
+        # la commande pr?c?dente ne veut pas s'executer, le champs "Name" est ?gal a "1" pour chaque ligne
         begin_id <<- end_id + 1
         end_id <<- end_id + size_bis
       })
     })
   })
-  # cette ligne sert à mettre les dates au format suivant : 1996-01-01 00:00:00 car auparavant elles etaient au
+  # cette ligne sert ? mettre les dates au format suivant : 1996-01-01 00:00:00 car auparavant elles etaient au
   # format : 1996-01-01 01:00:00
   setattr(tb$Date,'tzone','UTC')
   # Patrice
@@ -68,7 +68,7 @@ create_tibble2 = function(USM_list,doe_size,usm_number,sim_data) {
   })
   # Replicating one_doe_tb doe_size times; conversion to tibble
   tb <- bind_rows(rep(one_doe_tb, doe_size))
-
+  
   # adding doe identifiers to tb
   tb$DoE = sort(rep(1:doe_size,nrow(tb)/doe_size))
   
@@ -228,7 +228,7 @@ list_get_DOE_and_var_values2 = function(structure,usm_name,var,date) {
   #lapply(structure_usm, function(x) {filter(x, Date == ymd(date)) %>% select(var)})
   
   # renvoie un tibble
-  bind_rows(structure_usm,.id = "Name") %>% filter(Date == ymd(date)) %>% select(Name,var)
+  bind_rows(structure_usm,.id = "DoE") %>% filter(Date == ymd(date)) %>% select(DoE,var)
   #bind_rows(lapply(structure_usm, function(x) {filter(x, Date == ymd(date)) %>% select(var)}),.id = "Name")
   
 }
@@ -237,3 +237,96 @@ tibble_get_DOE_and_var_values = function(structure,usm_name,var,date) {
   var <- enquo(var)
   dplyr::filter(structure, Name == usm_name,Date == ymd(date)) %>% dplyr::select(DoE,!!var)
 }
+
+
+
+
+############### extraction functions #############################
+
+bench_get_dates_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name, usm_name, times = 100  ) {
+  n_doe <- length(doe_samp)
+  
+  benchmark_opti <- vector(mode = "list", n_doe)
+  
+  for (i in 1:n_doe) {
+    index <- doe_samp[i]
+    
+    opti_tb <- create_tibble3(usm_list,index,usm_number,sim_data)
+    opti_li <- create_list2(usm_list,index,usm_number,sim_data)
+    
+    benchmark_opti[[i]] <- microbenchmark(li = list_get_dates_and_var_values(opti_li,index,usm_name,var_name),
+                                          tb = tibble_get_dates_and_var_values5(opti_tb,index,usm_name,var_name),
+                                          times = times)
+    print(benchmark_opti[[i]])
+    
+  }
+  
+  names(benchmark_opti) <- doe_samp
+  
+  return(benchmark_opti)
+  
+}
+
+
+bench_get_usm_var <- function(usm_list, doe, usm_samp, sim_data, var_name, date, times = 100  ) {
+  
+  n_usm <- length(usm_samp)
+  
+  benchmark_multi <- vector(mode = "list", n_usm)
+  
+  for (i in 1:n_usm) {
+    index <- usm_samp[i]
+    
+    multi_tb <- create_tibble3(usm_list,doe,index,sim_data)
+    multi_li <- create_list2(usm_list,doe,index,sim_data)
+    
+    
+    benchmark_multi[[i]] <- microbenchmark(li = list_get_usm_names_and_var_values2(multi_li,doe,var_name,date),
+                                           tb = tibble_get_usm_names_and_var_values(multi_tb,doe,var_name,date),
+                                           times = times)
+    
+    print(benchmark_multi[[i]])
+  }
+  
+  names(benchmark_multi) <- usm_samp
+  
+  return(benchmark_multi)
+  
+}
+
+
+
+bench_get_doe_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name, usm_name, date, times = 100  ) {
+  n_doe <- length(doe_samp)
+  
+  benchmark_analysis <- vector(mode = "list", n_doe)
+  
+  for (i in 1:n_doe) {
+    index <- doe_samp[i]
+    
+    analysis_tb <- create_tibble3(usm_list,index,usm_number,sim_data)
+    analysis_li <- create_list2(usm_list,index,usm_number,sim_data)
+    
+    benchmark_analysis[[i]] <-  microbenchmark(li = list_get_DOE_and_var_values2(analysis_li,usm_name,var_name,date),
+                                               tb = tibble_get_DOE_and_var_values(analysis_tb,usm_name,var_name,date),
+                                               times = 100)
+    
+    print(benchmark_analysis[[i]])
+  }
+  
+  names(benchmark_analysis) <- doe_samp
+  
+  return(benchmark_analysis)
+  
+}
+
+
+
+bench_list2df <- function(bench_list, id = "doe") {
+  sum_list <- lapply(bench_list, summary)
+  df <- dplyr::bind_rows(sum_list, .id = id)
+  df[[id]] <- as.numeric(df[[id]])
+  return(df)
+}
+
+
