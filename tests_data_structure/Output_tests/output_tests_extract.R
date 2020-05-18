@@ -3,7 +3,6 @@ library(data.table)
 library(lubridate)
 library(microbenchmark)
 library(ggplot2)
-library("SticsRPacks")
 library("SticsOnR")
 library("SticsRFiles")
 library(dplyr)
@@ -34,7 +33,14 @@ sim_data_289 <- lapply(sim_data, function(x)
 
 
 ## Extraction's tests
-bench_times <- 10
+bench_times <- 100
+sys_name <- Sys.info()[['sysname']]
+opti_name <- paste0("benchmark_opti_",sys_name,"_")
+multi_name <- paste0("benchmark_multi_",sys_name,"_")
+analysis_name <- paste0("benchmark_analysis_",sys_name,"_")
+opti_plot <- paste0("plot_opti_",sys_name,"_")
+multi_plot <- paste0("plot_multi_",sys_name,"_")
+analysis_plot <- paste0("plot_analysis_",sys_name,"_")
 
 ### Optimization's extraction test
 
@@ -49,15 +55,14 @@ benchmark_opti_1 <- bench_get_dates_var(usm_list = USM_list_1996,
                                 times = bench_times)
 
 # save data !
-save(file = "benchmark_opti_1.RData", list = "benchmark_opti_1")
+save(file = paste0(opti_name,"1.RData"), list = "benchmark_opti_1")
 
 # plot
 bench_list2df(benchmark_opti_1) %>% mutate(med_time_log10 = log10(median)) %>%
+ggplot() + geom_line(aes(doe, med_time_log10, colour = expr)) + ggtitle("test") -> p_opti_1
 
-ggplot() + geom_line(aes(doe, med_time_log10, colour = expr)) -> p_opti_1
 
-
-ggsave(filename = "plot_opti_1.png", plot = p_opti_1)
+ggsave(filename = paste0(opti_plot, "1.png"), plot = p_opti_1)
 
 gc()
 
@@ -71,16 +76,14 @@ benchmark_opti_2 <- bench_get_dates_var(usm_list = USM_list_1996,
                                       usm_name = "lu96iN6_2",
                                       times = bench_times)
 
-
 # save data !
-save(file = "benchmark_opti_2.RData", list = "benchmark_opti_2")
+save(file = paste0(opti_name,"2.RData"), list = "benchmark_opti_2")
 
 # plot
 bench_list2df(benchmark_opti_2) %>% mutate(med_time_log10 = log10(median)) %>%
-
 ggplot() + geom_line(aes(doe, med_time_log10, colour = expr)) -> p_opti_2
 
-ggsave(filename = "plot_opti_2.png", plot = p_opti_2)
+ggsave(filename = paste0(opti_plot, "2.png"), plot = p_opti_2)
 
 gc()
 
@@ -100,14 +103,13 @@ benchmark_multi_1 <- bench_get_usm_var(usm_list = USM_list_1996,
 
 
 # save data !
-save(file = "benchmark_multi_1.RData", list = "benchmark_multi_1")
+save(file = paste0(multi_name,"1.RData"), list = "benchmark_multi_1")
 
 # plot
 bench_list2df(benchmark_multi_1, id = "usm") %>% mutate(med_time_log10 = log10(median)) %>%
-
 ggplot() + geom_line(aes(usm, med_time_log10, colour = expr)) -> p_multi_1
 
-ggsave(filename = "plot_multi_1.png", plot = p_multi_1)
+ggsave(filename = paste0(multi_plot, "1.png"), plot = p_multi_1)
 
 gc()
 
@@ -122,15 +124,15 @@ benchmark_multi_2 <- bench_get_usm_var(usm_list = USM_list_1996,
                                        date = "1996-01-05", 
                                        times = bench_times )
 
+
 # save data !
-save(file = "benchmark_multi_2.RData", list = "benchmark_multi_2")
+save(file = paste0(multi_name,"2.RData"), list = "benchmark_multi_2")
 
 # plot
 bench_list2df(benchmark_multi_2, id = "usm") %>% mutate(med_time_log10 = log10(median)) %>%
-
 ggplot() + geom_line(aes(usm, med_time_log10, colour = expr)) -> p_multi_2
 
-ggsave(filename = "plot_multi_2.png", plot = p_multi_2)
+ggsave(filename = paste0(multi_plot, "2.png"), plot = p_multi_2)
 
 gc()
 
@@ -146,14 +148,15 @@ benchmark_analysis_1 <- bench_get_doe_var(usm_list = USM_list_1996,
                                         usm_name = "lu96iN6_2",
                                         date = "1996-01-05",
                                         times = bench_times)
+
 # save data !
-save(file = "benchmark_analysis_1.RData", list = "benchmark_analysis_1")
+save(file = paste0(analysis_name,"1.RData"), list = "benchmark_analysis_1")
 
 # plot
 bench_list2df(benchmark_analysis_1) %>% mutate(med_time_log10 = log10(median)) %>%
 ggplot() + geom_line(aes(doe, med_time_log10, colour = expr)) -> p_analysis_1
 
-ggsave(filename = "plot_analysis_1.png", plot = p_analysis_1)
+ggsave(filename = paste0(analysis_plot, "1.png"), plot = p_analysis_1)
 
 gc()
 
@@ -171,14 +174,13 @@ benchmark_analysis_2 <- bench_get_doe_var(usm_list = USM_list_1996,
 
 
 # save data !
-save(file = "benchmark_analysis_2.RData", list = "benchmark_analysis_2")
+save(file = paste0(analysis_name,"2.RData"), list = "benchmark_analysis_2")
 
 # plot
 bench_list2df(benchmark_analysis_2) %>% mutate(med_time_log10 = log10(median)) %>%
-
 ggplot() + geom_line(aes(doe, med_time_log10, colour = expr)) -> p_analysis_2
 
-ggsave(filename = "plot_analysis_2.png", plot = p_analysis_2)
+ggsave(filename = paste0(analysis_plot, "2.png"), plot = p_analysis_2)
 
 gc()
 

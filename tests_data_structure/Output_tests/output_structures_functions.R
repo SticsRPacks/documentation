@@ -309,7 +309,7 @@ bench_get_doe_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name
     
     benchmark_analysis[[i]] <-  microbenchmark(li = list_get_DOE_and_var_values2(analysis_li,usm_name,var_name,date),
                                                tb = tibble_get_DOE_and_var_values(analysis_tb,usm_name,var_name,date),
-                                               times = 100)
+                                               times = times)
     
     print(benchmark_analysis[[i]])
   }
@@ -321,12 +321,34 @@ bench_get_doe_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name
 }
 
 
-
+# Generates a data.frame fro a list of microbenchmark
+# objects, setting a common execution time unit
+# and adding it as column
 bench_list2df <- function(bench_list, id = "doe") {
-  sum_list <- lapply(bench_list, summary)
+  units_vect <- unlist(lapply(bench_list, get_bench_unit))
+  com_unit <- get_common_unit(units_vect)
+  sum_list <- lapply(bench_list, function(x) print(x, unit = names(com_unit)) %>% mutate(unit = com_unit))
   df <- dplyr::bind_rows(sum_list, .id = id)
   df[[id]] <- as.numeric(df[[id]])
   return(df)
 }
+
+# Getting unit from a microbenchmark object
+get_bench_unit <- function(bench_table) {
+  unit_str <- gsub(pattern = "Unit: ", x = capture.output(bench_table)[1], replacement = "")
+  return(unit_str)
+}
+
+# Getting the common unit from a list
+# of units == the most represented
+get_common_unit <- function(units_vect) {
+  units_list <- c("nanoseconds", "microseconds", "milliseconds","seconds")
+  names(units_list) <- c("ns", "us","ms", "s")
+  units_names <- unique(units_vect)
+  units_count <- unlist(lapply(units_names, function(x) sum(units_vect %in% x)))
+  unit_name <- units_names[units_count == max(units_count)]
+  units_list[ units_list %in% unit_name ]
+}
+
 
 
