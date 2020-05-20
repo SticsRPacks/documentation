@@ -327,7 +327,7 @@ bench_get_doe_var <- function(usm_list, doe_samp, usm_number, sim_data, var_name
 bench_list2df <- function(bench_list, id = "doe") {
   units_vect <- unlist(lapply(bench_list, get_bench_unit))
   com_unit <- get_common_unit(units_vect)
-  sum_list <- lapply(bench_list, function(x) print(x, unit = names(com_unit)) %>% mutate(unit = com_unit))
+  sum_list <- lapply(bench_list, function(x) summary(x, unit = names(com_unit)) %>% mutate(unit = com_unit))
   df <- dplyr::bind_rows(sum_list, .id = id)
   df[[id]] <- as.numeric(df[[id]])
   return(df)
