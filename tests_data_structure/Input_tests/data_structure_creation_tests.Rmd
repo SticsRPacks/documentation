@@ -122,55 +122,113 @@ with a non pre-allocated method, which is not possible for the other types.
 
 ```{r npa vs pa}
 
- # list which contains the structures' types
+# list which contains the structures' types
 Structures_types <- c("list","class")
- # list which contains the differents instanciations methods
-Instanciation_methods <- c("NPA Lapply","PA Lapply")
+# times units
+times_units <- c("nanoseconds","microseconds","milliseconds","seconds")
+# get benchmark time unit, 
+time_unit <- NULL
+# graph legend dor time unit
+time_ref <- NULL
 
-# main loop
-for (i in num_elem) {
-  
-  cat("\nNumber of elements : ",i,"\n")
-  
-  # loop that will take vector_method and lapply_method together for the same structure because
-  # list_vector and list_lapply have the same size
-  for (j in 1:length(Structures_types)) {
+times_list_NPA <- list()
+times_list_PA <- list()
+times_class_NPA <- list()
+times_class_PA <- list()
+
+weights_list <- list()
+weights_class <- list()
+
+# Loop on structures (List,Class)
+for (i in Structures_types) {
+  cat("\nStrucure : ",i,"\n")
+  # Loop on size (10K,100K,1M)
+  for (j in num_elem) {
     
-      cat(Structures_types[j],"\n")
-    
-      # instance_weight will be used to store the weight of the instances in the i-th loop
-      set.seed(1)
-      test <- eval(parse(text=paste("list_of_usm_",Structures_types[j],"_by_lapply(",i,")",sep="")))
-      instance_weight <- object.size(test)
-      set.seed(1)
-      test <- eval(parse(text=paste("list_of_usm_",Structures_types[j],"_by_PA_lapply(",i,")",sep="")))
-      instance_weight <- append(instance_weight,object.size(test))
-      
-      plot_weight <- data.frame(Instanciation_modes = Instanciation_methods,
-                                weights = instance_weight)
-    
-      graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
-        geom_bar(stat = "identity")
-      print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-    
-      benchmark <- microbenchmark(NPA_Lapply= eval(parse(text=paste("list_of_usm_",Structures_types[j],
-                                                                "_by_lapply(",i,")",sep=""))),
-                                  PA_Lapply = eval(parse(text=paste("list_of_usm_",Structures_types[j],
-                                                                "_by_PA_lapply(",i,")",sep=""))),
-                                  setup = set.seed(1),
-                                  times = 100)
-      
-      plot_time <- data.frame(Instanciation_modes = Instanciation_methods,
-                              mean_times = log10(summary(benchmark)$mean))
-    
-      graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-        geom_bar(stat = "identity")
-      print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-    
-      print(ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s %s","Duration tests for a ",
-                                                     i," elements ",Structures_types[j])))
+    # first call to creation functions to get the structure weight for the j size
+    set.seed(1) # setting seed to have the same object between list and class
+    test <- eval(parse(text=paste("list_of_usm_",i,"_by_lapply(",j,")",sep="")))
+    if (i == "list") {
+      weights_list <- append(weights_list,object.size(test))
     }
+    else {
+      weights_class <- append(weights_class,object.size(test))
+    }
+    
+    # benchmark
+     benchmark <- microbenchmark(NPA_Lapply= eval(parse(text=paste("list_of_usm_",i,"_by_lapply(",j,")",sep=""))),
+                                 PA_Lapply = eval(parse(text=paste("list_of_usm_",i,"_by_PA_lapply(",j,")",sep=""))),
+                                 setup = set.seed(1),times = 100)
+     
+     if (is.null(time_unit)) {
+       time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
+     }
+     
+     current_bench_time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
+     
+     time_NPA = summary(benchmark)$median[1]
+     time_PA = summary(benchmark)$median[2]
+     
+     if (current_bench_time_unit != time_unit) {
+       index_time_unit = which(times_units == time_unit)
+       index_current_bench_time_unit = which(times_units == current_bench_time_unit)
+       diff = index_current_bench_time_unit - index_time_unit
+       # we're starting from the hypothesis that the first unit will be the unit from the benchmark with the smallest size and a benchmark with a bigger size will take more time. We multiply by 1000 because it is the rate to pass from an unit to another.
+       for (k in 1:diff) {
+         time_NPA <- time_NPA*1000
+         time_PA <- time_PA*1000
+       }
+     }
+     
+     if (i == "list") {
+       if (j == 1000) {
+         times_list_NPA <- time_NPA
+         times_list_PA <- time_PA
+       }
+       else {
+         times_list_NPA <- append(times_list_NPA,time_NPA)
+         times_list_PA <- append(times_list_PA,time_PA)
+       }
+     }
+     else {
+       if (j == 1000) {
+         times_class_NPA <- time_NPA
+         times_class_PA <- time_PA
+       }
+       else {
+         times_class_NPA <- append(times_class_NPA,time_NPA)
+         times_class_PA <- append(times_class_PA,time_PA)
+       }
+     }
+     
+     if (j == 100000) {
+       print(ggplot2::autoplot(benchmark))
+     }
+  }
+  time_ref <- paste("Time_log10_",time_unit,sep="")
+  if (i == "list") {
+    df_NPA <- data.frame(Usms = num_elem, time_ref = log10(times_list_NPA), type = "NPA")
+    df_PA <- data.frame(Usms = num_elem, time_ref = log10(times_list_PA), type = "PA")
+    final <- rbind(df_NPA,df_PA)
+    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
+  }
+  else {
+    df_NPA <- data.frame(Usms = num_elem, time_ref = log10(times_class_NPA), type = "NPA")
+    df_PA <- data.frame(Usms = num_elem, time_ref = log10(times_class_PA), type = "PA")
+    final <- rbind(df_NPA,df_PA)
+    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
+  }
 }
+
+df_list_weights <- data.frame(Usms = num_elem, Weights = weights_list, type = "List")
+df_class_weights <- data.frame(Usms = num_elem, Weights = weights_class, type = "Class")
+final_weights <- rbind(df_list_weights,df_class_weights)
+ggplot(final_weights)+geom_line(aes(Usms,Weights,colour=type))
+
+df_list_time <- data.frame(Usms = num_elem, time_ref = log10(times_list_NPA), type = "NPA List")
+df_class_time <- data.frame(Usms = num_elem, time_ref = log10(times_class_NPA), type = "NPA Class")
+final_time <- rbind(df_list_time,df_class_time)
+ggplot(final_time)+geom_line(aes(Usms,time_ref,colour=type))
 ```
 
 Even, if the NPA instanciation is 'lighter' than the others, its huge instanciation time makes that we will not use it. Indeed, during the tests, we must divide by hundred the number of usm the NPA contains because it will last more tha 3 days before it creates a 1M usms structure. 
@@ -188,56 +246,142 @@ Tibble : Same ways as for DataTable
 
 # list which contains the structures' types
 Structures_types <- c("dataframe","datatable","tibble")
-# list which contains the differents instanciations methods
+# times units
+times_units <- c("nanoseconds","microseconds","milliseconds","seconds")
+# get benchmark time unit, 
+time_unit <- NULL
+# graph legend dor time unit
+time_ref <- NULL
 
-# main loop
-for (i in num_elem) {
-  
-  cat("\nNumber of elements : ",i,"\n")
+times_dataframe <- list()
+times_dataframe_lapply <- list()
+times_datatable <- list()
+times_datatable_lapply <- list()
+times_tibble <- list()
+times_tibble_lapply <- list()
 
-  # loop that will take vector_method and lapply_method together for the same structure because
-  # list_vector and list_lapply have the same size
-  for (j in 1:length(Structures_types)) {
-    
-      cat(Structures_types[j],"\n")
-    
-      Instanciation_methods = c(Structures_types[j],"Lapply")
-      
-      set.seed(1)
-      test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_",Structures_types[j],"(",i,")",
-                                    sep="")))
-      instance_weight <- object.size(test)
-      set.seed(1)
-      test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_lapply(",i,")",
-                                    sep="")))
-      instance_weight <- append(instance_weight,object.size(test))
-      
-      plot_weight <- data.frame(Instanciation_modes = Instanciation_methods,
-                              weights = instance_weight)
-  
-      graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
-        geom_bar(stat = "identity")
-      print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-    
-      benchmark <- microbenchmark(structure=eval(parse(text=paste("usm_",Structures_types[j],
-                                                                 "_by_",Structures_types[j],
-                                                                 "(",i,")",sep=""))),
-                                  Lapply=eval(parse(text=paste("usm_",Structures_types[j],
-                                                               "_by_lapply(",i,")",sep=""))),
-                                  setup = set.seed(1),
-                                  times = 50)
-      
-      plot_time <- data.frame(Instanciation_modes = Instanciation_methods,
-                              mean_times = log10(summary(benchmark)$mean))
-    
-      graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-        geom_bar(stat = "identity")
-      print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-    
-      print(ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s %s","Duration tests for a ",
-                                                     i," elements ",Structures_types[j])))
+weights_dataframe <- list()
+weights_datatable <- list()
+weights_tibble <- list()
+
+# Loop on the structures
+for (i in Structures_types) {
+  cat("\nStrucure : ",i,"\n")
+  # Loop on the structure's size
+  for (j in num_elem) {
+    # Both instanciation methods should return the same object
+    # The set.seed() command maes all the structures having the same information
+    set.seed(1)
+    test <- eval(parse(text=paste("usm_",i,"_by_lapply(",j,")",sep="")))
+    if (i == "dataframe") {
+      weights_dataframe <- append(weights_dataframe,object.size(test))
     }
+    else {
+      if (i == "datatable") {
+        weights_datatable <- append(weights_datatable,object.size(test))
+      }
+      else {
+        weights_tibble <- append(weights_tibble,object.size(test))
+      }
+    }
+    # benchmark
+    name1 <- paste(i,"_by_itself",sep="")
+    name2 <- paste(i,"_by_lapply",sep="")
+    benchmark <- microbenchmark(name1 = eval(parse(text=paste("usm_",i,"_by_",i,"(",j,")",sep=""))),
+                                name2 = eval(parse(text=paste("usm_",i,"_by_lapply(",j,")",sep=""))),
+                                setup = set.seed(1),times = 10)
+    
+    if (is.null(time_unit)) {
+       time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
+     }
+     
+     current_bench_time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
+     
+     time_itself = summary(benchmark)$median[1]
+     time_lapply = summary(benchmark)$median[2]
+     
+     if (current_bench_time_unit != time_unit) {
+       index_time_unit = which(times_units == time_unit)
+       index_current_bench_time_unit = which(times_units == current_bench_time_unit)
+       diff = index_current_bench_time_unit - index_time_unit
+       # we're starting from the hypothesis that the first unit will be the unit from the benchmark with the smallest size and a benchmark with a bigger size will take more time. We multiply by 1000 because it is the rate to pass from an unit to another.
+       for (k in 1:diff) {
+         time_itself <- time_itself*1000
+         time_lapply <- time_lapply*1000
+       }
+     }
+     
+     if (i == "dataframe") {
+       if (j == 1000) {
+         times_dataframe <- time_itself
+         times_dataframe_lapply <- time_lapply
+       }
+       else {
+         times_dataframe <- append(times_dataframe,time_itself)
+         times_dataframe_lapply <- append(times_dataframe_lapply,time_lapply)
+       }
+     }
+     else {
+       if (i == "datatable") {
+         if (j == 1000) {
+           times_datatable <- time_itself
+           times_datatable_lapply <- time_lapply
+         }
+         else {
+           times_datatable <- append(times_datatable,time_itself)
+           times_datatable_lapply <- append(times_datatable_lapply,time_lapply)
+         }
+       }
+       else {
+         if (j == 1000) {
+            times_tibble <- time_itself
+            times_tibble_lapply <- time_lapply
+         }
+         else {
+            times_tibble <- append(times_tibble,time_itself)
+            times_tibble_lapply <- append(times_tibble_lapply,time_lapply)
+         }
+       }
+     }
+     
+     if (j == 100000) {
+       print(ggplot2::autoplot(benchmark))
+     }
+  }
+  time_ref <- paste("Time_log10_",time_unit,sep="")
+  if (i == "dataframe") {
+    df_df <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe), type = "Dataframe itself")
+    df_df_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe_lapply), type = "Dataframe lapply")
+    final <- rbind(df_df,df_df_lapply)
+    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
+  }
+  else {
+    if (i == "datatable") {
+      df_dt <- data.frame(Usms = num_elem, time_ref = log10(times_datatable), type = "Datatable itself")
+      df_dt_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_datatable_lapply), type = "Datatable lapply")
+      final <- rbind(df_dataframe,df_df_lapply)
+      ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
+    }
+    else {
+      df_tb <- data.frame(Usms = num_elem, time_ref = log10(times_tibble), type = "Tibble itself")
+      df_tb_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_tibble_lapply), type = "Tibble lapply")
+      final <- rbind(df_dataframe,df_df_lapply)
+      ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
+    }
+  }
 }
+
+df_dataframe_weights <- data.frame(Usms = num_elem, Weights = weights_dataframe, type = "Dataframe")
+df_datatable_weights <- data.frame(Usms = num_elem, Weights = weights_datatable, type = "Datatable")
+df_tibble_weights <- data.frame(Usms = num_elem, Weights = weights_tibble, type = "Tibble")
+final_weights <- rbind(df_dataframe_weights,df_datatable_weights,df_tibble_weights)
+ggplot(final_weights)+geom_line(aes(Usms,Weights,colour=type))
+
+df_dataframe_time <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe_lapply), type = "Dataframe")
+df_datatable_time <- data.frame(Usms = num_elem, time_ref = log10(times_datatable_lapply), type = "Datatable")
+df_tibble_time <- data.frame(Usms = num_elem, time_ref = log10(times_tibble_lapply), type = "Tibble")
+final_time <- rbind(df_dataframe_time,df_datatable_time,df_tibble_time)
+ggplot(final_time)+geom_line(aes(Usms,time_ref,colour=type))
 ```
 
 ## II.B Most suitable datatype structure
