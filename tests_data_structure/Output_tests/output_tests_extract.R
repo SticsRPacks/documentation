@@ -101,6 +101,14 @@ benchmark_multi_1 <- bench_get_usm_var(usm_list = USM_list_1996,
                                        date = "1996-01-05",
                                        times = 10 )
 
+multi_tb <- create_tibble3(usm_list,1,500000,sim_data_289)
+multi_li <- create_list2(usm_list,1,500000,sim_data_289)
+
+
+benchmark_multi_1 <- microbenchmark(li = list_get_usm_names_and_var_values2(multi_li,1,"resmes","1996-01-05"),
+                                    tb = tibble_get_usm_names_and_var_values(multi_tb,1,"resmes","1996-01-05"),
+                                    times = 10)
+
 # save data !
 save(file = paste0(multi_name,"1.RData"), list = "benchmark_multi_1")
 
