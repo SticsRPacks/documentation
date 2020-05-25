@@ -12,51 +12,54 @@ library("SticsRFiles")
 
 source("output_structures_functions.R")
 
-# Download the example USMs:
-#data_dir= file.path(SticsRFiles::download_data(),"study_case_1","V9.0")
-# NB: all examples are now in data_dir
-
-# DEFINE THE PATH TO YOUR LOCALLY INSTALLED VERSION OF JAVASTICS
-####################################################################################
-path_to_JavaStics="C:/Users/Thomas/Documents/GitHub/SticsRTests/inst/stics"  ############ A MODIFIER #####################
-####################################################################################
-javastics_path=file.path(path_to_JavaStics,"JavaSTICS-1.41-stics-9.0")
-stics_path=file.path(javastics_path,"bin/stics_modulo.exe")
-
-#'
-#' ## Generate Stics input files from JavaStics input files
-#' The Stics wrapper function used in CroptimizR works on text formatted input files (new_travail.usm,
-#' climat.txt, ...) stored per USMs in different directories (which names must be the USM names).
-#' `stics_inputs_path` is here the path of the directory that will contain these USMs folders.
-stics_inputs_path = "C:/Users/Thomas/Documents/V9.0/TxtFiles"
-#stics_inputs_path=file.path(data_dir,"TxtFiles")
-dir.create(stics_inputs_path)
-#' ## Run the model before optimization for a prior evaluation
-# Set the model options (see '? stics_wrapper_options' for details)
-model_options=stics_wrapper_options(stics_path,stics_inputs_path,
-                                    parallel=FALSE)
-# Run the model on all situations found in stics_inputs_path
-sim_before_optim=stics_wrapper(model_options=model_options)
-
-################### DATAS ################################
-
-# stics_inputs_path est l'emplacement du dossier V9.0/TxtFiles apr?s avoir ?x?cut? RunModel.R
-#stics_inputs_path = "C:/Users/Thomas/Documents/V9.0/TxtFiles"
-
-USM_list_all = c("bo96iN+","bou00t1","bou00t3","bou99t1","bou99t3","lu96iN+",
-                 "lu96iN6","lu97iN+")
-
+#' # Download the example USMs:
+#' #data_dir= file.path(SticsRFiles::download_data(),"study_case_1","V9.0")
+#' # NB: all examples are now in data_dir
+#' 
+#' # DEFINE THE PATH TO YOUR LOCALLY INSTALLED VERSION OF JAVASTICS
+#' ####################################################################################
+#' path_to_JavaStics="C:/Users/Thomas/Documents/GitHub/SticsRTests/inst/stics"  ############ A MODIFIER #####################
+#' ####################################################################################
+#' javastics_path=file.path(path_to_JavaStics,"JavaSTICS-1.41-stics-9.0")
+#' stics_path=file.path(javastics_path,"bin/stics_modulo.exe")
+#' 
+#' #'
+#' #' ## Generate Stics input files from JavaStics input files
+#' #' The Stics wrapper function used in CroptimizR works on text formatted input files (new_travail.usm,
+#' #' climat.txt, ...) stored per USMs in different directories (which names must be the USM names).
+#' #' `stics_inputs_path` is here the path of the directory that will contain these USMs folders.
+#' stics_inputs_path = "C:/Users/Thomas/Documents/V9.0/TxtFiles"
+#' #stics_inputs_path=file.path(data_dir,"TxtFiles")
+#' dir.create(stics_inputs_path)
+#' #' ## Run the model before optimization for a prior evaluation
+#' # Set the model options (see '? stics_wrapper_options' for details)
+#' model_options=stics_wrapper_options(stics_path,stics_inputs_path,
+#'                                     parallel=FALSE)
+#' # Run the model on all situations found in stics_inputs_path
+#' sim_before_optim=stics_wrapper(model_options=model_options)
+#' 
+#' ################### DATAS ################################
+#' 
+#' # stics_inputs_path est l'emplacement du dossier V9.0/TxtFiles apr?s avoir ?x?cut? RunModel.R
+#' #stics_inputs_path = "C:/Users/Thomas/Documents/V9.0/TxtFiles"
+#' 
+#' USM_list_all = c("bo96iN+","bou00t1","bou00t3","bou99t1","bou99t3","lu96iN+",
+#'                  "lu96iN6","lu97iN+")
+#' 
 USM_list_1996 = c("bo96iN+","lu96iN+","lu96iN6")
+#' 
+#' 
+#' ############### TESTS ############################
+#' 
+#' # Instanciation of data structures
+#' #
+#' # Get output data sub-list from stics_wrapper run (RunModel_test.R)
+#' # for USM_list_1996
+#' sim_data <- sim_before_optim$sim_list[[1]][USM_list_1996]
 
-
-############### TESTS ############################
-
-# Instanciation of data structures
-#
-# Get output data sub-list from stics_wrapper run (RunModel_test.R)
-# for USM_list_1996
+load("sim_before_optim.RData")
 sim_data <- sim_before_optim$sim_list[[1]][USM_list_1996]
-
+sim_data
 
 # Selecting needed data
 sim_data_5 <- lapply(sim_data, function(x)
