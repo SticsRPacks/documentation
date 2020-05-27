@@ -1,3 +1,5 @@
+library(purrr)
+
 ################# USM elements ##################
 
 # function that creates a 300 elem long list of elements that can be modified
@@ -248,6 +250,13 @@ usm_tibble_by_lapply = function(usmNumber) {
 }
 
 ################# RANDOM EXTRACT ##################################
+
+## get random names
+
+get_random_names = function(Usm_number) {
+  samples <- sample(Usm_number,Usm_number/2)
+  return(lapply(samples,function(x) paste("usm_",x,sep="")))
+}
 
 ## Extract by usm name
 
