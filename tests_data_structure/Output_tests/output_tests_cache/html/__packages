@@ -1,0 +1,9 @@
+base
+tibble
+data.table
+lubridate
+microbenchmark
+ggplot2
+SticsOnR
+SticsRFiles
+dplyr

@@ -1,9 +1,10 @@
 ---
 title: "Model output test"
 output:
+  pdf_document: default
   html_document:
     number_sections: true
-  pdf_document: default
+    self_contained: no
 ---
 
 ```{r setup, include=FALSE}
@@ -11,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE,
                       cache = TRUE,
                       cache.lazy = TRUE,
                       warn = -1)
-source("output_tests.R")
+source("output_tests_extract.R")
 ```
 
 
@@ -246,11 +247,91 @@ FOr this test, we get the dates along with variable's values that we want for a 
 
 Here are the results for the tests on Windows OS :
 
-![](plot_opti_Windows_1.png)
+```{r opti 1 windows, echo=FALSE}
+doe_samp <- c(1,10000,20000,30000,40000,50000)
+load("benchmark_opti_Windows_1.RData")
+df <- bench_list2df(benchmark_opti_1)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Here are the results for the tests on Linux OS :
 
-![](plot_opti_Linux_1.png)
+```{r opti Linux 1, echo=FALSE}
+doe_samp <- c(1,10000,20000,30000,40000,50000)
+load("benchmark_opti_Linux_1.RData")
+df <- bench_list2df(benchmark_opti_1)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 As we can see, the List type clearly outperforms the Tibble type.
 
@@ -258,11 +339,92 @@ As we can see, the List type clearly outperforms the Tibble type.
 
 Windows OS results :
 
-![](plot_opti_Windows_2.png)
+```{r opti Windows 2, echo=FALSE}
+doe_samp <- c(1,10000,20000,30000,40000,50000)
+load("benchmark_opti_Windows_2.RData")
+df <- bench_list2df(benchmark_opti_2)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
+
 
 Linux OS results : 
 
-![](plot_opti_Linux_2.png)
+```{r opti Linux 2, echo=FALSE}
+doe_samp <- c(1,10000,20000,30000,40000,50000)
+load("benchmark_opti_Linux_2.RData")
+df <- bench_list2df(benchmark_opti_2)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Once again, the List type is clearly better than the Tibble Type.
 
@@ -278,12 +440,104 @@ For this test, we only have a single DoE, but we want to get the Usms names alon
 
 Windows OS results :
 
-![]()
+```{r multi Windows 1, echo=FALSE}
+units_name <- c("nanoseconds","microseconds","milliseconds","seconds")
+units_dim <- c("ns","us","ms","s")
+usm_samp <- c(100000,200000,300000,400000,500000)
 
+load("benchmark_multi_Windows_1.RData")
+load("benchmark_multi_Windows_1_list.RData")
+load("benchmark_multi_Windows_1_tibble.RData")
+
+df <- bench_list2df(benchmark_multi_1, id = "usm") 
+
+unit_str <- df$unit[1]
+com_unit <- units_dim[which(units_name == unit_str)]
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+last_time_tb <- summary(benchmark_multi_1_tb, unit = com_unit) %>% mutate(unit = unit_str)
+last_time_li <- summary(benchmark_multi_1_li, unit = com_unit) %>% mutate(unit = unit_str)
+
+time_list <- append(time_list,last_time_li$median)
+time_tb <- append(time_tb,last_time_tb$median)
+
+time_unit <- paste('median_log10_',unit_str,sep="")
+
+df_li<- data.frame(Usms = usm_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(Usms = usm_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_li,df_tb)
+ggplot(final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Linux OS results :
 
-![](plot_multi_Linux_1.png)
+```{r multi 1 Linux,echo=FALSE} 
+usm_samp <- c(100000,200000,300000,400000,500000)
+load("benchmark_multi_Linux_1.RData")
+df <- bench_list2df(benchmark_multi_1, id = "usm")
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_multi_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_multi_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_multi_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_multi_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(Usms = usm_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(Usms = usm_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 
 We can see that the Tibble is faster than the List in this first setup.
@@ -292,11 +546,89 @@ We can see that the Tibble is faster than the List in this first setup.
 
 Windows OS results :
 
-![](plot_multi_Windows_2.png)
+```{r multi Windows 2, echo=FALSE}
+usm_samp <- c(100000,200000,300000,400000,500000,600000,700000,800000,900000,1000000)
+load("benchmark_multi_Windows_2.RData")
+df <- bench_list2df(benchmark_multi_2, id = "usm")
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_multi_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_multi_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_multi_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_multi_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(Usms = usm_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(Usms = usm_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Linux OS results :
 
-![](plot_multi_Linux_2.png)
+```{r multi Linux 2, echo=FALSE}
+usm_samp <- c(100000,200000,300000,400000,500000,600000,700000,800000,900000,1000000)
+load("benchmark_multi_Linux_2.RData")
+df <- bench_list2df(benchmark_multi_2, id = "usm")
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_multi_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_multi_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_multi_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_multi_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(Usms = usm_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(Usms = usm_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 The results on this graph follow the results on the previous one. The Tibble storage method is more adapted to the multi-simulation use case than the List.
 
@@ -310,11 +642,89 @@ For this test, we get the DoE aong with the variable's values for the wanted var
 
 Windows OS results :
 
-![](plot_analysis_Windows_1.png)
+```{r analysis Windows 1,echo=FALSE} 
+doe_samp <- c(10000,20000,30000,40000,50000)
+load("benchmark_analysis_Windows_1.RData")
+df <- bench_list2df(benchmark_analysis_1)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Linux OS results :
 
-![](plot_analysis_Linux_1.png)
+```{r analysis Linux 1, echo=FALSE}
+doe_samp <- c(10000,20000,30000,40000,50000)
+load("benchmark_analysis_Linux_1.RData")
+df <- bench_list2df(benchmark_analysis_1)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 We can see that the List are faster than the Tibble on these tests.
 
@@ -322,11 +732,89 @@ We can see that the List are faster than the Tibble on these tests.
 
 Windows OS results :
 
-![](plot_analysis_Windows_2.png)
+```{r analysis Windows 2, echo=FALSE}
+doe_samp <- c(10000,20000,30000,40000,50000)
+load("benchmark_analysis_Windows_2.RData")
+df <- bench_list2df(benchmark_analysis_2)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Linux OS results :
 
-![](plot_analysis_Linux_2.png)
+```{r analysis Linux 2, echo=FALSE}
+doe_samp <- c(10000,20000,30000,40000,50000)
+load("benchmark_analysis_Linux_2.RData")
+df <- bench_list2df(benchmark_analysis_2)
+
+time_list <- list()
+time_tb <- list()
+cpt_list = 1
+cpt_tb = 1
+
+time_df_opti_list <- dplyr::filter(df,expr == "li") %>% dplyr::select(median)
+time_df_opti_tb <- dplyr::filter(df,expr == "tb") %>% dplyr::select(median)
+
+for (time in time_df_opti_list) {
+  if (cpt_list == 1) {
+    time_list <- time
+  }
+  else {
+    time_list <- append(time_list,time)
+  }
+  cpt_list <- cpt_list + 1
+}
+
+for (time in time_df_opti_tb) {
+  if (cpt_tb == 1) {
+    time_tb <- time
+  }
+  else {
+    time_tb <- append(time_list,time)
+  }
+  cpt_tb <- cpt_tb + 1
+}
+
+time_unit <- paste('median_log10_',df$unit[1],sep="")
+
+df_list <- data.frame(DoE = doe_samp,Valeurs = log10(time_list), type = "List" )
+df_tb <- data.frame(DoE = doe_samp,Valeurs = log10(time_tb), type = "Tibble")
+final <- rbind(df_list,df_tb)
+ggplot(final)+geom_line(aes(DoE,Valeurs,colour=type))+labs(y = time_unit)
+```
 
 Unlikely to the previous results, this time it's the Tibble that is faster than the List. We maybe can explain that on the way the dplyr::filter function has been coded. Indeed, in the List function, the wanted Usms are get first, then their variables and values are processed while in the Tibble function, each tibble's row is tested. And this process takes more time when they are 289 dates per Usm than when they are only 5. We can also conclude that it is faster to search information in a tibble using the dplyr::filter function than in a List.
 
