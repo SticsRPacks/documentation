@@ -1,0 +1,14 @@
+base
+purrr
+tibble
+data.table
+tidyverse
+ggplot2
+tidyr
+readr
+dplyr
+stringr
+forcats
+microbenchmark
+memuse
+lobstr

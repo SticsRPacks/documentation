@@ -115,120 +115,50 @@ for each datatype structure with different instanciation method and for differen
 
 ## II.A Instanciation Tests
 
-### II.A.1 Non Pre-Allocated Vs Pre-Allocated
+### II.A.1 List Vs Class
 
 These tests were made for list and class types because only these two types can be instanciated
 with a non pre-allocated method, which is not possible for the other types.
 
-```{r npa vs pa}
+```{r list vs class, echo=FALSE}
+load("List_Vs_Class_times.RData")
+load("List_Vs_Class_weights.RData")
 
-# list which contains the structures' types
-Structures_types <- c("list","class")
-# times units
-times_units <- c("nanoseconds","microseconds","milliseconds","seconds")
-# get benchmark time unit, 
-time_unit <- NULL
-# graph legend dor time unit
-time_ref <- NULL
+df <- bench_list2df(benchmarks_list_class)
+time_unit = paste("median_log10_",df$unit[1],sep="")
 
-times_list_NPA <- list()
-times_list_PA <- list()
-times_class_NPA <- list()
-times_class_PA <- list()
+df_npa_list <- dplyr::filter(df,doe <= 3,expr == "NPA_Lapply")
+df_pa_list <- dplyr::filter(df,doe <= 3, expr == "PA_Lapply")
+df_weights_list <- dplyr::filter(df_weights_list_class, type == "List")
 
-weights_list <- list()
-weights_class <- list()
+df_npa_class <- dplyr::filter(df,doe > 3, expr == "NPA_Lapply")
+df_pa_class <- dplyr::filter(df,doe > 3, expr == "PA_Lapply")
+df_weights_class <- dplyr::filter(df_weights_list_class, type == "Class")
 
-# Loop on structures (List,Class)
-for (i in Structures_types) {
-  cat("\nStrucure : ",i,"\n")
-  # Loop on size (10K,100K,1M)
-  for (j in num_elem) {
-    
-    # first call to creation functions to get the structure weight for the j size
-    set.seed(1) # setting seed to have the same object between list and class
-    test <- eval(parse(text=paste("list_of_usm_",i,"_by_lapply(",j,")",sep="")))
-    if (i == "list") {
-      weights_list <- append(weights_list,object.size(test))
-    }
-    else {
-      weights_class <- append(weights_class,object.size(test))
-    }
-    
-    # benchmark
-     benchmark <- microbenchmark(NPA_Lapply= eval(parse(text=paste("list_of_usm_",i,"_by_lapply(",j,")",sep=""))),
-                                 PA_Lapply = eval(parse(text=paste("list_of_usm_",i,"_by_PA_lapply(",j,")",sep=""))),
-                                 setup = set.seed(1),times = 100)
-     
-     if (is.null(time_unit)) {
-       time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
-     }
-     
-     current_bench_time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
-     
-     time_NPA = summary(benchmark)$median[1]
-     time_PA = summary(benchmark)$median[2]
-     
-     if (current_bench_time_unit != time_unit) {
-       index_time_unit = which(times_units == time_unit)
-       index_current_bench_time_unit = which(times_units == current_bench_time_unit)
-       diff = index_current_bench_time_unit - index_time_unit
-       # we're starting from the hypothesis that the first unit will be the unit from the benchmark with the smallest size and a benchmark with a bigger size will take more time. We multiply by 1000 because it is the rate to pass from an unit to another.
-       for (k in 1:diff) {
-         time_NPA <- time_NPA*1000
-         time_PA <- time_PA*1000
-       }
-     }
-     
-     if (i == "list") {
-       if (j == 1000) {
-         times_list_NPA <- time_NPA
-         times_list_PA <- time_PA
-       }
-       else {
-         times_list_NPA <- append(times_list_NPA,time_NPA)
-         times_list_PA <- append(times_list_PA,time_PA)
-       }
-     }
-     else {
-       if (j == 1000) {
-         times_class_NPA <- time_NPA
-         times_class_PA <- time_PA
-       }
-       else {
-         times_class_NPA <- append(times_class_NPA,time_NPA)
-         times_class_PA <- append(times_class_PA,time_PA)
-       }
-     }
-     
-     if (j == 100000) {
-       print(ggplot2::autoplot(benchmark))
-     }
-  }
-  time_ref <- paste("Time_log10_",time_unit,sep="")
-  if (i == "list") {
-    df_NPA <- data.frame(Usms = num_elem, time_ref = log10(times_list_NPA), type = "NPA")
-    df_PA <- data.frame(Usms = num_elem, time_ref = log10(times_list_PA), type = "PA")
-    final <- rbind(df_NPA,df_PA)
-    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
-  }
-  else {
-    df_NPA <- data.frame(Usms = num_elem, time_ref = log10(times_class_NPA), type = "NPA")
-    df_PA <- data.frame(Usms = num_elem, time_ref = log10(times_class_PA), type = "PA")
-    final <- rbind(df_NPA,df_PA)
-    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
-  }
-}
+list_npa <- data.frame(Usms = num_elem, Valeurs = log10(df_npa_list$median), type = "Non Pre-Allocated List")
+list_pa <- data.frame(Usms = num_elem, Valeurs = log10(df_pa_list$median), type = "Pre-Allocated List")
 
-df_list_weights <- data.frame(Usms = num_elem, Weights = weights_list, type = "List")
-df_class_weights <- data.frame(Usms = num_elem, Weights = weights_class, type = "Class")
-final_weights <- rbind(df_list_weights,df_class_weights)
-ggplot(final_weights)+geom_line(aes(Usms,Weights,colour=type))
+df_list <- rbind(list_npa,list_pa)
+cat("List time graph for 1K Usms to 100K Usms")
+ggplot(df_list)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 
-df_list_time <- data.frame(Usms = num_elem, time_ref = log10(times_list_NPA), type = "NPA List")
-df_class_time <- data.frame(Usms = num_elem, time_ref = log10(times_class_NPA), type = "NPA Class")
-final_time <- rbind(df_list_time,df_class_time)
-ggplot(final_time)+geom_line(aes(Usms,time_ref,colour=type))
+class_npa <- data.frame(Usms = num_elem,Valeurs = log10(df_npa_class$median), type = "Non pre-Allocated Class")
+class_pa <- data.frame(Usms = num_elem,Valeurs = log10(df_pa_class$median), type = "Pre-Allocated Class")
+
+df_class <- rbind(class_npa,class_pa)
+cat("Class time graph for 1K Usms to 100K Usms")
+ggplot(df_class)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+
+weights_list <- data.frame(Usms = num_elem,Valeurs = log10(df_weights_list$Valeurs), type = "List")
+weights_class <- data.frame(Usms = num_elem,Valeurs = log10(df_weights_class$Valeurs), type = "Class")
+
+df_weights <- rbind(weights_class,weights_list)
+cat("Weights graph between List and Class")
+ggplot(df_weights)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = "log10_bytes")
+
+df_final <- rbind(list_npa,class_npa)
+cat("Comparative time graph for fastest instanciation method for List and Class")
+ggplot(df_final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
 Even, if the NPA instanciation is 'lighter' than the others, its huge instanciation time makes that we will not use it. Indeed, during the tests, we must divide by hundred the number of usm the NPA contains because it will last more tha 3 days before it creates a 1M usms structure. 
@@ -242,379 +172,72 @@ DataTable : Doing the same as before but for a DataTable or by casting the DataF
 DataTable.
 Tibble : Same ways as for DataTable
 
-``` {r df,dt,tb}
+``` {r df,dt,tb, echo=FALSE}
+load("Df_Vs_Dt_Vs_Tb_times.RData")
+load("Df_Vs_Dt_Vs_Tb_weights.RData")
 
-# list which contains the structures' types
-Structures_types <- c("dataframe","datatable","tibble")
-# times units
-times_units <- c("nanoseconds","microseconds","milliseconds","seconds")
-# get benchmark time unit, 
-time_unit <- NULL
-# graph legend dor time unit
-time_ref <- NULL
+df <- bench_list2df(benchmarks_df_dt_tb)
+time_unit = paste("median_log10_",df$unit[1],sep="")
 
-times_dataframe <- list()
-times_dataframe_lapply <- list()
-times_datatable <- list()
-times_datatable_lapply <- list()
-times_tibble <- list()
-times_tibble_lapply <- list()
+df_itself <- dplyr::filter(df,doe < 4,expr == "name1")
+df_lapply <- dplyr::filter(df,doe < 4,expr == "name2" )
+df_weights <- weights_df_dt_tb[1,]
 
-weights_dataframe <- list()
-weights_datatable <- list()
-weights_tibble <- list()
+dt_itself <- dplyr::filter(df,doe > 3,doe < 7,expr == "name1")
+dt_lapply <- dplyr::filter(df,doe > 3,doe < 7,expr == "name2")
+dt_weights <- weights_df_dt_tb[2,]
 
-# Loop on the structures
-for (i in Structures_types) {
-  cat("\nStrucure : ",i,"\n")
-  # Loop on the structure's size
-  for (j in num_elem) {
-    # Both instanciation methods should return the same object
-    # The set.seed() command maes all the structures having the same information
-    set.seed(1)
-    test <- eval(parse(text=paste("usm_",i,"_by_lapply(",j,")",sep="")))
-    if (i == "dataframe") {
-      weights_dataframe <- append(weights_dataframe,object.size(test))
-    }
-    else {
-      if (i == "datatable") {
-        weights_datatable <- append(weights_datatable,object.size(test))
-      }
-      else {
-        weights_tibble <- append(weights_tibble,object.size(test))
-      }
-    }
-    # benchmark
-    name1 <- paste(i,"_by_itself",sep="")
-    name2 <- paste(i,"_by_lapply",sep="")
-    benchmark <- microbenchmark(name1 = eval(parse(text=paste("usm_",i,"_by_",i,"(",j,")",sep=""))),
-                                name2 = eval(parse(text=paste("usm_",i,"_by_lapply(",j,")",sep=""))),
-                                setup = set.seed(1),times = 10)
-    
-    if (is.null(time_unit)) {
-       time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
-     }
-     
-     current_bench_time_unit =  unit_str <- gsub(pattern = "Unit: ", x = capture.output(benchmark)[1], replacement = "")
-     
-     time_itself = summary(benchmark)$median[1]
-     time_lapply = summary(benchmark)$median[2]
-     
-     if (current_bench_time_unit != time_unit) {
-       index_time_unit = which(times_units == time_unit)
-       index_current_bench_time_unit = which(times_units == current_bench_time_unit)
-       diff = index_current_bench_time_unit - index_time_unit
-       # we're starting from the hypothesis that the first unit will be the unit from the benchmark with the smallest size and a benchmark with a bigger size will take more time. We multiply by 1000 because it is the rate to pass from an unit to another.
-       for (k in 1:diff) {
-         time_itself <- time_itself*1000
-         time_lapply <- time_lapply*1000
-       }
-     }
-     
-     if (i == "dataframe") {
-       if (j == 1000) {
-         times_dataframe <- time_itself
-         times_dataframe_lapply <- time_lapply
-       }
-       else {
-         times_dataframe <- append(times_dataframe,time_itself)
-         times_dataframe_lapply <- append(times_dataframe_lapply,time_lapply)
-       }
-     }
-     else {
-       if (i == "datatable") {
-         if (j == 1000) {
-           times_datatable <- time_itself
-           times_datatable_lapply <- time_lapply
-         }
-         else {
-           times_datatable <- append(times_datatable,time_itself)
-           times_datatable_lapply <- append(times_datatable_lapply,time_lapply)
-         }
-       }
-       else {
-         if (j == 1000) {
-            times_tibble <- time_itself
-            times_tibble_lapply <- time_lapply
-         }
-         else {
-            times_tibble <- append(times_tibble,time_itself)
-            times_tibble_lapply <- append(times_tibble_lapply,time_lapply)
-         }
-       }
-     }
-     
-     if (j == 100000) {
-       print(ggplot2::autoplot(benchmark))
-     }
-  }
-  time_ref <- paste("Time_log10_",time_unit,sep="")
-  if (i == "dataframe") {
-    df_df <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe), type = "Dataframe itself")
-    df_df_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe_lapply), type = "Dataframe lapply")
-    final <- rbind(df_df,df_df_lapply)
-    ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
-  }
-  else {
-    if (i == "datatable") {
-      df_dt <- data.frame(Usms = num_elem, time_ref = log10(times_datatable), type = "Datatable itself")
-      df_dt_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_datatable_lapply), type = "Datatable lapply")
-      final <- rbind(df_dataframe,df_df_lapply)
-      ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
-    }
-    else {
-      df_tb <- data.frame(Usms = num_elem, time_ref = log10(times_tibble), type = "Tibble itself")
-      df_tb_lapply <- data.frame(Usms = num_elem, time_ref = log10(times_tibble_lapply), type = "Tibble lapply")
-      final <- rbind(df_dataframe,df_df_lapply)
-      ggplot(final)+geom_line(aes(Usms,time_ref,colour=type))
-    }
-  }
-}
+tb_itself <- dplyr::filter(df,doe > 6,expr == "name1")
+tb_lapply <- dplyr::filter(df,doe > 6,expr == "name2")
+tb_weights <- weights_df_dt_tb[3,]
 
-df_dataframe_weights <- data.frame(Usms = num_elem, Weights = weights_dataframe, type = "Dataframe")
-df_datatable_weights <- data.frame(Usms = num_elem, Weights = weights_datatable, type = "Datatable")
-df_tibble_weights <- data.frame(Usms = num_elem, Weights = weights_tibble, type = "Tibble")
-final_weights <- rbind(df_dataframe_weights,df_datatable_weights,df_tibble_weights)
-ggplot(final_weights)+geom_line(aes(Usms,Weights,colour=type))
+itself_df <- data.frame(Usms = num_elem, Valeurs = log10(df_itself$median), type = "Dataframe itself")
+lapply_df <- data.frame(Usms = num_elem, Valeurs = log10(df_lapply$median), type = "Dataframe lapply")
+weights_df <- data.frame(Usms = num_elem, Valeurs = log10(df_weights), type = "Dataframe")
 
-df_dataframe_time <- data.frame(Usms = num_elem, time_ref = log10(times_dataframe_lapply), type = "Dataframe")
-df_datatable_time <- data.frame(Usms = num_elem, time_ref = log10(times_datatable_lapply), type = "Datatable")
-df_tibble_time <- data.frame(Usms = num_elem, time_ref = log10(times_tibble_lapply), type = "Tibble")
-final_time <- rbind(df_dataframe_time,df_datatable_time,df_tibble_time)
-ggplot(final_time)+geom_line(aes(Usms,time_ref,colour=type))
+itself_dt <- data.frame(Usms = num_elem, Valeurs = log10(dt_itself$median), type = "Datatable itself")
+lapply_dt <- data.frame(Usms = num_elem, Valeurs = log10(dt_lapply$median), type = "Datatable lapply")
+weights_dt <- data.frame(Usms = num_elem, Valeurs = log10(dt_weights), type = "Datatable")
+
+itself_tb <- data.frame(Usms = num_elem, Valeurs = log10(tb_itself$median), type = "Tibble itself")
+lapply_tb <- data.frame(Usms = num_elem, Valeurs = log10(tb_lapply$median), type = "Tibble lapply")
+weights_tb <- data.frame(Usms = num_elem, Valeurs = log10(tb_weights), type = "Tibble")
+
+cat("Time graph for Dataframe for 1K USms to 100K USms")
+final_df <- rbind(itself_df,lapply_df)
+ggplot(final_df)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+
+cat("Time graph for Datatable for 1K USms to 100K USms")
+final_dt <- rbind(itself_dt,lapply_dt)
+ggplot(final_dt)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+
+cat("Time graph for Tibble for 1K USms to 100K USms")
+final_tb <- rbind(itself_tb,lapply_tb)
+ggplot(final_tb)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+
+cat("Weights graph betweend Dataframe, Datatable and Tibble")
+final_weights <- rbind(weights_df,weights_dt,weights_tb)
+ggplot(final_weights)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = "log10_bytes")
+
+cat("Comparative time graph for the fastest instanciation method for DataFrame, DataTable and Tibble")
+final_times <- rbind(lapply_df,lapply_dt,lapply_tb)
+ggplot(final_times)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
+
+We can see that the DataTable type seems to be faster to instanciate. Furthermore, it has exactly the same weight as the others types.
 
 ## II.B Most suitable datatype structure
 
 With the previous results, we now try to find the most suitable datatype.
 
-```{r best datatype structure, eval=FALSE}
+```{r best datatype structure, echo=FALSE}
+best_weights <- rbind(weights_list,weights_dt)
+cat("Weights graph between List and DataTable")
+ggplot(best_weights)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = "log10_bytes")
 
-# list which contains the structures' types
-Structures_types <- c("list","class","dataframe","datatable","tibble")
-# list which contains the differents instanciations methods
-Instanciation_methods <- c("Directly","Vector","Lapply")
-Instanciation_methods_bis <- c("Directly","By_Df_by_Vector","By_Df_by_Lapply","By_df_directly")
-Instanciation_methods_ter <- c("Vector","Lapply")
-
-# used for global recap plot
-all_weight <- list() # used to store the minimum weights for all the instances
-all_time <- list() # used to store the minimum generation time for all the instances
-
-# main loop
-for (i in num_elem) {
-  
-  cat("\nNumber of elements : ",i,"\n")
-  
-  # loop_weight will be used to store the min weight among the instances' weights in the j-th loop
-  loop_weight <- list()
-  # loop_time is the same as loop_weight but it will store the min generation time
-  loop_time <- list()
-
-  # loop that will take vector_method and lapply_method together for the same structure because
-  # list_vector and list_lapply have the same size
-  for (j in 1:length(Structures_types)) {
-    
-      cat(Structures_types[j],"\n")
-      
-      if (j < 3) {
-       
-        test <- eval(parse(text=paste("list_of_usm_",Structures_types[j],"_by_vector(",i,")",
-                                      sep="")))
-        instance_weight <- object.size(test)
-      
-        test <- eval(parse(text=paste("list_of_usm_",Structures_types[j],"_by_lapply(",i,")",
-                                      sep="")))
-        instance_weight <- append(instance_weight,object.size(test))
-      
-        plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                  weights = instance_weight)
-      
-        graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
-          geom_bar(stat = "identity")
-        print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-      
-        benchmark <- microbenchmark(Vector = eval(parse(text=paste("list_of_usm_",
-                                                                   Structures_types[j],
-                                                                   "_by_vector(",i,")",sep=""))),
-                                    Lapply= eval(parse(text=paste("list_of_usm_",
-                                                                  Structures_types[j],
-                                                                  "_by_lapply(",i,")",sep=""))),
-                                    times = 3)
-        
-        plot_time <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                mean_times = log10(summary(benchmark)$mean))
-      
-        graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-          geom_bar(stat = "identity")
-        print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-      
-        print(ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s %s","Duration tests for a ",
-                                                       i," elements ",Structures_types[j])))
-        
-        if (length(loop_weight) == 0) {
-          loop_weight <- min(instance_weight)
-          loop_time <- min(summary(benchmark)$mean)
-        }
-        else {
-          loop_weight <- append(loop_weight,min(instance_weight))
-          loop_time <- append(loop_time,min(summary(benchmark)$mean))
-        }
-        
-        if (length(all_weight) == 0) {
-          all_weight <- min(instance_weight)
-          all_time <- min(summary(benchmark)$mean)
-        }
-        else {
-          all_weight <- append(all_weight,min(instance_weight))
-          all_time <- append(all_time,min(summary(benchmark)$mean))
-        }
-        
-      }
-      else {
-        
-        if (j == 3) {  # Dataframe  
-          
-          test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_vector(",i,")",
-                                        sep="")))
-          instance_weight <- object.size(test)
-        
-          test <- eval(parse(text=paste("usm_",Structures_types[j],"_by_lapply(",i,")",
-                                        sep="")))
-          instance_weight <- append(instance_weight,object.size(test))
-          
-          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                  weights = instance_weight)
-      
-          graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
-            geom_bar(stat = "identity")
-          print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-        
-          benchmark <- microbenchmark(Vector=eval(parse(text=paste("usm_",Structures_types[j],
-                                                                   "_by_vector(",i,")",sep=""))),
-                                      Lapply=eval(parse(text=paste("usm_",Structures_types[j],
-                                                                   "_by_lapply(",i,")",sep=""))),
-                                      times = 3)
-          
-          plot_time <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                  mean_times = log10(summary(benchmark)$mean))
-        
-          graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-            geom_bar(stat = "identity")
-          print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-        
-          print(ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s %s","Duration tests for a",
-                                                         i," elements ",Structures_types[j])))
-          
-          if (length(loop_weight) == 0) {
-            loop_weight <- min(instance_weight)
-            loop_time <- min(summary(benchmark)$mean)
-          }
-          else {
-            loop_weight <- append(loop_weight,min(instance_weight))
-            loop_time <- append(loop_time,min(summary(benchmark)$mean))
-          }
-          
-          if (length(all_weight) == 0) {
-            all_weight <- min(instance_weight)
-            all_time <- min(summary(benchmark)$mean)
-          }
-          else {
-            all_weight <- append(all_weight,min(instance_weight))
-            all_time <- append(all_time,min(summary(benchmark)$mean))
-          }
-            
-        }
-        else { # DataTable & tibble
-          
-          test <- eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_vector(",i,")",sep="")))
-          instance_weight <- object.size(test)
-          
-          test <- eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_lapply(",i,")",sep="")))
-          instance_weight <- append(instance_weight,object.size(test))
-          
-          plot_weight <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                  weights = instance_weight)
-      
-          graph <- ggplot(data = plot_weight,aes(x =Instanciation_modes, y=weights)) +
-            geom_bar(stat = "identity")
-          print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-        
-          benchmark <- microbenchmark(Vector=eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_vector(",i,")",sep=""))),
-                                      Lapply=eval(parse(text=paste("usm_",Structures_types[j],
-                                        "_by_usm_dataframe_by_lapply(",i,")",sep=""))),
-                                      times = 3)
-          
-          plot_time <- data.frame(Instanciation_modes = Instanciation_methods_ter,
-                                  mean_times = log10(summary(benchmark)$mean))
-        
-          graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-            geom_bar(stat = "identity")
-          print(graph + ggtitle(sprintf("%d %s %s",i," elements ",Structures_types[j])))
-        
-          print(ggplot2::autoplot(benchmark) + ggtitle(sprintf("%s %d %s %s","Duration tests for a ",
-                                                         i," elements ",Structures_types[j])))
-          
-          if (length(loop_weight) == 0) {
-            loop_weight <- min(instance_weight)
-            loop_time <- min(summary(benchmark)$mean)
-          }
-          else {
-            loop_weight <- append(loop_weight,min(instance_weight))
-            loop_time <- append(loop_time,min(summary(benchmark)$mean))
-          }
-          
-          if (length(all_weight) == 0) {
-            all_weight <- min(instance_weight)
-            all_time <- min(summary(benchmark)$mean)
-          }
-          else {
-            all_weight <- append(all_weight,min(instance_weight))
-            all_time <- append(all_time,min(summary(benchmark)$mean))
-          }
-        }
-      }
-  }
-  # Recap for all the instances at the same size
-  plot_weight_recap <- data.frame(structures = Structures_types,weight_log10 = log10(loop_weight))
-  
-  graph_weight_recap <- ggplot(data = plot_weight_recap,aes(x = structures, y=weight_log10)) +
-    geom_bar(stat = "identity")
-  print(graph_weight_recap + ggtitle(sprintf("%s %d %s","Weight recap for ",i,
-                                             " elements structures")))
-  
-  plot_time_recap <- data.frame(structures = Structures_types,times_log10 = log10(loop_time))
-  
-  graph_time_recap <- ggplot(data = plot_time_recap,aes(x = structures, y=times_log10)) +
-    geom_bar(stat = "identity")
-  print(graph_time_recap + ggtitle(sprintf("%s %d %s","time recap for ",i,
-                                           " elements Structures")))
-}
-
-# GLOBAL Recap
-
-structures <- rep(Structures_types,3)
-times_log10 <- log10(all_time)
-weight_log10 <- log10(all_weight)
-size <- c(rep(num_elem[1],5),rep(num_elem[2],5),rep(num_elem[3],5))
-size <- as.character(size)
-
-global_plot_weight_recap <- data.frame(structures,weight_log10,size)
-
-global_graph_weight_recap <- ggplot(data = global_plot_weight_recap,aes(x = size, y=weight_log10,
-                                                                        fill = structures)) + 
-  geom_bar(position = "dodge", stat = "identity")
-global_graph_weight_recap + ggtitle(sprintf("%s","weight recap graph"))
-
-global_plot_time_recap <- data.frame(structures,times_log10,size)
-
-global_graph_time_recap <- ggplot(data = global_plot_time_recap,aes(x = size, y=times_log10,
-                                                                    fill = structures)) +
-  geom_bar(position = "dodge",stat = "identity")
-global_graph_time_recap + ggtitle(sprintf("%s"," time recap graph"))
+cat("Comparative time graph for the fastest instanciation method for List and DataTable")
+best_times <- rbind(list_npa,lapply_dt)
+ggplot(best_times)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
   
 We can conclude that the most suitable datatype is one of DataFrame,DataTable and Tibble.
@@ -627,65 +250,62 @@ We're now moving to Usm sublist extraction test part. For this part, we tested t
 
 In these tests we're randomly picking and extracting usm names.
 
-```{r random extraction s,eval=FALSE}
+```{r random extraction,echo=FALSE}
+load("random_extract.RData")
 
-li <- list_of_usm_list_by_vector(100)
-cla <- list_of_usm_class_by_vector(100)
-df <- usm_dataframe_by_vector(100)
-dt <- usm_datatable_by_usm_dataframe_by_vector(100)
-tb <- usm_tibble_by_usm_dataframe_by_vector(100)
+df <- bench_list2df(benchmarks)
+time_unit = paste("median_log10_",df$unit[1],sep="")
 
-benchmark <- microbenchmark(random_extract_for_usm_list_class(50,li),
-                            random_extract_for_usm_list_class(50,cla),
-                            map_random_extract(50,li),map_random_extract(50,cla),
-                            random_extract_for_usm_df_dt_tb(50,df),random_extract_for_usm_df_dt_tb(50,dt),
-                            random_extract_for_usm_df_dt_tb(50,tb),times = 100)
+basic_li <- dplyr::filter(df,expr == "random_extract_for_usm_list_class(li, random_names)")
+basic_cla <- dplyr::filter(df,expr == "random_extract_for_usm_list_class(cla, random_names)")
+mapped_li <- dplyr::filter(df,expr == "map_random_extract(li, random_names)")
+mapped_cla <- dplyr::filter(df,expr == "map_random_extract(cla, random_names)")
+basic_df <- dplyr::filter(df,expr == "random_extract_for_usm_df_dt_tb(df, random_names)")
+basic_dt <- dplyr::filter(df,expr == "random_extract_for_usm_df_dt_tb(df, random_names)")
+basic_tb <- dplyr::filter(df,expr == "random_extract_for_usm_df_dt_tb(df, random_names)")
 
-benchmark
+li <- data.frame(Usms = num_elem, Valeurs = log10(basic_li$median), type = "Basic extract List")
+cla <- data.frame(Usms = num_elem, Valeurs = log10(basic_cla$median), type = "Basic extract Class")
+map_li <- data.frame(Usms = num_elem, Valeurs = log10(mapped_li$median), type = "Map extract List")
+map_cla <- data.frame(Usms = num_elem, Valeurs = log10(mapped_cla$median), type = "Map extract Class")
+df <- data.frame(Usms = num_elem, Valeurs = log10(basic_df$median), type = "Basic extract Dataframe")
+dt <- data.frame(Usms = num_elem, Valeurs = log10(basic_dt$median), type = "Basic extract Datatable")
+tb <- data.frame(Usms = num_elem, Valeurs = log10(basic_tb$median), type = "Basic extract Tibble")
 
-plot_time <- data.frame(Instanciation_modes = c("list","class","map list","map class","dataframe","datatable",
-                                                "tibble"),
-                                  mean_times = log10(summary(benchmark)$mean))
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-            geom_bar(stat = "identity")
-
-graph
-
-ggplot2::autoplot(benchmark)
+cat("Graph time comparison between the differents ways to extract data and the differents structures")
+extract_plot <- rbind(li,cla,map_li,map_cla,df,dt,tb)
+ggplot(extract_plot)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
 ## III.B Extraction by criteria
 
 In these tests we're selectionning a usm's criteria and extracting the usm in which the criteria is present.
 
-```{r criteria extraction s,eval=FALSE}
+```{r criteria extraction,echo=FALSE}
+load("Criteria_extract.RData")
 
-li <- list_of_usm_list_by_vector(100)
-cla <- list_of_usm_class_by_vector(100)
-df <- usm_dataframe_by_vector(100)
-dt <- usm_datatable_by_usm_dataframe_by_vector(100)
-tb <- usm_tibble_by_usm_dataframe_by_vector(100)
+df <- bench_list2df(benchmarks)
+time_unit = paste("median_log10_",df$unit[1],sep="")
 
-benchmark <- microbenchmark(criteria_extract_for_usm_list_class(li,"ground_name","sol_canne"),
-                            criteria_extract_for_usm_list_class(cla,"ground_name","sol_canne"),
-                            map_criteria_extract(li,"ground_name","sol_canne"),
-                            map_criteria_extract(cla,"ground_name","sol_canne"),
-                            criteria_extract_for_usm_df_dt_tb(df,"ground_name","sol_canne"),
-                            criteria_extract_for_usm_df_dt_tb(dt,"ground_name","sol_canne"),
-                            criteria_extract_for_usm_df_dt_tb(tb,"ground_name","sol_canne"),
-                            times = 100)
+basic_li <- dplyr::filter(df,expr == 'criteria_extract_for_usm_list_class(li, "ground_name", "sol_canne")')
+basic_cla <- dplyr::filter(df,expr == 'criteria_extract_for_usm_list_class(cla, "ground_name", "sol_canne")')
+mapped_li <- dplyr::filter(df,expr == 'map_criteria_extract(li, "ground_name", "sol_canne")')
+mapped_cla <- dplyr::filter(df,expr == 'map_criteria_extract(cla, "ground_name", "sol_canne")')
+basic_df <- dplyr::filter(df,expr == 'criteria_extract_for_usm_df_dt_tb(df, "ground_name", "sol_canne")')
+basic_dt <- dplyr::filter(df,expr == 'criteria_extract_for_usm_df_dt_tb(dt, "ground_name", "sol_canne")')
+basic_tb <- dplyr::filter(df,expr == 'criteria_extract_for_usm_df_dt_tb(tb, "ground_name", "sol_canne")')
 
-benchmark
+li <- data.frame(Usms = num_elem, Valeurs = log10(basic_li$median), type = "Basic extract List")
+cla <- data.frame(Usms = num_elem, Valeurs = log10(basic_cla$median), type = "Basic extract Class")
+map_li <- data.frame(Usms = num_elem, Valeurs = log10(mapped_li$median), type = "Map extract List")
+map_cla <- data.frame(Usms = num_elem, Valeurs = log10(mapped_cla$median), type = "Map extract Class")
+df <- data.frame(Usms = num_elem, Valeurs = log10(basic_df$median), type = "Basic extract Dataframe")
+dt <- data.frame(Usms = num_elem, Valeurs = log10(basic_dt$median), type = "Basic extract Datatable")
+tb <- data.frame(Usms = num_elem, Valeurs = log10(basic_tb$median), type = "Basic extract Tibble")
 
-plot_time <- data.frame(Instanciation_modes = c("list","class","map list","map class","dataframe","datatable",
-                                                "tibble"),
-                                  mean_times = log10(summary(benchmark)$mean))
-
-graph <- ggplot(data = plot_time,aes(x = Instanciation_modes, y=mean_times)) +
-            geom_bar(stat = "identity")
-
-graph
-
-ggplot2::autoplot(benchmark)
+cat("Graph time comparison between the differents ways to extract data and the differents structures")
+extract_plot <- rbind(li,cla,map_li,map_cla,df,dt,tb)
+ggplot(extract_plot)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
+
+# IV.Conclusion
