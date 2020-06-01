@@ -1,6 +1,8 @@
 ---
-title: "data_structure"
-output: html_document
+title: "Best datatype structure for the input data"
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -161,7 +163,7 @@ cat("Comparative time graph for fastest instanciation method for List and Class"
 ggplot(df_final)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
-Even, if the NPA instanciation is 'lighter' than the others, its huge instanciation time makes that we will not use it. Indeed, during the tests, we must divide by hundred the number of usm the NPA contains because it will last more tha 3 days before it creates a 1M usms structure. 
+First of all, the NPA version is faster for both types. Furthermore, the Class type is lighter than the List type, but we can see that the difference remains stable through the Usms augmentation. The reason why the Class type is lighter than the List type can be explain by the fact that the Class type stores only the addresses of its variables and not the variables themselves. Finally, we can see that the List type has an instanciation time faster than the Class type.
 
 ### II.A.2 DataFrame, DataTable and Tibble
 
@@ -224,29 +226,14 @@ final_times <- rbind(lapply_df,lapply_dt,lapply_tb)
 ggplot(final_times)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
-We can see that the DataTable type seems to be faster to instanciate. Furthermore, it has exactly the same weight as the others types.
+Firstly, for all of them, when the number of Usms contained is inferior to 10K, the instanciation time to create a DataFrame-like structure from scratch is as equivalent as converting a List into a Dataframe-like structure. However, when we exceed 10K Usms, we can see a clear difference in instanciation time between both instanciation methods and the method using the list conversion is far faster. Secondly, we can see that all the structures have the same weights whatever the Usms number they have. Finally, the DataTable type instanciation time seems to be the best but the gap with the others types instanciation times is not so huge.
 
-## II.B Most suitable datatype structure
+# II.B Extraction
 
-With the previous results, we now try to find the most suitable datatype.
+We're now moving to Usm sublist extraction test part. For this part, we tested two methods of extracting usms sublist, by random usm name and criteria research. Each method comports differents ways to be executed depending of the type that is used, for instance, the method used to extract a subfrom a Class would not be the same than for a Dataframe-like structure.
+Furthermore, inside the List and Class types, two differents methods were tested, the first is a method that uses List and Class types as a dictionnary and the other method is a map method. Finally, for the Dataframe-like structure, the method tested is the dplyr::filter function.
 
-```{r best datatype structure, echo=FALSE}
-best_weights <- rbind(weights_list,weights_dt)
-cat("Weights graph between List and DataTable")
-ggplot(best_weights)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = "log10_bytes")
-
-cat("Comparative time graph for the fastest instanciation method for List and DataTable")
-best_times <- rbind(list_npa,lapply_dt)
-ggplot(best_times)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
-```
-  
-We can conclude that the most suitable datatype is one of DataFrame,DataTable and Tibble.
-
-# III. Extraction
-
-We're now moving to Usm sublist extraction test part. For this part, we tested two ways of extracting usms sublist, by random usm name and criteria research. Each tests was tested in several ways.
-
-## III.A Random extraction by Usm name
+## II.B.1 Random extraction by Usm name
 
 In these tests we're randomly picking and extracting usm names.
 
@@ -277,7 +264,10 @@ extract_plot <- rbind(li,cla,map_li,map_cla,df,dt,tb)
 ggplot(extract_plot)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
-## III.B Extraction by criteria
+First of all, we can see the the map methods are the slowest methods. Next, we can see that the dlpyr::filter function has the same execution time whatever the Dataframe-like structure used. Then, we can see that the method to extract a sublist from a List type using it as a dictionnary is the fastest of all, slighty before the same method using the Class type.
+Finally, we see that there's no a huge gap between the dplyr::filter function and the method using List and Class types as dictionnary and the most important thing, the more Usms the structure have, thinner is the gap between these two methods.
+
+## II.B.2 Extraction by criteria
 
 In these tests we're selectionning a usm's criteria and extracting the usm in which the criteria is present.
 
@@ -308,4 +298,24 @@ extract_plot <- rbind(li,cla,map_li,map_cla,df,dt,tb)
 ggplot(extract_plot)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
 ```
 
-# IV.Conclusion
+Now we can see some diffrences. First, the methods using the Class type (map method and dictionnary method) are the slowest. Then it is the same methods but using the List type. These are the firsts two diffrences (1 : not grouped by methods but by types, 2: method using List and Class types as dictionnary is not the fastest anymore). Other difference, the dplyr::function has not the same execution time depending the type used, the faster is the Tibble type then the DataFrame and DataTable types.
+
+## II.C Best datatype structure
+
+With the previous results, we now try to find the datatype structure in order to store the input data.
+
+```{r best datatype structure, echo=FALSE}
+best_weights <- rbind(weights_list,weights_dt)
+cat("Weights graph between List and DataTable")
+ggplot(best_weights)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = "log10_bytes")
+
+cat("Comparative time graph for the fastest instanciation method for List and DataTable")
+best_times <- rbind(list_npa,lapply_dt)
+ggplot(best_times)+geom_line(aes(Usms,Valeurs,colour=type))+labs(y = time_unit)
+```
+  
+To begin with, the DataTable type uses less memory than the List type. Then, the List type is faster but we can see that the gap between the two types is not huge.
+
+# III. Conclusion
+
+According to all the analysis made, we can say that the best datatype structure to store the input data is a Dataframe-like structure because it allies a fast instanciation time, a fast execution time for sublists extraction and it is light in memory consumption.
