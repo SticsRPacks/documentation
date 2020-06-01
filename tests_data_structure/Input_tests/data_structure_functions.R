@@ -310,3 +310,35 @@ criteria_extract_for_usm_df_dt_tb = function(structure,criteria,wanted) {
   criteria <- enquo(criteria)
   dplyr::filter(structure,!!criteria == wanted)
 }
+
+
+# Generates a data.frame fro a list of microbenchmark
+# objects, setting a common execution time unit
+# and adding it as column
+bench_list2df <- function(bench_list, id = "doe") {
+  units_vect <- unlist(lapply(bench_list, get_bench_unit))
+  com_unit <- get_common_unit(units_vect)
+  sum_list <- lapply(bench_list, function(x) summary(x, unit = names(com_unit)) %>% mutate(unit = com_unit))
+  df <- dplyr::bind_rows(sum_list, .id = id)
+  df[[id]] <- as.numeric(df[[id]])
+  return(df)
+}
+
+# Getting unit from a microbenchmark object
+get_bench_unit <- function(bench_table) {
+  unit_str <- gsub(pattern = "Unit: ", x = capture.output(bench_table)[1], replacement = "")
+  return(unit_str)
+}
+
+# Getting the common unit from a list
+# of units == the most represented
+get_common_unit <- function(units_vect) {
+  units_list <- c("nanoseconds", "microseconds", "milliseconds","seconds")
+  names(units_list) <- c("ns", "us","ms", "s")
+  units_names <- unique(units_vect)
+  units_count <- unlist(lapply(units_names, function(x) sum(units_vect %in% x)))
+  #unit_name <- units_names[units_count == max(units_count)]
+  # on ne s'embête pas et on prend l'unité la plus basse au lieu de celle la plus présente car il y a un nombre pair de tests contrairement aux tests de données de sortie.
+  unit_name <- units_names[1]
+  units_list[ units_list %in% unit_name ]
+}
