@@ -102,7 +102,7 @@ for (sit in situation_list) {
   }
   
   # boucle sur le plan d'experience numérique par situation
-  for (iparams in 1:nrows(params)) {
+  for (iparams in 1:nrow(params)) {
     
     # run the model with parameters values defined by params[iparams,]
     
@@ -122,7 +122,7 @@ Comment spécifier au wrapper les situations, variables et dates à simuler et p
 *	Le temps de calcul des wrappers peut parfois être diminué si un nombre réduit de variables est simulé. Cela dépend du modèle (e.g. requête dans une base de donnée pour lire les résultats pour APSIM, écriture et lecture +/- lourde dans les fichiers de sortie des modèles si on peut leur spécifier les variables à écrire, ...).
 
 # Solution proposée 
-Trois arguments :
+Cinq arguments :
 
 *	sit_names : vecteur de nom des situations à simuler
 *	var_names : vecteur de nom des variables à simuler
@@ -145,7 +145,7 @@ simple_wrapper <- function(param_values, model_options, ...) {
 }
 ```
 permettra facilement de faire de l'estimation de paramètre, de la multi-simulation ou même AI/AS.
-Dans ces deux derniers cas, l'utilisateur devra par contre lui-même extraire les résultats qui l'intéressent en terme de dates.
+Dans ces deux derniers cas, l'utilisateur devra par contre lui-même extraire les résultats qui l'intéressent en termes de variables et de dates.
 
 Un cas de développement de wrapper un peu plus avancé mais a priori pas très compliqué à réaliser serait de prendre en compte les arguments `var_names`, `dates` et `stages` : l'utilisateur définit les situations à simuler via son workspace, comme précédemment, mais le wrapper ne renvoie les résultats que pour les variables, dates et stades sélectionnés, ce qui évite des manipulations pour le post-traitement des résultats. Le caractère optionnel (au moins de `dates` et `stages`, puisqu'il ne sont pas fournis en estimation de paramètres) doit cependant être géré dans le wrapper.
 
@@ -184,17 +184,17 @@ Comment stocker les valeurs de différentes variables simulées pour différente
 *	Les tests réalisés pas Thomas Robine (cf. https://github.com/SticsRPacks/documentation/tree/master/tests_data_structure/Output_tests/output_tests.html ) montrent qu’un stockage sous forme d’un seul tibble est efficace en temps de traitement et ergonomique mais peut poser des problèmes mémoires pour des tailles importantes, mais réalistes, des différents cas d’étude. Par ailleurs, l’implémentation actuelle (liste de liste de data.frame) n’est pas satisfaisante en raison de son manque d’ergonomie.
 
 ## Solution proposée
-Une solution, intermédiaire entre la solution actuelle et la solution « un seul tibble », est une liste de tibble par situation. Le tibble contiendrait les résultats des simulations des différentes variables (en colonne), dates et stades pour la situation concernée et pour l'ensemble des valeurs du plan d'expérience. Une colonne `Doe` contiendrait le numéro de ligne du plan d'expérience numérique, une colonne `Date` la date et une colone 'Stage' le (ou les) noms des stades pour lesquels la variable est demandée.
+Une solution, intermédiaire entre la solution actuelle et la solution « un seul tibble », est une liste de tibble par situation. Le tibble contiendrait les résultats des simulations des différentes variables (en colonne), dates et stades pour la situation concernée et pour l'ensemble des valeurs du plan d'expérience. Une colonne `DoE` contiendrait le numéro de ligne du plan d'expérience numérique, une colonne `Date` la date et une colone 'Stage' le (ou les) noms des stades pour lesquels la variable est demandée.
 
 Dans un cas multi-simulation simple de 2 situations, pour lesquelles on demande 2 dates et 1 stade "rec" on aurait par exemple : 
 ```{r, echo=FALSE}
-list("sit1"=tibble(Doe=c(1,1,1), Date=as.POSIXct(c("2020-01-01","2020-03-01","2020-07-12"), format=c("%Y-%m-%d")), var1=c(1.1,1.2,1.3), Stage=c(NA,NA,"rec")),
-     "sit2"=tibble(Doe=c(1,1,1), Date=as.POSIXct(c("2020-01-01","2020-03-01","2020-05-01"), format=c("%Y-%m-%d")), var1=c(1.1,1.2,1.3), Stage=c(NA,NA,"rec")))
+list("sit1"=tibble(DoE=c(1,1,1), Date=as.POSIXct(c("2020-01-01","2020-03-01","2020-07-12"), format=c("%Y-%m-%d")), var1=c(1.1,1.2,1.3), Stage=c(NA,NA,"rec")),
+     "sit2"=tibble(DoE=c(1,1,1), Date=as.POSIXct(c("2020-01-01","2020-03-01","2020-05-01"), format=c("%Y-%m-%d")), var1=c(1.1,1.2,1.3), Stage=c(NA,NA,"rec")))
 ```
 
 Dans un cas AI /AS avec une situation et deux stades, on aurait :
 ```{r, echo=FALSE}
-list("sit1"=tibble(Doe=c(1,1,2,2,3,3), Date=as.POSIXct(c("2020-03-11","2020-07-12","2020-03-10","2020-07-10","2020-03-09","2020-07-09"), format=c("%Y-%m-%d")), var1=c(1.1,1.3,1.4,1.6,1.6,1.8), Stage=c("lev","rec","lev","rec","lev","rec")))
+list("sit1"=tibble(DoE=c(1,1,2,2,3,3), Date=as.POSIXct(c("2020-03-11","2020-07-12","2020-03-10","2020-07-10","2020-03-09","2020-07-09"), format=c("%Y-%m-%d")), var1=c(1.1,1.3,1.4,1.6,1.6,1.8), Stage=c("lev","rec","lev","rec","lev","rec")))
 ```
 
 ## Eléments de Discussion
@@ -202,20 +202,212 @@ Cette solution a l’avantage :
 
 *	de résoudre les problèmes mémoires rencontrés avec la solution « un seul tibble » en répartissant les données simulées par variable en différents vecteurs (1 par situation)
 *	d’être plus ergonomique que la solution actuellement implémentée (liste de liste) : 
-    *	extraction de simulations d’une variable pour une date ou un stade et différents individus du DOE (cas typique AI/AS) : `filter(data,Date=...)$var` ou `filter(data,Stage=...)$var`   
-    *	extraction des simulations d’une variable à toutes (ou une liste de) dates (cas typique estimation de paramètres ou multi-simulation, 1 seul DOE) : `data$var` ou `filter(data,Date=...)$var`     
+    *	extraction de simulations d’une variable pour une date ou un stade et différents individus du DoE (cas typique AI/AS) : `filter(data,Date=...)$var` ou `filter(data,Stage=...)$var`   
+    *	extraction des simulations d’une variable à toutes (ou une liste de) dates (cas typique estimation de paramètres ou multi-simulation, 1 seul DoE) : `data$var` ou `filter(data,Date=...)$var`     
     *	L’extraction de simulations d’une variable pour différentes situations pourra se faire soit via la transformation de la liste en un seul tibble si la mémoire le permet (bind_rows) soit via une instruction type apply.
 
 
 # Exemple d'un wrapper simple qui implémente ces solutions
 
-CODAGE DU WRAPPER (sans sit_var_date)
+```{r}
+lai_toymodel <- function(jul_beg, jul_end, A, x0, x1, x2, x3) {
+  # jul_beg, jul_end : beginning and end of simulation in julian days
+  # A : max value for lai
+  # x1 et x3 : increasing and decreasing slope
+  # x0 et x2 : dates of maximum slopes
+  x <- jul_beg:jul_end
+  A*(1/(1+exp(x0-x)/x1)-1/(1+exp(x2-x)/x3))
+}
 
-wrapper : équation bonzai, on définit les situations et T° en dur dans le code ...
 
-Dans les différents cas (avec ou sans prise en compte des arguments)
+laitm_simple_wrapper <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)), 
+                                  model_options=list(year=2001,
+                                                     jul_beg=70,
+                                                     jul_end=150), ...) {
+#  Runs the lai_toymodel for a set of situations defined in model_options (year, jul_beg, jul_end),
+#  Forces the lai_toymodel parameters A, x1 and x3 with the values given in param_values argument 
+#   (that may depend on the situation to simulate)  
+#  Returns all the simulated values (i.e. all situations, variables and dates)
+  
+  res <- list()
+  for (isit in 1:length(model_options$year)) {
+    
+    jul_beg <- model_options$jul_beg[isit]
+    jul_end <- model_options$jul_end[isit]
+    year <- model_options$year[isit]
+    sit=as.character(year) # in this example, the situation name is the year
+    x0 <- jul_beg+20
+    x2 <- jul_end-20
+    
+    # extract design of experiment depending on the situation to simulate 
+    if ("situation" %in% names(param_values)) {
+      params <- filter(param_values, situation==sit)
+    } else {
+      params <- param_values
+    }
+    
+    # Loop on design of experiment per situation
+    for (iparams in 1:nrow(params)) {
 
-Illustrer uTILISATION mode AI/AS, multisimulation, estimation de paramètres 
+      # handle default value for the parameters
+      A <- if ("A" %in% names(params)) params$A[iparams] else 3
+      x1 <- if ("x1" %in% names(params)) params$x1[iparams] else 7
+      x3 <- if ("x3" %in% names(params)) params$x3[iparams] else 10
+      
+      # run the model
+      lai <- lai_toymodel(jul_beg=jul_beg, jul_end=jul_end, 
+                          A=A, x0=x0, x1=x1, x2=x2, x3=x3)
+      
+      # compute maximum lai stage
+      stage <- rep(NA,length(lai)) ; stage[which.max(lai)] <- "laimax"
+      
+      # fill the result variable
+      res[[sit]] <- bind_rows(res[[sit]],
+                              tibble(DoE=rep(iparams, length(lai)),
+                                     Date=as.POSIXct(as.character(as.Date(jul_beg:jul_end,
+                                                                          origin=paste0(year,"-01-01"))),
+                                                     format = "%Y-%m-%d",tz="UTC"), 
+                                     Stage=stage,
+                                     lai=lai))
+    }  
+  }
+  
+  return(res)
+}
+
+
+# AI/AS, for default situation
+n=10
+res<-laitm_simple_wrapper(param_values=tibble(A=runif(n,2,6),x1=runif(n,5,10),
+                                          x3=runif(n,8,12)))
+# extract results for one situation, variable and date but all DoE
+dplyr::filter(res[["2001"]],Stage == "laimax")
+
+
+# multi-simulation : change year, jul_begin and jul_end but keep constant parameters
+res<-laitm_simple_wrapper(model_options=list(year=2000:2010,
+                                              jul_beg=sample(60:80,11),
+                                              jul_end=sample(130:170,11)))
+# extract results for one variable and one stage but all situations
+bind_rows(res,.id="Situation") %>% dplyr::filter(Stage == "laimax")
+
+# Parameter estimation
+obs_list <- list(`2000`=tibble(Date=as.POSIXct(as.character(as.Date(c(90,100,110),
+                                                                    origin="2000-01-01")),
+                                               format = "%Y-%m-%d",tz="UTC"),
+                               lai=c(1.8, 2.4, 2.6)))
+sit_names <- names(obs_list)
+var_names <- setdiff(unique(unlist(lapply(obs_list,names))),c("Date","Stage"))
+laitm_simple_wrapper(param_values=tibble(A=4.1),
+                 model_options=list(year=2000:2002,
+                                    jul_beg=c(66,62,71),
+                                    jul_end=c(154,151,163)),
+                 var_names=var_names,
+                 sit_names=sit_names,
+                 sit_var_date_mask=obs_list)
+
+
+```
+
+
+# Idem mais en prenant en compte les arguments var_names, dates et stages
+
+```{r}
+
+laitm_wrapper_V2 <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)), 
+                             model_options=list(year=2001,
+                                                jul_beg=70,
+                                                jul_end=150), 
+                             sit_names=NULL, var_names=NULL, dates=NA, stages="", ...) {
+#  Runs the lai_toymodel for a set of situations defined in sit_names (if given) or model_options (year, jul_beg, jul_end),
+#  Forces the lai_toymodel parameters A, x1 and x3 with the values given in param_values argument 
+#   (that may depend on the situation to simulate)  
+#  Returns all OR A SELECTION OF the simulated values (depending on var_names, dates and stages arguments)
+  
+  res <- list()
+  if (is.null(sit_names)) sit_names <- model_options$year
+  
+  for (isit in which(as.character(model_options$year) %in% sit_names)) {
+    
+    jul_beg <- model_options$jul_beg[isit]
+    jul_end <- model_options$jul_end[isit]
+    year <- model_options$year[isit]
+    sit=as.character(year) # in this example, the situation name is the year
+    x0 <- jul_beg+20
+    x2 <- jul_end-20
+    
+    # extract design of experiment depending on the situation to simulate 
+    if ("situation" %in% names(param_values)) {
+      params <- filter(param_values, situation==sit)
+    } else {
+      params <- param_values
+    }
+    
+    # Loop on design of experiment per situation
+    for (iparams in 1:nrow(params)) {
+
+      # handle default value for the parameters
+      A <- if ("A" %in% names(params)) params$A[iparams] else 3
+      x1 <- if ("x1" %in% names(params)) params$x1[iparams] else 7
+      x3 <- if ("x3" %in% names(params)) params$x3[iparams] else 10
+      
+      # run the model
+      lai <- lai_toymodel(jul_beg=jul_beg, jul_end=jul_end, 
+                          A=A, x0=x0, x1=x1, x2=x2, x3=x3)
+      
+      # compute maximum lai stage
+      stage <- rep(NA,length(lai)) ; stage[which.max(lai)] <- "laimax"
+      
+      # fill the result variable
+      res_tmp <- tibble(DoE=rep(iparams, length(lai)),
+                        Date=as.POSIXct(as.character(as.Date(jul_beg:jul_end,
+                                                             origin=paste0(year,"-01-01"))),
+                                        format = "%Y-%m-%d",tz="UTC"), 
+                        Stage=stage,
+                        lai=lai)
+      
+      if (!is.na(dates) | stages!="") res_tmp <- dplyr::filter(res_tmp, Date == dates | Stage == stages) 
+      if (!is.null(var_names)) res_tmp <- select(res_tmp, DoE, Date, Stage,!!var_names)
+
+      res[[sit]] <- bind_rows(res[[sit]],res_tmp)
+    }  
+  }
+  
+  return(res)
+}
+
+
+# AI/AS, for default situation
+n=10
+laitm_wrapper_V2(param_values=tibble(A=runif(n,2,6),x1=runif(n,5,10),
+                                     x3=runif(n,8,12)),
+                 var_names="lai", stages="laimax")
+
+# multi-simulation : change year, jul_begin and jul_end but keep constant parameters
+res<-laitm_wrapper_V2(model_options=list(year=2000:2010,
+                                         jul_beg=sample(60:80,11),
+                                         jul_end=sample(130:170,11)),
+                      var_names="lai", stages="laimax")
+bind_rows(res,.id="Situation") 
+
+# Parameter estimation
+obs_list <- list(`2000`=tibble(Date=as.POSIXct(as.character(as.Date(c(90,100,110),
+                                                                    origin="2000-01-01")),
+                                               format = "%Y-%m-%d",tz="UTC"),
+                               lai=c(1.8, 2.4, 2.6)))
+sit_names <- names(obs_list)
+var_names <- setdiff(unique(unlist(lapply(obs_list,names))),c("Date","Stage"))
+laitm_wrapper_V2(param_values=tibble(A=4.1),
+                 model_options=list(year=2000:2002,
+                                    jul_beg=c(66,62,71),
+                                    jul_end=c(154,151,163)),
+                 var_names=var_names,
+                 sit_names=sit_names,
+                 sit_var_date_mask=obs_list)
+
+```
+
+
 
 
 # Remarques
