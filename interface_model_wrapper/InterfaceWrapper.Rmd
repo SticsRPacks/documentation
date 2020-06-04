@@ -114,23 +114,27 @@ for (sit in situation_list) {
 
 # Gestion des situations, variables et dates
 
-Comment spécifier au wrapper les situations, variables et dates à simuler et pour lesquelles le wrapper doit renvoyer les résultats ?
+Comment spécifier au wrapper les situations, variables et dates pour lesquelles le wrapper doit renvoyer les résultats ?
 
 ## Eléments de contraintes et de contexte : 
 
-*	Dans la plupart des cas d’estimation de paramètres la liste des situations, variables et dates peut être fournie automatiquement puisqu’elle est déduite des observations. Ce n'est cependant pas le cas s'il est nécessaire d'effectuer des transformations (observations qui ne correspondent pas à des variables simulées par exemple).
-*	Le temps de calcul des wrappers peut parfois être diminué si un nombre réduit de variables est simulé. Cela dépend du modèle (e.g. requête dans une base de donnée pour lire les résultats pour APSIM, écriture et lecture +/- lourde dans les fichiers de sortie des modèles si on peut leur spécifier les variables à écrire, ...).
+* Par défaut il est attendu que le wrapper fournisse les résultats pour l'ensemble des situations, variables et dates / stades simulés. Les situations à simuler seront cependant en général définies plus ou moins indirectement via l'argument `model_options` (e.g. en définissant un rép. de travail qui contient des fichiers correspondant à une liste de situations). 
+* La réduction des résultats renvoyés par le wrapper permet de faciliter leur manipulation par l'utilisateur (cas multi-simulation, AI/AS) qui n'a pas besoin de les filtrer
+* Le coût mémoire peut dans certains cas être largement diminué si la liste des situations, variables et dates / stades renvoyées par le wrapper est réduite au minimum requis pour l'application.
+*	Le temps de calcul des wrappers peut également être diminué si un nombre réduit de variables est simulé. Cela dépend du modèle (e.g. requête dans une base de donnée pour lire les résultats pour APSIM, écriture et lecture +/- lourde dans les fichiers de sortie des modèles si on peut leur spécifier les variables à écrire, ...).
+*	Dans la plupart des cas d’estimation de paramètres la liste des situations et variables à simuler peut être fournie automatiquement puisqu’elle est déduite des observations. Ce n'est cependant pas le cas s'il est nécessaire d'effectuer des transformations (observations qui ne correspondent pas à des variables simulées par exemple).
 
 # Solution proposée 
-Cinq arguments :
+Quatre arguments :
 
-*	sit_names : vecteur de nom des situations à simuler
-*	var_names : vecteur de nom des variables à simuler
-* dates : vecteur des dates à simuler
-* stages : vecteur des stades à simuler
-*	sit_var_date_mask : masque des situations, variables et dates à simuler (homogène au format des observations)
+*	sit_names : vecteur de nom des situations ...
+*	var_names : vecteur de nom des variables  ...
+* dates : vecteur des dates ...
+* stages : vecteur des stades ...
+... pour lesquelles le wrapper doit renvoyer les résultats
 
 Tous ces arguments seraient optionnels : cela permet de construire rapidement un wrapper qui fonctionne. 
+
 Par exemple:
 ```{r, eval=FALSE}
 simple_wrapper <- function(param_values, model_options, ...) {
@@ -139,39 +143,39 @@ simple_wrapper <- function(param_values, model_options, ...) {
   
   # lecture de la liste des situations à simuler dans le workspace 
   
-  # simulation de toutes les variables du modèle pour toutes dates sur toutes les situations
-  # pour les valeurs prescrites des paramètres 
+  # simulation de toutes les variables du modèle pour toutes dates sur toutes les 
+  # situations pour les valeurs prescrites des paramètres 
   
 }
 ```
 permettra facilement de faire de l'estimation de paramètre, de la multi-simulation ou même AI/AS.
-Dans ces deux derniers cas, l'utilisateur devra par contre lui-même extraire les résultats qui l'intéressent en termes de variables et de dates.
-
-Un cas de développement de wrapper un peu plus avancé mais a priori pas très compliqué à réaliser serait de prendre en compte les arguments `var_names`, `dates` et `stages` : l'utilisateur définit les situations à simuler via son workspace, comme précédemment, mais le wrapper ne renvoie les résultats que pour les variables, dates et stades sélectionnés, ce qui évite des manipulations pour le post-traitement des résultats. Le caractère optionnel (au moins de `dates` et `stages`, puisqu'il ne sont pas fournis en estimation de paramètres) doit cependant être géré dans le wrapper.
-
-L'argument `sit_names` est également assez facile à intégrer dans le wrapper pour sélectionner une sous-liste de situations à simuler au sein de celles définies dans le workspace, bien qu'une vérification de la cohérence des deux s'impose.
-
-L'utilisation de `sit_var_date_mask` n'est peut-être à conseiller que pour les modèles pour lesquels la gestion des sorties simulées est très coûteuse. Cet argument permet en effet de régler plus finement la liste des dates et variables à retourner en fonction des situations à simuler, mais la multiplicité des argument rend le wrapper plus complexe à implémenter.
-
-Si tous les arguments sont fournis et utilisés dans le wrapper, sit_var_date_mask doit être prioritaire.
+Dans ces deux derniers cas, l'utilisateur devra par contre lui-même extraire les résultats qui l'intéressent en termes de variables et de dates / stades. 
+Ce wrapper sera cependant probablement assez peu efficace en consommation mémoire, voire en temps de calcul, dans certains cas (typiquement AI / AS).
 
 Les noms des arguments sont fixés pour faciliter le passage d’un modèle à l’autre et pour fournir automatiquement les informations dans le cas estimation de paramètres (on aurait pu sinon laisser les développeurs de wrapper gérer cela via les options du wrapper).
 
-Les arguments `sit_names`, `var_names` et `sit_var_date_mask` sont automatiquement fournis d’après les observations dans le cas estimation de paramètre. Si l’utilisateur souhaite faire une transformation des sorties simulées ou des observations et a besoin pour cela de simuler des variables non observées, alors il peut définir ces arguments en entrée d’estim_param, ils seront passés tels quels au wrapper (peut-être via une solution du type `...` pour estim_param : tous les arguments non définis dans l'interface de estim_param pourraient être passés à l'ensemble des fonctions utilisateurs (wrapper, fonction de transformation, ...)).
+Les arguments `sit_names` et `var_names` seront automatiquement fournis d’après les observations dans le cas estimation de paramètre. Si l’utilisateur souhaite faire une transformation des sorties simulées ou des observations et a besoin pour cela de simuler des variables non observées, alors il pourra définir ces arguments en entrée d’estim_param, ils seront passés tels quels au wrapper (peut-être via une solution du type `...` pour estim_param : tous les arguments non définis dans l'interface de estim_param pourraient être passés à l'ensemble des fonctions utilisateurs (wrapper, fonction de transformation, ...)).
 
+Si `sit_names` n'est pas fourni, les résultats pour toutes les situations simulées doivent être retournés.
+Si `var_names` n'est pas fourni, les résultats pour toutes les variables simulées doivent être retournés.
+Si ni `dates`, ni `stades` ne sont fournis, les résultats pour toutes les dates doivent être retournés.
+Si `dates` et `stades` sont fournis, les résultats pour l'ensemble des deux doivent être retournés.
+
+**On pourrait simplifier en ne mentionnant pas les arguments dates et stades, ou alors seulement dans un deuxième temps pour une version avancée du wrapper. En effet, ils ne sont pas utiles pour l'estimation de paramètres et à terme il est probable que les fonctions de multi-simulation et AI/AS prennent en charges ces arguments et filtrent les résultats des wrappers ...**
 
 ## Eléments de Discussion
 
 Cette solution a l’avantage :
 
 *	de fonctionner dans les cas standards même si ces arguments ne sont pas gérés dans les wrappers à partir du moment où il simule au moins les situations, variables et dates nécessaires,
-*	d’être assez souple pour le développement des wrappers (seuls certains de ces 3 arguments peuvent être pris en compte dans le wrapper en fonction des cas d’études traités, méthodes utilisées, optimisation du temps de calcul du wrapper …),
-*	de ne pas demander à l’utilisateur de spécifier les situations, variables et dates à simuler dans le cas estimation de paramètre sans transformation.
+*	d’être assez souple pour le développement des wrappers (seuls certains de ces arguments peuvent être pris en compte dans le wrapper en fonction des cas d’études traités, méthodes utilisées, optimisation du temps de calcul du wrapper …),
+*	de ne pas demander à l’utilisateur de spécifier les situations et variables à simuler dans le cas estimation de paramètre sans transformation.
 
 Mais a l’inconvénient :
 
 *	de complexifier le développement des wrappers si on veut qu’ils fonctionnent de façon optimale dans tous les cas (il faut traiter les différents arguments, leur caractère optionnel, compatibilité avec ce qui peut être réellement fourni par le modèle, ...),
 *	de multiplier la liste des arguments des wrappers 
+* de ne pas permettre de définir finement les variables et dates / stades en fonction des situations (comme le permet l'argument sit_var_date_mask actuel et que je propose d'abandonner). La liste des variables et dates / stades sera donc commune à l'ensemble des situations. Dans certains cas cela nécessitera donc que l'utilisateur fasse un filtrage des résultats a posteriori (mais pas plus complexe a priori que de construire sit_var_date_mask ...). 
 
 # Stockage des sorties simulées
 
@@ -210,25 +214,71 @@ Cette solution a l’avantage :
 # Exemple d'un wrapper simple qui implémente ces solutions
 
 ```{r}
-lai_toymodel <- function(jul_beg, jul_end, A, x0, x1, x2, x3) {
-  # jul_beg, jul_end : beginning and end of simulation in julian days
-  # A : max value for lai
-  # x1 et x3 : increasing and decreasing slope
-  # x0 et x2 : dates of maximum slopes
-  x <- jul_beg:jul_end
-  A*(1/(1+exp(x0-x)/x1)-1/(1+exp(x2-x)/x3))
+lai_toymodel <- function(year, jul_beg, jul_end, max_lai=8, inc_slope=5, dec_slope=2) {
+  # Compute lai for a given year with a simple double-logistic function 
+  #
+  # Arguments
+  #   - year: simulation year 
+  #   - jul_beg, jul_end: beginning and end of simulation in julian days
+  #   - max_lai: max value for lai
+  #   - inc_slope and dec_slope: increasing and decreasing slope
+  #
+  # Value
+  #   - lai: vector of simulated lai
+  #   - date_laimax: date of maximum lai (POSIXct)
+  #   - dates: vector of dates (POSIXct) for which lai is computed
+  
+  # julian day of maximum slopes are hard-coded in this simple example depending 
+  # on jul_beg and jul_end
+  julday_incslope <- jul_beg+(jul_end-jul_beg)/3  
+  julday_decslope <- jul_end-(jul_end-jul_beg)/3
+  jul_days <- jul_beg:jul_end
+  
+  lai <- max_lai * ( 1/(1+exp((julday_incslope-jul_days)/inc_slope)) - 
+                     1/(1+exp((julday_decslope-jul_days)/dec_slope)) ) 
+  
+  dates <- as.POSIXct(as.character(as.Date(jul_beg:jul_end,
+                                           origin=paste0(year,"-01-01"))),
+                      format = "%Y-%m-%d",tz="UTC")
+  
+  date_laimax <- dates[which.max(lai)]
+    
+  return(list(lai=lai,date_laimax=date_laimax, dates=dates))
+  
 }
 
 
-laitm_simple_wrapper <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)), 
-                                  model_options=list(year=2001,
-                                                     jul_beg=70,
-                                                     jul_end=150), ...) {
-#  Runs the lai_toymodel for a set of situations defined in model_options (year, jul_beg, jul_end),
-#  Forces the lai_toymodel parameters A, x1 and x3 with the values given in param_values argument 
-#   (that may depend on the situation to simulate)  
-#  Returns all the simulated values (i.e. all situations, variables and dates)
-  
+laitm_simple_wrapper <- function(param_values=tibble(), 
+                                  model_options=list(year=c(2001),
+                                                     jul_beg=c(70),
+                                                     jul_end=c(150)), ...) {
+  # A simple wrapper for lai_toymodel that does not handle sit_names, var_names, 
+  # dates and stages optionnal arguments 
+  #
+  # Arguments
+  #   - param_values: tibble containing the values of the lay_toymodel parameters 
+  #     to force among max_lai, inc_slope and dec_slope (depending on the situation 
+  #     to simulate if column situation is provided) 
+  #   - model_options: list containing vector of years and beginning/end julian days, 
+  #     that defines the situations to simulate
+  #   - ...: mandatory since CroptimizR will give additional arguments not used here
+  #
+  # Value:
+  #   A named list of tibble per situation (names of situations are the years). 
+  #   Each tibble contains columns:
+  #      - Date (POSIXct dates of simulated results), 
+  #      - Stage (name of phenological stage(s) reached at the given date), 
+  #      - DoE (line number of the Design of Experiment for the corresponding situation),
+  #      - One column per simulated variable (lai in this case)
+  # 
+  # Details:
+  #  - Runs the lai_toymodel for a set of situations defined in model_options 
+  #    (year, jul_beg, jul_end)
+  #  - Forces the lai_toymodel parameters max_lai, inc_slope and dec_slope with 
+  #    the values given in param_values argument (that may depend on the situation to 
+  #    simulate)  
+  #  - Returns all the simulated values (i.e. all situations, variables and dates)
+  #
   res <- list()
   for (isit in 1:length(model_options$year)) {
     
@@ -236,10 +286,8 @@ laitm_simple_wrapper <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)),
     jul_end <- model_options$jul_end[isit]
     year <- model_options$year[isit]
     sit=as.character(year) # in this example, the situation name is the year
-    x0 <- jul_beg+20
-    x2 <- jul_end-20
     
-    # extract design of experiment depending on the situation to simulate 
+    # Extract the design of experiment depending on the situation to simulate 
     if ("situation" %in% names(param_values)) {
       params <- filter(param_values, situation==sit)
     } else {
@@ -247,96 +295,131 @@ laitm_simple_wrapper <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)),
     }
     
     # Loop on design of experiment per situation
-    for (iparams in 1:nrow(params)) {
+    for (iparams in 1:max(nrow(params),1)) {
 
-      # handle default value for the parameters
-      A <- if ("A" %in% names(params)) params$A[iparams] else 3
-      x1 <- if ("x1" %in% names(params)) params$x1[iparams] else 7
-      x3 <- if ("x3" %in% names(params)) params$x3[iparams] else 10
+      res_laitm <- do.call('lai_toymodel', append(lapply(params,`[`,iparams), 
+                                  list(year=year, jul_beg=jul_beg, jul_end=jul_end)))
+                           
       
-      # run the model
-      lai <- lai_toymodel(jul_beg=jul_beg, jul_end=jul_end, 
-                          A=A, x0=x0, x1=x1, x2=x2, x3=x3)
-      
-      # compute maximum lai stage
-      stage <- rep(NA,length(lai)) ; stage[which.max(lai)] <- "laimax"
+      # Store "maximum lai" stage in the stage vector
+      stage <- rep(NA,length(res_laitm$lai)) 
+      stage[res_laitm$dates==res_laitm$date_laimax] <- "laimax"
       
       # fill the result variable
       res[[sit]] <- bind_rows(res[[sit]],
-                              tibble(DoE=rep(iparams, length(lai)),
-                                     Date=as.POSIXct(as.character(as.Date(jul_beg:jul_end,
-                                                                          origin=paste0(year,"-01-01"))),
-                                                     format = "%Y-%m-%d",tz="UTC"), 
+                              tibble(DoE=rep(iparams, length(res_laitm$lai)),
+                                     Date=res_laitm$dates, 
                                      Stage=stage,
-                                     lai=lai))
+                                     lai=res_laitm$lai))
     }  
   }
   
   return(res)
 }
 
-
 # AI/AS, for default situation
+# Two of the three lai_toymodel parameters are randomly sampled
 n=10
-res<-laitm_simple_wrapper(param_values=tibble(A=runif(n,2,6),x1=runif(n,5,10),
-                                          x3=runif(n,8,12)))
-# extract results for one situation, variable and date but all DoE
+res<-laitm_simple_wrapper(param_values=tibble(inc_slope=runif(n,2,7),
+                                          max_lai=runif(n,3,10)))
+# Results are extracted for one situation, variable and date but all DoE with the 
+# following command
 dplyr::filter(res[["2001"]],Stage == "laimax")
 
-
-# multi-simulation : change year, jul_begin and jul_end but keep constant parameters
+# Multi-simulation: the model is run for a set of different situations, and max_lai 
+# parameter is forced to a constant value different from the defautl one 
 res<-laitm_simple_wrapper(model_options=list(year=2000:2010,
                                               jul_beg=sample(60:80,11),
-                                              jul_end=sample(130:170,11)))
-# extract results for one variable and one stage but all situations
+                                              jul_end=sample(130:170,11)),
+                          param_values=tibble(max_lai=7))
+# Results are extracted for lai at one stage but for all situations with the 
+# following command
 bind_rows(res,.id="Situation") %>% dplyr::filter(Stage == "laimax")
 
-# Parameter estimation
+# Parameter estimation: in this example we just simulate how the estim_param function
+# will call the wrapper to see if it works
 obs_list <- list(`2000`=tibble(Date=as.POSIXct(as.character(as.Date(c(90,100,110),
                                                                     origin="2000-01-01")),
                                                format = "%Y-%m-%d",tz="UTC"),
                                lai=c(1.8, 2.4, 2.6)))
 sit_names <- names(obs_list)
 var_names <- setdiff(unique(unlist(lapply(obs_list,names))),c("Date","Stage"))
-laitm_simple_wrapper(param_values=tibble(A=4.1),
+laitm_simple_wrapper(param_values=tibble(max_lai=4.1),
                  model_options=list(year=2000:2002,
                                     jul_beg=c(66,62,71),
                                     jul_end=c(154,151,163)),
                  var_names=var_names,
-                 sit_names=sit_names,
-                 sit_var_date_mask=obs_list)
-
+                 sit_names=sit_names)
+# All simulated situations, variables and dates are returned and will be intersected 
+# with obs_list in estim_param
 
 ```
+
+En général, au contraire de ce cas simple, model_option contiendra plutot un path 
+vers un répertoire de travail contenant les fichiers d'entrées du modèle, ce qui 
+définira la liste (maximum) gdes situations à simuler.
 
 
 # Idem mais en prenant en compte les arguments var_names, dates et stages
 
 ```{r}
 
-laitm_wrapper_V2 <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)), 
-                             model_options=list(year=2001,
-                                                jul_beg=70,
-                                                jul_end=150), 
-                             sit_names=NULL, var_names=NULL, dates=NA, stages="", ...) {
-#  Runs the lai_toymodel for a set of situations defined in sit_names (if given) or model_options (year, jul_beg, jul_end),
-#  Forces the lai_toymodel parameters A, x1 and x3 with the values given in param_values argument 
-#   (that may depend on the situation to simulate)  
-#  Returns all OR A SELECTION OF the simulated values (depending on var_names, dates and stages arguments)
-  
+laitm_wrapper_V2 <- function(param_values=tibble(), 
+                                  model_options=list(year=c(2001),
+                                                     jul_beg=c(70),
+                                                     jul_end=c(150)), 
+                             sit_names=NULL, var_names=NULL, dates=NA, stages="") {
+  # A wrapper for lai_toymodel that handles sit_names, var_names, dates and stages 
+  # optionnal arguments 
+  #
+  # Arguments
+  #   - param_values: tibble containing the values of the lay_toymodel parameters 
+  #     to force among max_lai, inc_slope and dec_slope (depending on the situation 
+  #     to simulate if column situation is provided) 
+  #   - model_options: list containing vector of years and beginning/end julian days, 
+  #     that defines the situations to simulate
+  #   - sit_names: list of situations for which results must be returned (optional, 
+  #     returns results for all simulated situations if not given)
+  #   - var_names: list of variables for which results must be returned (optional, 
+  #     returns results for all simulated variables if not given)
+  #   - dates: list of dates for which results must be returned (optional, returns 
+  #     results for all dates if neither dates nor stages are given, returns only 
+  #     results at given dates if dates is given but not stages, returns results for 
+  #     both given dates and stages otherwise)
+  #   - stages: list of stages  for which results must be returned (optional, returns 
+  #     results for all dates if neither dates nor stages are given, returns only 
+  #     results at given stages if stages is given but not dates, returns results for 
+  #     both given dates and stages otherwise)
+  #
+  # Value:
+  #   A named list of tibble per situation (names of situations are the years). 
+  #   Each tibble contains columns:
+  #      - Date (POSIXct dates of simulated results), 
+  #      - Stage (name of phenological stage(s) reached at the given date), 
+  #      - DoE (line number of the Design of Experiment for the corresponding situation),
+  #      - One column per simulated variable (lai in this case)
+  # 
+  # Details:
+  #  - Runs the lai_toymodel for a set of situations defined in sit_names (if given) 
+  #    or model_options (year, jul_beg, jul_end)
+  #  - Forces the lai_toymodel parameters max_lai, inc_slope and dec_slope with 
+  #    the values given in param_values argument (that may depend on the situation to 
+  #    simulate)  
+  #  - Returns all OR A SELECTION OF the simulated values (depending on var_names, 
+  #    dates and stages arguments)
+  #
   res <- list()
-  if (is.null(sit_names)) sit_names <- model_options$year
   
+  if (is.null(sit_names)) sit_names <- model_options$year
+
   for (isit in which(as.character(model_options$year) %in% sit_names)) {
-    
+
     jul_beg <- model_options$jul_beg[isit]
     jul_end <- model_options$jul_end[isit]
     year <- model_options$year[isit]
     sit=as.character(year) # in this example, the situation name is the year
-    x0 <- jul_beg+20
-    x2 <- jul_end-20
     
-    # extract design of experiment depending on the situation to simulate 
+    # Extract the design of experiment depending on the situation to simulate 
     if ("situation" %in% names(param_values)) {
       params <- filter(param_values, situation==sit)
     } else {
@@ -344,51 +427,53 @@ laitm_wrapper_V2 <- function(param_values=tibble(A=c(3), x1=c(7), x3=c(10)),
     }
     
     # Loop on design of experiment per situation
-    for (iparams in 1:nrow(params)) {
+    for (iparams in 1:max(nrow(params),1)) {
 
-      # handle default value for the parameters
-      A <- if ("A" %in% names(params)) params$A[iparams] else 3
-      x1 <- if ("x1" %in% names(params)) params$x1[iparams] else 7
-      x3 <- if ("x3" %in% names(params)) params$x3[iparams] else 10
+      res_laitm <- do.call('lai_toymodel', append(lapply(params,`[`,iparams), 
+                                  list(year=year, jul_beg=jul_beg, jul_end=jul_end)))
+                           
       
-      # run the model
-      lai <- lai_toymodel(jul_beg=jul_beg, jul_end=jul_end, 
-                          A=A, x0=x0, x1=x1, x2=x2, x3=x3)
-      
-      # compute maximum lai stage
-      stage <- rep(NA,length(lai)) ; stage[which.max(lai)] <- "laimax"
+      # Store "maximum lai" stage in the stage vector
+      stage <- rep(NA,length(res_laitm$lai)) 
+      stage[res_laitm$dates==res_laitm$date_laimax] <- "laimax"
       
       # fill the result variable
-      res_tmp <- tibble(DoE=rep(iparams, length(lai)),
-                        Date=as.POSIXct(as.character(as.Date(jul_beg:jul_end,
-                                                             origin=paste0(year,"-01-01"))),
-                                        format = "%Y-%m-%d",tz="UTC"), 
+      res_tmp <- tibble(DoE=rep(iparams, length(res_laitm$lai)),
+                        Date=res_laitm$dates, 
                         Stage=stage,
-                        lai=lai)
+                        lai=res_laitm$lai)
       
-      if (!is.na(dates) | stages!="") res_tmp <- dplyr::filter(res_tmp, Date == dates | Stage == stages) 
+      if (!is.na(dates[1]) | stages[1]!="") 
+        res_tmp <- dplyr::filter(res_tmp, Date == dates | Stage == stages) 
       if (!is.null(var_names)) res_tmp <- select(res_tmp, DoE, Date, Stage,!!var_names)
 
       res[[sit]] <- bind_rows(res[[sit]],res_tmp)
+
+      
     }  
   }
   
   return(res)
+
 }
 
 
 # AI/AS, for default situation
 n=10
-laitm_wrapper_V2(param_values=tibble(A=runif(n,2,6),x1=runif(n,5,10),
-                                     x3=runif(n,8,12)),
+laitm_wrapper_V2(param_values=tibble(inc_slope=runif(n,2,7),
+                                     max_lai=runif(n,3,10)),
                  var_names="lai", stages="laimax")
+# In this case, results are directly returned in the expected format
 
 # multi-simulation : change year, jul_begin and jul_end but keep constant parameters
-res<-laitm_wrapper_V2(model_options=list(year=2000:2010,
-                                         jul_beg=sample(60:80,11),
-                                         jul_end=sample(130:170,11)),
-                      var_names="lai", stages="laimax")
-bind_rows(res,.id="Situation") 
+res<- laitm_wrapper_V2(model_options=list(year=2000:2010,
+                                          jul_beg=sample(60:80,11),
+                                          jul_end=sample(130:170,11)),
+                       param_values=tibble(max_lai=7),
+                       var_names="lai", stages="laimax")
+# In this case, a simple bind_rows returns the expected format
+bind_rows(res,.id="Situation")
+
 
 # Parameter estimation
 obs_list <- list(`2000`=tibble(Date=as.POSIXct(as.character(as.Date(c(90,100,110),
@@ -397,20 +482,21 @@ obs_list <- list(`2000`=tibble(Date=as.POSIXct(as.character(as.Date(c(90,100,110
                                lai=c(1.8, 2.4, 2.6)))
 sit_names <- names(obs_list)
 var_names <- setdiff(unique(unlist(lapply(obs_list,names))),c("Date","Stage"))
-laitm_wrapper_V2(param_values=tibble(A=4.1),
+laitm_wrapper_V2(param_values=tibble(max_lai=4.1),
                  model_options=list(year=2000:2002,
                                     jul_beg=c(66,62,71),
                                     jul_end=c(154,151,163)),
                  var_names=var_names,
-                 sit_names=sit_names,
-                 sit_var_date_mask=obs_list)
+                 sit_names=sit_names)
+# In this case, only the observed situation and variable is returned (but for all 
+# dates) and will be intersected with obs_list in estim_param
+# If the user provide var_names to estim_param, it will be given to the wrapper 
+# instead of this computed from obs_list
 
 ```
-
-
 
 
 # Remarques
 Les cas intercropping et successions culturales ne sont pas (encore) pris en compte dans cette réflexion.
 
- 
+Je n'ai pas non plus encore traité le cas des warnings / erreurs détectés dans le wrapper. 
