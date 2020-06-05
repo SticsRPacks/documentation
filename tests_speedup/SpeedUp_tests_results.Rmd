@@ -1,0 +1,44 @@
+---
+title: "Speed Up"
+author: "ROBINE Thomas"
+date: "05/06/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The purpose of this document is to format the results of the Speedup tests performed in order to know the optimal number of cpus to have the smallest run time when estimating parameters. For these tests, we had to estimate the parameters of 14 Usms. We had to repeat the minimization 10 times and we had to evaluate the minimized criterion a 1000 times. For these tests, we had to tests two methods. The first one was to use threads and the second was to use a sequential method. Each test for each test was repeted 3 times.
+
+# I. Thread method
+
+Cpus number | Run 1 | Run 2 | Run 3 | Mean time
+:-----------|:------|:------|:------|:---------
+1 | 46 hours | 46 hours | 22 hours | 38 hours
+2 | 13 hours | 13 hours | 13 hours | 13 hours
+4 | 10 hours | 10 hours | 5 hours | 8 hours
+6 | 4 hours | 4 hours | 4 hours | 4 hours
+7 | 3.5 hours | 3.5 hours | 3.5 hours | 3.5 hours
+8 | 3.5 hours | 3.5 hours | 3.5 hours | 3.5 hours
+10 | 4 hours | 4 hours | 4 hours | 4 hours
+12 | 4 hours | 4 hours | 4 hours | 4 hours
+14 | 4 hours | 4 hours | 4 hours | 4 hours
+
+```{r graph thread, echo=FALSE}
+library(ggplot2)
+cat("Average run time chart according to the number of CPUs")
+mean_values <- c(38,13,8,4,3.5,3.5,4,4,4)
+df <- data.frame(CPUs = c(1,2,4,6,7,8,10,12,14),Execution_time = mean_values)
+ggplot(df)+geom_line(aes(CPUs,Execution_time))
+```
+
+We have singular values for the third executions with a number of cpus of 1 and 4. To overcome this, we can re-run the tests with a larger number of repetitions. However, we can see that the minimum execution time is around 7 and 8 Cpus.
+
+# II. Sequential method
+
+Cpus number | Run 1 | Run 2 | Run 3 | Mean time
+:-----------|:------|:------|:------|:---------
+1 | 12 hours | 12 hours | 12 hours | 12 hours
+
+We get a strange result because the logic would like the execution time to be the same as the time taken for 1 CPU with a thread method. This challenges our results and encourages us to repeat the tests with more repetitions.
