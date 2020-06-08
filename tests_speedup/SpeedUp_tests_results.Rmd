@@ -42,3 +42,23 @@ Cpus number | Run 1 | Run 2 | Run 3 | Mean time
 1 | 12 hours | 12 hours | 12 hours | 12 hours
 
 We get a strange result because the logic would like the execution time to be the same as the time taken for 1 CPU with a thread method. This challenges our results and encourages us to repeat the tests with more repetitions.
+
+# III. Speed-Up
+
+The Speed-up formula S(p) is S(p) = Tp(1)/Tp(P), with p the nomber of processors and Tp the run time for p processors.
+First, we must define our S(1), which is the best time we have for 1 cpu between the thread method and the sequential method.
+S(1) = 12
+
+Cpus number | 1 | 2 | 4 | 6 | 7 | 8 | 10 | 12 | 14
+:-----------|:--|:--|:--|:--|:--|:--|:---|:---|:---
+Run time | 12 | 13 | 8 | 4 | 3.5 | 3.5 | 4 | 4 | 4
+S(p) | 12/12 | 12/13 | 12/8 | 12/4 | 12/3.5 | 12/3.5 | 12/4 | 12/4 | 12/4 
+
+
+```{r speed-up, echo=FALSE}
+
+values <- c(12/12,12/13,12/8,12/4,12/3.5,12/3.5,12/4,12/4,12/4)
+process <- c(1,2,4,6,7,8,10,12,14)
+df <- data.frame(Processors = process, Valeurs = values)
+ggplot(df)+geom_line(aes(Processors,Valeurs))+labs(y = "S(p)")
+```
