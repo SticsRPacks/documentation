@@ -1,16 +1,20 @@
 # profile ligne 38 ? 60
 # Download and transform Vignette simple_case for different tests
 # ---------------------------------------------------------------
-
+library(profvis)
 #context("Parameter estimation")
 
-tmpdir <- normalizePath("D:\\Home\\trobine\\Documents\\Github\\documentation\\test_profiling", winslash = "/", mustWork = FALSE)
+# home tmpdir path
+tmpdir <- normalizePath("C:\\Users\\Thomas\\Documents\\GitHub\\documentation\\test_profiling", winslash = "/", mustWork = FALSE)
+# inrae tmpdir path
+#tmpdir <- normalizePath("D:\\Home\\trobine\\Documents\\Github\\documentation\\test_profiling", winslash = "/", mustWork = FALSE)
+# default tmpdir path
 # tmpdir <- normalizePath(tmpdir(), winslash = "/", mustWork = FALSE)
 simple_case_rmd <-file.path(tmpdir,"Parameter_estimation_simple_case.Rmd")
 download.file("https://raw.github.com/SticsRPacks/CroptimizR/master/vignettes/Parameter_estimation_simple_case.Rmd",
               simple_case_rmd)
 
-# # 
+# #
 # # ## set the parameters for a run in auto_test mode
 xfun::gsub_file(file=simple_case_rmd,
                 pattern="params$eval_auto_test",replacement="TRUE",fixed=TRUE)
@@ -48,33 +52,31 @@ xfun::gsub_file(file=simple_case_r_tmp,
                 fixed=TRUE)
 
 ## change the options of the parameter estimation method
-# xfun::gsub_file(file=simple_case_r_tmp,
-#                 pattern="optim_options$nb_rep <- 7",replacement="optim_options$nb_rep <- 2",fixed=TRUE)
-# xfun::gsub_file(file=simple_case_r_tmp,
-#                 pattern="optim_options$maxeval <- 500",replacement="optim_options$maxeval <- 4",fixed=TRUE)
+xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$nb_rep <- 7",replacement="optim_options$nb_rep <- 6",fixed=TRUE)
+# xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$maxeval <- 500",replacement="optim_options$maxeval <- 500",fixed=TRUE)
 
 ## run it
-source(simple_case_r_tmp)
+profvis(source(simple_case_r_tmp))
 
 # ## load the results
 # load(file.path(optim_options$path_results,"optim_results.Rdata"))
 # nlo_new<-lapply(nlo,function(x) {x$call<-NULL;x}) # remove "call" since it may change between code versions ...
 # load(system.file(file.path("extdata","ResultsSimpleCase2repet4iter"), "optim_results.Rdata", package = "CroptimizR"))
 # nlo<-lapply(nlo,function(x) {x$call<-NULL;x})
-# 
+#
 # test_that("Test Vignette simple_case", {
 #   expect_equal(nlo_new,nlo, tolerance = 1e-5)
 #   expect_true(file.exists(file.path(optim_options$path_results,"EstimatedVSinit.pdf")))
 # })
-# 
-# 
+#
+#
 # # Test model crash
 # # ----------------
-# 
+#
 # ## Copy the simple case R script for this test
 # simple_case_r_tmp <-file.path(tmpdir,"Parameter_estimation_simple_case_tmp.R")
 # file.copy(from=simple_case_r, to=simple_case_r_tmp, overwrite=TRUE)
-# 
+#
 # ## Define initial values as those used for computing the reference results
 # ## (random sampling may lead to different values on different platforms even with the same seed)
 # xfun::gsub_file(file=simple_case_r_tmp,
@@ -82,7 +84,7 @@ source(simple_case_r_tmp)
 #                 replacement="file.remove(file.path(stics_inputs_path,sit_name,\"tempopar.sti\"))
 # optim_results=estim_param(obs_list=obs_list,",
 #                 fixed=TRUE)
-# 
+#
 # test_that("Test Vignette model crash", {
 #   expect_error(source(simple_case_r_tmp),"error")
 # })
@@ -99,7 +101,7 @@ source(simple_case_r_tmp)
 # vignette_rmd <-file.path(tmpdir,"Parameter_estimation_Specific_and_Varietal.Rmd")
 # download.file("https://raw.github.com/SticsRPacks/CroptimizR/master/vignettes/Parameter_estimation_Specific_and_Varietal.Rmd",
 #               vignette_rmd)
-# 
+#
 # ## set the parameters for a run in auto_test mode
 # xfun::gsub_file(file=vignette_rmd,
 #                 pattern="params$eval_auto_test",replacement="TRUE",fixed=TRUE)
@@ -112,7 +114,7 @@ source(simple_case_r_tmp)
 #                 pattern="params$path_to_JavaStics",
 #                 replacement=paste0("\"",javastics_path,"\""),
 #                 fixed=TRUE)
-# 
+#
 # ## Define initial values as those used for computing the reference results
 # ## (random sampling may lead to different values on different platforms even with the same seed)
 # xfun::gsub_file(file=vignette_rmd,
@@ -123,26 +125,26 @@ source(simple_case_r_tmp)
 #                 pattern="lb=c(50,100),ub=c(400,450))",
 #                 replacement="lb=c(50,100),ub=c(400,450), init_values=data.frame(c(293.3769, 115.9086), c(299.3398,162.9456)))",
 #                 fixed=TRUE)
-# 
+#
 # ## change the options of the parameter estimation method
 # xfun::gsub_file(file=vignette_rmd,
 #                 pattern="optim_options$nb_rep <- 7",replacement="optim_options$nb_rep <- 2",fixed=TRUE)
 # xfun::gsub_file(file=vignette_rmd,
 #                 pattern="optim_options$maxeval <- 1000",replacement="optim_options$maxeval <- 4",fixed=TRUE)
-# 
+#
 # ## generate the R script
 # knitr::purl(input=vignette_rmd,
 #             output=file.path(tmpdir,"Parameter_estimation_Specific_and_Varietal.R"), documentation = 2)
-# 
+#
 # ## run it
 # source(file.path(tmpdir,"Parameter_estimation_Specific_and_Varietal.R"))
-# 
+#
 # ## load the results
 # load(file.path(optim_options$path_results,"optim_results.Rdata"))
 # nlo_new<-lapply(nlo,function(x) {x$call<-NULL;x}) # remove "call" since it may change between code versions ...
 # load(system.file(file.path("extdata","ResultsSpecificVarietal_2repet4iter"), "optim_results.Rdata", package = "CroptimizR"))
 # nlo<-lapply(nlo,function(x) {x$call<-NULL;x}) # remove "call" since it may change between code versions ...
-# 
+#
 # test_that("Test Vignette specific and varietal", {
 #   expect_equal(nlo_new,nlo, tolerance = 1e-4)
 #   expect_true(file.exists(file.path(optim_options$path_results,"EstimatedVSinit.pdf")))
