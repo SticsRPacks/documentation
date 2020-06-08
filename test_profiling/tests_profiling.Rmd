@@ -1,0 +1,31 @@
+---
+title: "Profiling"
+author: "ROBINE Thomas"
+date: "8 juin 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# I. Introduction
+
+In this document, we made some profiling tests in order to know which part of the code is the one that have the longest run time.
+We, especially, put our focus on parts after the "model_function" call because this is obvious that the model run time is the code run time, which is 498160 milliseconds.
+
+So, we profile our code using the profiling tool from RStudio and we obtaine a flame graph that we analyzed.
+Here is the listing of all the calls made after the "model_function" call, that we know their origin. There are many calls that we don't know from what part they are called from.
+
+Call | Source | Run time (ms) | Global run time (ms) | Rate on run (%)
+:----|:-------|:--------------|:---------------------|:---------------
+do.call | SticsOnR/R/stics_wrapper.R#118 | 200 | 41500 | 8.33
+exists_sticks_exe | SticsOnR/R/stics_wrapper.R#131 | 10 | 40660 | 8.16
+check_stics_exe | SticsOnR/R/stics_wrapper.R#642 | 180 | 86040 | 17.27
+suppressWarnings | SticsOnR/R/stics_exe_utilities.R#288 | 180 | 85860 | 17.24
+run_system_cmd | SticsOnR/R/stics_exe_utilities.R#288 | 180 | 85830 | 17.22
+try | SticsOnR/R/run_system_cmd.R#19 | 180 | 486990 | 97.76
+system2 | SticsOnR/R/run_system_cmd.R#19 | 180 | 89720 | 18.01
+parallel::makeCluster | SticsOnR/R/stics_wrapper.R#143 | 150 | 31090 | 6.24
+parallel::clusterCall | SticsOnR/R/stics_wrapper.R#143 | 870 | 185260 | 37.19
+%dopar% | SticsOnR/R/stics_wrapper.R#237 | 750 | 183450 | 36.83
