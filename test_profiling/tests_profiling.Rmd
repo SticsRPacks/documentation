@@ -17,15 +17,70 @@ We, especially, put our focus on parts after the "model_function" call because t
 So, we profile our code using the profiling tool from RStudio and we obtaine a flame graph that we analyzed.
 Here is the listing of all the calls made after the "model_function" call, that we know their origin. There are many calls that we don't know from what part they are called from.
 
-Call | Source | Run time (ms) | Global run time (ms) | Rate on run (%)
+# II. Calls' path from model_function and their source
+
+call 1 : model_function -> do.call :  SticsOnR/R/stics_wrapper.R#118
+
+call 2 : model_function -> do.call -> exists_sticks_exe : SticsOnR/R/stics_wrapper.R#642
+
+call 3 : model_function -> do.call -> check_sticks_exe : SticsOnR/R/stics_wrapper.R#642
+
+call 4 : model_function -> do.call -> check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
+
+call 5 : model_function -> do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
+
+call 6 : model_function -> do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
+
+call 7 : model_function -> check_sticks_exe : SticsOnR/R/stics_wrapper.R#131
+
+call 8 : model_function -> check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
+
+call 9 : model_function -> check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
+
+call 10 : model_function -> check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
+
+call 11 : model_function -> parallel::makeCluster : SticsOnR/R/stics_wrapper.R#140
+
+call 12 : model_function -> parallel::clusterCall : SticsOnR/R/stics_wrapper.R#143
+
+call 13 : model_function -> %dopar% : SticsOnR/R/stics_wrapper.R#237
+
+# III. Parallel's runs
+
+Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
 :----|:-------|:--------------|:---------------------|:---------------
-do.call | SticsOnR/R/stics_wrapper.R#118 | 200 | 41500 | 8.33
-exists_sticks_exe | SticsOnR/R/stics_wrapper.R#131 | 10 | 40660 | 8.16
-check_stics_exe | SticsOnR/R/stics_wrapper.R#642 | 180 | 86040 | 17.27
-suppressWarnings | SticsOnR/R/stics_exe_utilities.R#288 | 180 | 85860 | 17.24
-run_system_cmd | SticsOnR/R/stics_exe_utilities.R#288 | 180 | 85830 | 17.22
-try | SticsOnR/R/run_system_cmd.R#19 | 180 | 486990 | 97.76
-system2 | SticsOnR/R/run_system_cmd.R#19 | 180 | 89720 | 18.01
-parallel::makeCluster | SticsOnR/R/stics_wrapper.R#143 | 150 | 31090 | 6.24
-parallel::clusterCall | SticsOnR/R/stics_wrapper.R#143 | 870 | 185260 | 37.19
-%dopar% | SticsOnR/R/stics_wrapper.R#237 | 750 | 183450 | 36.83
+prog | 207493 | - | - 
+model_function | 70630 | 197613 | 95.24
+1 | 173 | 15723 | 7.58
+2 | 10 | 707 | 0.35
+3 | 160 | 31900 | 15.37
+4 | 160 | 31900 | 15.37
+5 | 160 | 31853 | 15.35
+6 | 160 | 34973 | 16.86
+7 | 180 | 31900 | 15.37
+8 | 180 | 31900 | 15.37
+9 | 180 | 31853 | 15.35
+10 | 180 | 34973 | 16.86
+11 | 123 | 12056 | 5.81
+12 | 810 | 79750 | 38.44
+13 | 750 | 76790 | 37
+
+# IV. Sequential's runs
+
+Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
+:----|:-------|:--------------|:---------------------|:---------------
+prog | 210166 | - | - 
+model_function | 83550 | 199810 | 95.07
+1 | 143 | 15770 | 7.50
+2 | 10 | 810 | 0.39
+3 | 133 | 31966 | 15.21
+4 | 133 | 31946 | 15.20
+5 | 133 | 31933 | 15.19
+6 | 133 | 34940 | 16.62
+7 | 166 | 31900 | 15.21
+8 | 166 | 31900 | 15.20
+9 | 166 | 31853 | 15.19
+10 | 166 | 34973 | 16.62
+11 | 120 | 12053 | 5.73
+12 | 790 | 80546 | 38.32
+13 | 740 | 78650 | 37.42

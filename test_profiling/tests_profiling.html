@@ -188,86 +188,243 @@ summary {
 <h1>I. Introduction</h1>
 <p>In this document, we made some profiling tests in order to know which part of the code is the one that have the longest run time. We, especially, put our focus on parts after the &quot;model_function&quot; call because this is obvious that the model run time is the code run time, which is 498160 milliseconds.</p>
 <p>So, we profile our code using the profiling tool from RStudio and we obtaine a flame graph that we analyzed. Here is the listing of all the calls made after the &quot;model_function&quot; call, that we know their origin. There are many calls that we don't know from what part they are called from.</p>
-<table>
+</div>
+<div id="ii.-calls-path-from-model_function-and-their-source" class="section level1">
+<h1>II. Calls' path from model_function and their source</h1>
+<p>call 1 : model_function -&gt; do.call : SticsOnR/R/stics_wrapper.R#118</p>
+<p>call 2 : model_function -&gt; do.call -&gt; exists_sticks_exe : SticsOnR/R/stics_wrapper.R#642</p>
+<p>call 3 : model_function -&gt; do.call -&gt; check_sticks_exe : SticsOnR/R/stics_wrapper.R#642</p>
+<p>call 4 : model_function -&gt; do.call -&gt; check_sticks_exe -&gt; suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288</p>
+<p>call 5 : model_function -&gt; do.call -&gt; check_sticks_exe -&gt; suppressWarnings -&gt; run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288</p>
+<p>call 6 : model_function -&gt; do.call -&gt; check_sticks_exe -&gt; suppressWarnings -&gt; run_system_cmd -&gt; system2 : SticsOnR/R/run_system_cmd.R#19</p>
+<p>call 7 : model_function -&gt; check_sticks_exe : SticsOnR/R/stics_wrapper.R#131</p>
+<p>call 8 : model_function -&gt; check_sticks_exe -&gt; suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288</p>
+<p>call 9 : model_function -&gt; check_sticks_exe -&gt; suppressWarnings -&gt; run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288</p>
+<p>call 10 : model_function -&gt; check_sticks_exe -&gt; suppressWarnings -&gt; run_system_cmd -&gt; system2 : SticsOnR/R/run_system_cmd.R#19</p>
+<p>call 11 : model_function -&gt; parallel::makeCluster : SticsOnR/R/stics_wrapper.R#140</p>
+<p>call 12 : model_function -&gt; parallel::clusterCall : SticsOnR/R/stics_wrapper.R#143</p>
+<p>call 13 : model_function -&gt; %dopar% : SticsOnR/R/stics_wrapper.R#237</p>
+</div>
+<div id="iii.-parallels-runs" class="section level1">
+<h1>III. Parallel's runs</h1>
+<table style="width:99%;">
+<colgroup>
+<col width="8%"></col>
+<col width="12%"></col>
+<col width="22%"></col>
+<col width="31%"></col>
+<col width="23%"></col>
+</colgroup>
 <thead>
 <tr class="header">
 <th align="left">Call</th>
-<th align="left">Source</th>
-<th align="left">Run time (ms)</th>
-<th align="left">Global run time (ms)</th>
-<th align="left">Rate on run (%)</th>
+<th align="left">Average Run time (ms)</th>
+<th align="left">Average Global run time (ms)</th>
+<th align="left">Average Rate on run (%)</th>
 </tr>
 </thead>
 <tbody>
 <tr class="odd">
-<td align="left">do.call</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#118</td>
-<td align="left">200</td>
-<td align="left">41500</td>
-<td align="left">8.33</td>
+<td align="left">prog</td>
+<td align="left">207493</td>
+<td align="left">-</td>
+<td align="left">-</td>
 </tr>
 <tr class="even">
-<td align="left">exists_sticks_exe</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#131</td>
+<td align="left">model_function</td>
+<td align="left">70630</td>
+<td align="left">197613</td>
+<td align="left">95.24</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">173</td>
+<td align="left">15723</td>
+<td align="left">7.58</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
 <td align="left">10</td>
-<td align="left">40660</td>
-<td align="left">8.16</td>
+<td align="left">707</td>
+<td align="left">0.35</td>
 </tr>
 <tr class="odd">
-<td align="left">check_stics_exe</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#642</td>
-<td align="left">180</td>
-<td align="left">86040</td>
-<td align="left">17.27</td>
+<td align="left">3</td>
+<td align="left">160</td>
+<td align="left">31900</td>
+<td align="left">15.37</td>
 </tr>
 <tr class="even">
-<td align="left">suppressWarnings</td>
-<td align="left">SticsOnR/R/stics_exe_utilities.R#288</td>
-<td align="left">180</td>
-<td align="left">85860</td>
-<td align="left">17.24</td>
+<td align="left">4</td>
+<td align="left">160</td>
+<td align="left">31900</td>
+<td align="left">15.37</td>
 </tr>
 <tr class="odd">
-<td align="left">run_system_cmd</td>
-<td align="left">SticsOnR/R/stics_exe_utilities.R#288</td>
-<td align="left">180</td>
-<td align="left">85830</td>
-<td align="left">17.22</td>
+<td align="left">5</td>
+<td align="left">160</td>
+<td align="left">31853</td>
+<td align="left">15.35</td>
 </tr>
 <tr class="even">
-<td align="left">try</td>
-<td align="left">SticsOnR/R/run_system_cmd.R#19</td>
-<td align="left">180</td>
-<td align="left">486990</td>
-<td align="left">97.76</td>
+<td align="left">6</td>
+<td align="left">160</td>
+<td align="left">34973</td>
+<td align="left">16.86</td>
 </tr>
 <tr class="odd">
-<td align="left">system2</td>
-<td align="left">SticsOnR/R/run_system_cmd.R#19</td>
+<td align="left">7</td>
 <td align="left">180</td>
-<td align="left">89720</td>
-<td align="left">18.01</td>
+<td align="left">31900</td>
+<td align="left">15.37</td>
 </tr>
 <tr class="even">
-<td align="left">parallel::makeCluster</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#143</td>
-<td align="left">150</td>
-<td align="left">31090</td>
-<td align="left">6.24</td>
+<td align="left">8</td>
+<td align="left">180</td>
+<td align="left">31900</td>
+<td align="left">15.37</td>
 </tr>
 <tr class="odd">
-<td align="left">parallel::clusterCall</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#143</td>
-<td align="left">870</td>
-<td align="left">185260</td>
-<td align="left">37.19</td>
+<td align="left">9</td>
+<td align="left">180</td>
+<td align="left">31853</td>
+<td align="left">15.35</td>
 </tr>
 <tr class="even">
-<td align="left">%dopar%</td>
-<td align="left">SticsOnR/R/stics_wrapper.R#237</td>
+<td align="left">10</td>
+<td align="left">180</td>
+<td align="left">34973</td>
+<td align="left">16.86</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">123</td>
+<td align="left">12056</td>
+<td align="left">5.81</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">810</td>
+<td align="left">79750</td>
+<td align="left">38.44</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
 <td align="left">750</td>
-<td align="left">183450</td>
-<td align="left">36.83</td>
+<td align="left">76790</td>
+<td align="left">37</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div id="iv.-sequentials-runs" class="section level1">
+<h1>IV. Sequential's runs</h1>
+<table style="width:99%;">
+<colgroup>
+<col width="8%"></col>
+<col width="12%"></col>
+<col width="22%"></col>
+<col width="31%"></col>
+<col width="23%"></col>
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">Call</th>
+<th align="left">Average Run time (ms)</th>
+<th align="left">Average Global run time (ms)</th>
+<th align="left">Average Rate on run (%)</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">prog</td>
+<td align="left">210166</td>
+<td align="left">-</td>
+<td align="left">-</td>
+</tr>
+<tr class="even">
+<td align="left">model_function</td>
+<td align="left">83550</td>
+<td align="left">199810</td>
+<td align="left">95.07</td>
+</tr>
+<tr class="odd">
+<td align="left">1</td>
+<td align="left">143</td>
+<td align="left">15770</td>
+<td align="left">7.50</td>
+</tr>
+<tr class="even">
+<td align="left">2</td>
+<td align="left">10</td>
+<td align="left">810</td>
+<td align="left">0.39</td>
+</tr>
+<tr class="odd">
+<td align="left">3</td>
+<td align="left">133</td>
+<td align="left">31966</td>
+<td align="left">15.21</td>
+</tr>
+<tr class="even">
+<td align="left">4</td>
+<td align="left">133</td>
+<td align="left">31946</td>
+<td align="left">15.20</td>
+</tr>
+<tr class="odd">
+<td align="left">5</td>
+<td align="left">133</td>
+<td align="left">31933</td>
+<td align="left">15.19</td>
+</tr>
+<tr class="even">
+<td align="left">6</td>
+<td align="left">133</td>
+<td align="left">34940</td>
+<td align="left">16.62</td>
+</tr>
+<tr class="odd">
+<td align="left">7</td>
+<td align="left">166</td>
+<td align="left">31900</td>
+<td align="left">15.21</td>
+</tr>
+<tr class="even">
+<td align="left">8</td>
+<td align="left">166</td>
+<td align="left">31900</td>
+<td align="left">15.20</td>
+</tr>
+<tr class="odd">
+<td align="left">9</td>
+<td align="left">166</td>
+<td align="left">31853</td>
+<td align="left">15.19</td>
+</tr>
+<tr class="even">
+<td align="left">10</td>
+<td align="left">166</td>
+<td align="left">34973</td>
+<td align="left">16.62</td>
+</tr>
+<tr class="odd">
+<td align="left">11</td>
+<td align="left">120</td>
+<td align="left">12053</td>
+<td align="left">5.73</td>
+</tr>
+<tr class="even">
+<td align="left">12</td>
+<td align="left">790</td>
+<td align="left">80546</td>
+<td align="left">38.32</td>
+</tr>
+<tr class="odd">
+<td align="left">13</td>
+<td align="left">740</td>
+<td align="left">78650</td>
+<td align="left">37.42</td>
 </tr>
 </tbody>
 </table>
