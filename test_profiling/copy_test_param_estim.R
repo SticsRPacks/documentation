@@ -52,8 +52,11 @@ xfun::gsub_file(file=simple_case_r_tmp,
                 fixed=TRUE)
 
 ## change the options of the parameter estimation method
-xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$nb_rep <- 7",replacement="optim_options$nb_rep <- 6",fixed=TRUE)
-# xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$maxeval <- 500",replacement="optim_options$maxeval <- 500",fixed=TRUE)
+xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$nb_rep <- 7",replacement="optim_options$nb_rep <- 2",fixed=TRUE)
+xfun::gsub_file(file=simple_case_r_tmp, pattern="optim_options$maxeval <- 500",replacement="optim_options$maxeval <- 250",fixed=TRUE)
+
+xfun::gsub_file(file = simple_case_r_tmp, pattern = "model_options= stics_wrapper_options(javastics_path, data_dir = stics_inputs_path, parallel=FALSE)",
+               replacement="model_options= stics_wrapper_options(javastics_path, data_dir = stics_inputs_path, parallel=TRUE, cores = 1)",fixed=TRUE)
 
 ## run it
 profvis(source(simple_case_r_tmp))
