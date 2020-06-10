@@ -49,8 +49,8 @@ call 13 : model_function -> %dopar% : SticsOnR/R/stics_wrapper.R#237
 
 Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
 :----|:-------|:--------------|:---------------------|:---------------
-prog | 207493 | - | - 
-model_function | 70630 | 197613 | 95.24
+prog | - |207493 | - 
+model_function | - | 197613 | 95.24
 1 | 173 | 15723 | 7.58
 2 | 10 | 707 | 0.35
 3 | 160 | 31900 | 15.37
@@ -69,8 +69,8 @@ model_function | 70630 | 197613 | 95.24
 
 Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
 :----|:-------|:--------------|:---------------------|:---------------
-prog | 210166 | - | - 
-model_function | 83550 | 199810 | 95.07
+prog | - | 210166 | - 
+model_function | - | 199810 | 95.07
 1 | 143 | 15770 | 7.50
 2 | 10 | 810 | 0.39
 3 | 133 | 31966 | 15.21
