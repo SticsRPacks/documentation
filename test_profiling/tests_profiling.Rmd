@@ -7,80 +7,69 @@ output: html_document
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+library(RColorBrewer)
 ```
 
 # I. Introduction
 
-In this document, we made some profiling tests in order to know which part of the code is the one that have the longest run time.
-We, especially, put our focus on parts after the "model_function" call because this is obvious that the model run time is the code run time, which is 498160 milliseconds.
+We do the profiling of the simple case vignette and we want to know which code points take the most time and check that they match the way the code was thought.
+Here we test the optimization of a parameter of a USM. We carry out these tests with a repetition number of 2 and a number of assessments of 250 for two reasons. The first being the execution time and the second, the fact that the IDE Rstudio has trouble loading the results of the profiler with too large repetitions and evaluations. Finally, these tests are performed in two configurations, a first sequential configuration and a second using parallelisation with a CPU.
 
 So, we profile our code using the profiling tool from RStudio and we obtaine a flame graph that we analyzed.
 Here is the listing of all the calls made after the "model_function" call, that we know their origin. There are many calls that we don't know from what part they are called from.
 
-# II. Calls' path from model_function and their source
+# II. Calls' path and source
 
-call 1 : model_function -> do.call :  SticsOnR/R/stics_wrapper.R#118
+do.call :  SticsOnR/R/stics_wrapper.R#118
 
-call 2 : model_function -> do.call -> exists_sticks_exe : SticsOnR/R/stics_wrapper.R#642
+do.call -> exists_sticks_exe : SticsOnR/R/stics_wrapper.R#642
 
-call 3 : model_function -> do.call -> check_sticks_exe : SticsOnR/R/stics_wrapper.R#642
+do.call -> check_sticks_exe : SticsOnR/R/stics_wrapper.R#642
 
-call 4 : model_function -> do.call -> check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
+do.call -> check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
 
-call 5 : model_function -> do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
+do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
 
-call 6 : model_function -> do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
+do.call -> check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
 
-call 7 : model_function -> check_sticks_exe : SticsOnR/R/stics_wrapper.R#131
+check_sticks_exe : SticsOnR/R/stics_wrapper.R#131
 
-call 8 : model_function -> check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
+check_sticks_exe -> suppressWarnings : SticsOnR/R/stics_exe_utilities.R#288
 
-call 9 : model_function -> check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
+check_sticks_exe -> suppressWarnings -> run_system_cmd : SticsOnR/R/stics_exe_utilities.R#288
 
-call 10 : model_function -> check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
+check_sticks_exe -> suppressWarnings -> run_system_cmd -> system2 : SticsOnR/R/run_system_cmd.R#19
 
-call 11 : model_function -> parallel::makeCluster : SticsOnR/R/stics_wrapper.R#140
+parallel::makeCluster : SticsOnR/R/stics_wrapper.R#140
 
-call 12 : model_function -> parallel::clusterCall : SticsOnR/R/stics_wrapper.R#143
+parallel::clusterCall : SticsOnR/R/stics_wrapper.R#143
 
-call 13 : model_function -> %dopar% : SticsOnR/R/stics_wrapper.R#237
+%dopar% : SticsOnR/R/stics_wrapper.R#237
 
-# III. Parallel's runs
+# III. Parallel's runs with 1 USM
 
-Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
-:----|:-------|:--------------|:---------------------|:---------------
-prog | - |207493 | - 
-model_function | - | 197613 | 95.24
-1 | 173 | 15723 | 7.58
-2 | 10 | 707 | 0.35
-3 | 160 | 31900 | 15.37
-4 | 160 | 31900 | 15.37
-5 | 160 | 31853 | 15.35
-6 | 160 | 34973 | 16.86
-7 | 180 | 31900 | 15.37
-8 | 180 | 31900 | 15.37
-9 | 180 | 31853 | 15.35
-10 | 180 | 34973 | 16.86
-11 | 123 | 12056 | 5.81
-12 | 810 | 79750 | 38.44
-13 | 750 | 76790 | 37
+![](1usm_thread_method.png)
 
-# IV. Sequential's runs
+The "Average run time" column represents the time spent in the call. For example, the time spent in the "do.call -> check_sticks_exe" call is 160 ms whereas in the "check_sticks_exe" call without "do.call", it is 180 ms.
 
-Call | Average Run time (ms) | Average Global run time (ms) | Average Rate on run (%)
-:----|:-------|:--------------|:---------------------|:---------------
-prog | - | 210166 | - 
-model_function | - | 199810 | 95.07
-1 | 143 | 15770 | 7.50
-2 | 10 | 810 | 0.39
-3 | 133 | 31966 | 15.21
-4 | 133 | 31946 | 15.20
-5 | 133 | 31933 | 15.19
-6 | 133 | 34940 | 16.62
-7 | 166 | 31900 | 15.21
-8 | 166 | 31900 | 15.20
-9 | 166 | 31853 | 15.19
-10 | 166 | 34973 | 16.62
-11 | 120 | 12053 | 5.73
-12 | 790 | 80546 | 38.32
-13 | 740 | 78650 | 37.42
+The column "Average global run time" represents the total time spent in the function throughout the program. This is why some functions have an "Average global run time" higher than the function that called it. In this case, the called function was called elsewhere in the program without going through the previous function.
+
+By looking at the calls, we can group them into four parts. The first includes the call to Stics (System2), 
+then we have the parts concerning the calls to the cluster and finally the %dopar% part. Moreover, if we sum their percentages,
+we arrive at ~ 98%, which agree with the way it was developed.
+
+```{r pie thread, echo=FALSE}
+myPalette <- brewer.pal(5, "Set2")
+Prop <- c(16.86,5.81,38.44,37,1.89)
+pie(Prop, labels = c("Stics 16.86%","MakeCluster 5.81%","ClusterCall 38.44%","Dopar 37%","Others 1.89%"), border = "white", col = myPalette)
+```
+
+# IV. Sequential's runs with 1 USM
+
+![](1usm_sequential_method.png)
+
+```{r pie sequential, echo=FALSE}
+myPalette <- brewer.pal(5, "Set2")
+Prop <- c(16.62,5.73,38.32,37.42,1.91)
+pie(Prop, labels = c("Stics 16.62%", "MakeCluster 5.73%", "ClusterCall 38.32%", "Dopar 37.42%", "Others 1.91%"), border = "white", col = myPalette)
+```
