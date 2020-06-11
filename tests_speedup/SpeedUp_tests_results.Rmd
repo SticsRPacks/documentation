@@ -28,12 +28,12 @@ Cpus number | Run 1 | Run 2 | Run 3 | Mean time
 ```{r graph thread, echo=FALSE}
 library(ggplot2)
 cat("Average run time chart according to the number of CPUs")
-mean_values <- c(38,13,8,4,3.5,3.5,4,4,4)
+mean_values <- c(22,13,5,4,3.5,3.5,4,4,4)
 df <- data.frame(CPUs = c(1,2,4,6,7,8,10,12,14),Execution_time = mean_values)
 ggplot(df)+geom_line(aes(CPUs,Execution_time))
 ```
 
-We have singular values for the third executions with a number of cpus of 1 and 4. To overcome this, we can re-run the tests with a larger number of repetitions. However, we can see that the minimum execution time is around 7 and 8 Cpus.
+We have singular values for the runs with 1 and 4 CPUs. This may be due to a bottleneck effect when the processors are communicating with the disk. We are using the minimum run time for these cases because the other values are outlayers. To overcome this, we should have run the tests on a private node or run more tests but we couldn't. We've also could run the tests with differents parameters to optimize. However, the results are quite stable and correspond to what we could determine by experience before.
 
 # II. Sequential method
 
@@ -52,12 +52,12 @@ S(1) = 12
 Cpus number | 1 | 2 | 4 | 6 | 7 | 8 | 10 | 12 | 14
 :-----------|:--|:--|:--|:--|:--|:--|:---|:---|:---
 Run time | 12 | 13 | 8 | 4 | 3.5 | 3.5 | 4 | 4 | 4
-S(p) | 12/12 | 12/13 | 12/8 | 12/4 | 12/3.5 | 12/3.5 | 12/4 | 12/4 | 12/4 
+S(p) | 12/12 | 12/13 | 12/5 | 12/4 | 12/3.5 | 12/3.5 | 12/4 | 12/4 | 12/4 
 
 
 ```{r speed-up, echo=FALSE}
 
-values <- c(12/12,12/13,12/8,12/4,12/3.5,12/3.5,12/4,12/4,12/4)
+values <- c(12/12,12/13,12/5,12/4,12/3.5,12/3.5,12/4,12/4,12/4)
 process <- c(1,2,4,6,7,8,10,12,14)
 df <- data.frame(Processors = process, Valeurs = values)
 ggplot(df)+geom_line(aes(Processors,Valeurs))+labs(y = "S(p)")
