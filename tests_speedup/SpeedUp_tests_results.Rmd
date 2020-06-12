@@ -30,7 +30,7 @@ library(ggplot2)
 cat("Average run time chart according to the number of CPUs")
 mean_values <- c(22,13,5,4,3.5,3.5,4,4,4)
 df <- data.frame(CPUs = c(1,2,4,6,7,8,10,12,14),Execution_time = mean_values)
-ggplot(df)+geom_line(aes(CPUs,Execution_time))
+ggplot(df)+geom_line(aes(CPUs,Execution_time))+labs(y = "Execution time (hours)")
 ```
 
 We have singular values for the runs with 1 and 4 CPUs. This may be due to a bottleneck effect when the processors are communicating with the disk. We are using the minimum run time for these cases because the other values are outlayers. To overcome this, we should have run the tests on a private node or run more tests but we couldn't. We've also could run the tests with differents parameters to optimize. However, the results are quite stable and correspond to what we could determine by experience before.
