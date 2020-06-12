@@ -50,18 +50,18 @@ parallel::clusterCall : SticsOnR/R/stics_wrapper.R#143
 
 ![](1usm_thread_method.png)
 
+
 The "Average run time" column represents the time spent in the call. For example, the time spent in the "do.call -> check_sticks_exe" call is 160 ms whereas in the "check_sticks_exe" call without "do.call", it is 180 ms.
 
 The column "Average global run time" represents the total time spent in the function throughout the program. This is why some functions have an "Average global run time" higher than the function that called it. In this case, the called function was called elsewhere in the program without going through the previous function.
 
 By looking at the calls, we can group them into four parts. The first includes the call to Stics (System2), 
-then we have the parts concerning the calls to the cluster and finally the %dopar% part. Moreover, if we sum their percentages,
-we arrive at ~ 98%, which agree with the way it was developed.
+then we have the parts concerning the calls to the cluster and finally the %dopar% part.
 
 ```{r pie thread, echo=FALSE}
 myPalette <- brewer.pal(5, "Set2")
-Prop <- c(16.86,5.81,38.44,37,1.89)
-pie(Prop, labels = c("Stics 16.86%","MakeCluster 5.81%","ClusterCall 38.44%","Dopar 37%","Others 1.89%"), border = "white", col = myPalette)
+Prop <- c(15.37,5.81,38.44,37,3.38)
+pie(Prop, labels = c("Check_stics_exe 15.37%","MakeCluster 5.81%","ClusterCall 38.44%","Dopar 37%","Others 3.38%"), border = "white", col = myPalette)
 ```
 
 # IV. Sequential's runs with 1 USM
@@ -70,6 +70,30 @@ pie(Prop, labels = c("Stics 16.86%","MakeCluster 5.81%","ClusterCall 38.44%","Do
 
 ```{r pie sequential, echo=FALSE}
 myPalette <- brewer.pal(5, "Set2")
-Prop <- c(16.62,5.73,38.32,37.42,1.91)
-pie(Prop, labels = c("Stics 16.62%", "MakeCluster 5.73%", "ClusterCall 38.32%", "Dopar 37.42%", "Others 1.91%"), border = "white", col = myPalette)
+Prop <- c(15.21,5.73,38.32,37.42,3.32)
+pie(Prop, labels = c("Check_stics_exe 15.21%", "MakeCluster 5.73%", "ClusterCall 38.32%", "Dopar 37.42%", "Others 3.32%"), border = "white", col = myPalette)
 ```
+
+# V. Parallel's runs with 7 usms
+
+![](7usms_thread_method.png)
+
+```{r pie thread 7, echo=FALSE}
+myPalette <- brewer.pal(5, "Set2")
+Prop <- c(10.29,17.69,30.71,38.83,2.48)
+pie(Prop, labels = c("Check_stics_exe 10.29%","MakeCluster 17.69%","ClusterCall 30.71%","Dopar 38.83%","Others 2.48%"), border = "white", col = myPalette)
+```
+
+# VI. Sequential's runs with 7 usms
+
+![](7usms_sequential_method.png)
+
+```{r pie sequential 7, echo=FALSE}
+myPalette <- brewer.pal(5, "Set2")
+Prop <- c(7.81,2.80,17.21,70.76,1.42)
+pie(Prop, labels = c("Check_stics_exe 7.81%","MakeCluster 2.80%","ClusterCall 17.21%","Dopar 70.76%","Others 1.42%"), border = "white", col = myPalette)
+```
+
+# VII. Conclusion
+
+In conclusion, we can say several things. The first is that the call to the "clusterCall" function can be made once at the beginning of the program. Second, we also observe that optimizing a single USM is not effective because the model takes only one third of the execution time. Finally, we need to distinguish parallels and sequentials runs in order to avoid calling parallels' methods in sequentials' runs and save time.
