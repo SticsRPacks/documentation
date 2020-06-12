@@ -242,7 +242,7 @@ summary {
 </div>
 <div id="vii.-conclusion" class="section level1">
 <h1>VII. Conclusion</h1>
-<p>In conclusion, we can say several things. The first is that the call to the &quot;clusterCall&quot; function can be made once at the beginning of the program. Second, we also observe that optimizing a single USM is not effective because the model takes only one third of the execution time. Finally, we need to distinguish parallels and sequentials runs in order to avoid calling parallels' methods in sequentials' runs and save time.</p>
+<p>We can see several things. First, when we optimize multiple Usms, the dopar part works as expected by taking a bigger part of the program sequentially than in parallel. On the contrary, we can see that the dopar part occupies only one third of the execution time of the program whereas it should take as much as what it takes in the case with 7 usms with the sequential method. So, we can save time on cluster functions by storing their results in global variables for reuse. We can also make conditions, but it would significantly make the code heavier. Finally, we can store the result of the check_stics command to avoid having to perform it sequentially throughout the program.</p>
 </div>
 
 
