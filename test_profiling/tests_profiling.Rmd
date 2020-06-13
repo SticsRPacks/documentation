@@ -2,7 +2,9 @@
 title: "Profiling"
 author: "ROBINE Thomas"
 date: "8 juin 2020"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
