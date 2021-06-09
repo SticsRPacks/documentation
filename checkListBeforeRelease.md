@@ -4,7 +4,7 @@
 * check the package: ctrl-shift-E
 * check SticsRTest with the current state of the package and the last release of the other ones
 * change version number: usethis::use_version(which="major" or "minor" or "patch")
-* update NEWS file (can use a script)
+* update NEWS file (can use the script tools/git-changelog-with-tags.sh)
 * commit and push changes
 * check github actions tests
 * check SticsRTest results (done with the master version of the other packages ...)
