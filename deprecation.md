@@ -4,10 +4,22 @@ Functions and arguments deprecation is done using [{lifecycle}](https://lifecycl
 
 An in-depth vignette on usage is available from the [package website](https://lifecycle.r-lib.org/articles/communicate.html):
 
-- [Rename an argument](https://lifecycle.r-lib.org/articles/communicate.html#renaming-an-argument). Don't forget to add a badge in the documentation of the function:
+- [Rename an argument](https://lifecycle.r-lib.org/articles/communicate.html#renaming-an-argument). 
+    Don't forget to add a badge in the documentation of the function:
     ```r
     #' @param old_param `r lifecycle::badge("deprecated")` `old_param` is no
     #'   longer supported, use new_param instead.
+
+    ```r
+    # in this example na_rm replaces na.rm
+    add_two <- function(x, y, na_rm = TRUE, na.rm = deprecated()) {
+      if (lifecycle::is_present(na.rm)) {
+        lifecycle::deprecate_warn("1.0.0", "add_two(na.rm)", "add_two(na_rm)")
+        na_rm <- na.rm
+      }
+
+      # ... the function code
+    }
     ```
 
 - [Deprecate a function](https://lifecycle.r-lib.org/articles/communicate.html#deprecate-a-function)
