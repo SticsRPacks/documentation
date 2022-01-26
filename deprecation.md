@@ -12,7 +12,7 @@ An in-depth vignette on usage is available from the [package website](https://li
 
     ```r
     # in this example na_rm replaces na.rm
-    add_two <- function(x, y, na_rm = TRUE, na.rm = deprecated()) {
+    add_two <- function(x, y, na_rm = TRUE, na.rm = lifecycle::deprecated()) {
       if (lifecycle::is_present(na.rm)) {
         lifecycle::deprecate_warn("1.0.0", "add_two(na.rm)", "add_two(na_rm)")
         na_rm <- na.rm
