@@ -25,6 +25,8 @@ An in-depth vignette on usage is available from the [package website](https://li
     - First change the function code.
     - Then build and test the package (ctl-shift-T) and check that warnings on the deprecated arguments are given.
     - Then search for the calls to the concerned function everywhere in the tests (folder tests) and docs (folder vignettes) and examples (folder R) 
+    - Then build and test the package (ctl-shift-T) and check that there are no more warnings.
+    - Then commit
 
 - [Deprecate a function](https://lifecycle.r-lib.org/articles/communicate.html#deprecate-a-function)
 
