@@ -8,7 +8,7 @@ An in-depth vignette on usage is available from the [package website](https://li
     Don't forget to add a badge in the documentation of the function:
     ```r
     #' @param old_param `r lifecycle::badge("deprecated")` `old_param` is no
-    #'   longer supported, use new_param instead.
+    #'   longer supported, use `new_param` instead.
 
     ```r
     # in this example na_rm replaces na.rm
