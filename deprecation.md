@@ -12,16 +12,12 @@ An in-depth vignette on usage is available from the [package website](https://li
 
 - [Deprecate a function](https://lifecycle.r-lib.org/articles/communicate.html#deprecate-a-function)
 
-Example (get_sim replaces get_daily_results):
-
+    Example (get_sim replaces get_daily_results):
     ```r
     #' Load and format Stics daily output file(s)
     #'
     #' @description
     #' `r lifecycle::badge("deprecated")`
-    #'
-    #' This function was deprecated because we realised that it's
-    #' a special case of the [get_sim()]
     #'
     #' @examples
     #'  \dontrun{
@@ -39,8 +35,7 @@ Example (get_sim replaces get_daily_results):
       lifecycle::deprecate_warn(
         "0.3.0",
         "get_daily_results()",
-        "get_sim()",
-        details = "This function is a special case of get_sim(); use it instead.")
+        "get_sim()")
       get_sim(...)
     }
     ```
