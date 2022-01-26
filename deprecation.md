@@ -17,6 +17,7 @@ An in-depth vignette on usage is available from the [package website](https://li
         lifecycle::deprecate_warn("1.0.0", "add_two(na.rm)", "add_two(na_rm)")
         na_rm <- na.rm
       }
+      na.rm <- na_rm # to remove when we update inside the function
 
       # ... the function code
     }
