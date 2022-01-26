@@ -26,7 +26,7 @@ An in-depth vignette on usage is available from the [package website](https://li
     - First change the function code (put the old argument at the end of the argument list)
     - Then change the function documentation (see here-before): add a doc for the new parameter (with its new definition) and replace the doc of the old parameter by what is given in the exampel here-before.
     - Then build (ctl-shift-B) and test the package (ctl-shift-T) and check that warnings on the deprecated arguments are given.
-    - Then search for the calls to the concerned function everywhere in the tests (folder tests) and docs (folder vignettes) and examples (folder R): ctl-shift-F under R (and choose Common R source files) **+ in other packages (in particular SticsRTest)**
+    - Then search for the calls to the concerned function everywhere in the tests (folder tests) and docs (folder vignettes) and examples (folder R): ctl-shift-F under R (and choose Common R source files) **+ in other packages (in particular SticsRTest and SticsRPacks tutorial)**
     - Then build and test the package (ctl-shift-T) and check that there are no more warnings.
     - Then regenrate the documentation (ctl-shift-D)
     - Then commit
