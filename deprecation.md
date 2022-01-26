@@ -24,7 +24,7 @@ An in-depth vignette on usage is available from the [package website](https://li
 
     - First change the function code (put the old argument at the end of the argument list)
     - Then change the function documentation (see here-before)
-    - Then build and test the package (ctl-shift-T) and check that warnings on the deprecated arguments are given.
+    - Then build (ctl-shift-B) and test the package (ctl-shift-T) and check that warnings on the deprecated arguments are given.
     - Then search for the calls to the concerned function everywhere in the tests (folder tests) and docs (folder vignettes) and examples (folder R) 
     - Then build and test the package (ctl-shift-T) and check that there are no more warnings.
     - Then commit
