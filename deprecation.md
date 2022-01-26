@@ -14,35 +14,36 @@ An in-depth vignette on usage is available from the [package website](https://li
 
 Example (get_sim replaces get_daily_results):
 
-#' Load and format Stics daily output file(s)
-#'
-#' @description
-#' `r lifecycle::badge("deprecated")`
-#'
-#' This function was deprecated because we realised that it's
-#' a special case of the [get_sim()]
-#'
-#' @examples
-#'  \dontrun{
-#' get_daily_results(path,"banana")
-#' # ->
-#' get_sim(path,"banana")
-#' }
-#'
-#' @keywords internal
-#'
-#' @export
+    ```r
+    #' Load and format Stics daily output file(s)
+    #'
+    #' @description
+    #' `r lifecycle::badge("deprecated")`
+    #'
+    #' This function was deprecated because we realised that it's
+    #' a special case of the [get_sim()]
+    #'
+    #' @examples
+    #'  \dontrun{
+    #' get_daily_results(path,"banana")
+    #' # ->
+    #' get_sim(path,"banana")
+    #' }
+    #'
+    #' @keywords internal
+    #'
+    #' @export
 
-get_daily_results <- function(...) {
+    get_daily_results <- function(...) {
 
-  lifecycle::deprecate_warn(
-    "0.3.0",
-    "get_daily_results()",
-    "get_sim()",
-    details = "This function is a special case of get_sim(); use it instead.")
-  get_sim(...)
-}
-
+      lifecycle::deprecate_warn(
+        "0.3.0",
+        "get_daily_results()",
+        "get_sim()",
+        details = "This function is a special case of get_sim(); use it instead.")
+      get_sim(...)
+    }
+    ```
 
 - [Rename a function](https://lifecycle.r-lib.org/articles/communicate.html#rename-a-function)
 
