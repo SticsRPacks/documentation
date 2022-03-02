@@ -28,15 +28,15 @@ Make sure to make those steps on a clean git repository (*i.e.* make a commit **
 
 Here is a checklist that you must follow before any submission to the CRAN:
 
-- [] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
-- [] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
-- [] Check that all imported or suggested packages are available on CRAN. If any mentioned in ‘Suggests’ or ‘Enhances’ fields are not from such a repository, where to obtain them at a repository should be specified in an ‘Additional_repositories’ field of the DESCRIPTION file (as a comma-separated list of repository URLs)
-- [] Make sure the package is not larger than 5MB on disk. Data should be compressed when possible.
-- [] Make sure you are running with one of the latest R versions
-- [] Update all of your packages: `update.packages()`
-- [] Check that your package does not return any error, warning or notes on you system (ctrl+shift+B)
-- [] Check that all tests on Github actions are passing, including the ones in SticsRTests (this for us, not for CRAN). The actions should use R-devel too.
-- [] Check your package using [{inteRgrate}](https://jumpingrivers.github.io/inteRgrate/):
+- [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
+- [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
+- [ ] Check that all imported or suggested packages are available on CRAN. If any mentioned in ‘Suggests’ or ‘Enhances’ fields are not from such a repository, where to obtain them at a repository should be specified in an ‘Additional_repositories’ field of the DESCRIPTION file (as a comma-separated list of repository URLs)
+- [ ] Make sure the package is not larger than 5MB on disk. Data should be compressed when possible.
+- [ ] Make sure you are running with one of the latest R versions
+- [ ] Update all of your packages: `update.packages()`
+- [ ] Check that your package does not return any error, warning or notes on you system (ctrl+shift+B)
+- [ ] Check that all tests on Github actions are passing, including the ones in SticsRTests (this for us, not for CRAN). The actions should use R-devel too.
+- [ ] Check your package using [{inteRgrate}](https://jumpingrivers.github.io/inteRgrate/):
   - `check_pkg()`
   - `check_lintr()`
   - `check_namespace()`
@@ -47,7 +47,7 @@ Here is a checklist that you must follow before any submission to the CRAN:
   - `check_tidy_description()`
   - `check_file_permissions()`
   - `check_line_breaks()`
-- [] Check URLs are correct (CRAN checks it and can refuse your package):
+- [ ] Check URLs are correct (CRAN checks it and can refuse your package):
 
     ```r
     # remotes::install_github("r-lib/urlchecker")
@@ -55,14 +55,14 @@ Here is a checklist that you must follow before any submission to the CRAN:
     urlchecker::url_update()
     ```
 
-- [] Spell check (you have to add it first using `usethis::use_spell_check()`): `spelling::spell_check_package()`. Packages can be refused for spelling errors. Try to check that packages are spelled between `'` (*e.g.* 'dplyr') and acronyms capitalized in the DESCRIPTION file
-- [] Make a good DESCRIPTION file, especially the Description section that should be a full paragraph.
-- [] Generate the `cran-comments.md` file using `usethis::use_cran_comments()`. This file is used to prove everything works and allow us to add comments (*e.g.* to explain notes). Make sure the file is tracked by Git and add it to `.Rbuildignore`.
-- [] Check using Rhub: `check = rhub::check_for_cran()` + win devel: `devtools::check_win_devel()` (checks the package with R-devel on windows). This step is only mandatory if you don't use Github Actions.
-- [] Check the results from Rhub: `check$cran_summary()`. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
-- [] Add the output of `check$cran_summary()` to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
-- [] Check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
-- [] Update README.md (if necessary) and NEWS.md.
+- [ ] Spell check (you have to add it first using `usethis::use_spell_check()`): `spelling::spell_check_package()`. Packages can be refused for spelling errors. Try to check that packages are spelled between `'` (*e.g.* 'dplyr') and acronyms capitalized in the DESCRIPTION file
+- [ ] Make a good DESCRIPTION file, especially the Description section that should be a full paragraph.
+- [ ] Generate the `cran-comments.md` file using `usethis::use_cran_comments()`. This file is used to prove everything works and allow us to add comments (*e.g.* to explain notes). Make sure the file is tracked by Git and add it to `.Rbuildignore`.
+- [ ] Check using Rhub: `check = rhub::check_for_cran()` + win devel: `devtools::check_win_devel()` (checks the package with R-devel on windows). This step is only mandatory if you don't use Github Actions.
+- [ ] Check the results from Rhub: `check$cran_summary()`. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
+- [ ] Add the output of `check$cran_summary()` to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
+- [ ] Check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
+- [ ] Update README.md (if necessary) and NEWS.md.
 
 When everything is checked, you can finally:
 
