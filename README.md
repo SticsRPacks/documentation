@@ -10,14 +10,16 @@ Welcome to the documentation of the `SticsRPacks` project.
 + The [coding style](coding_style.md) - the coding style guide for our project.
 + The [optimum data structures](data_structure.md) - evaluation of different data structures such as `data.frame`, `data.table`, `tibble`, `list`, multi-dimensional `arrays` for their performance (memory, execution time, ease of use) in read/write, selection, computation, etc...
 + The [procedure to deprecate](deprecation.md) functions or arguments
++ The [procedure for CRAN](cran-submission.md) (re-)submission
 
 ## Package documentation
 
-Each package has its own documentation living in its repository or website. The website of each package can be found at: https://sticsrpacks.github.io/{packagename}/. For example the website for the sandbox project is located here: https://sticsrpacks.github.io/sandbox/
+Each package has its own documentation living in its repository or website. The website of each package can be found at: <https://sticsrpacks.github.io/{packagename}/>. For example the website for the sandbox project is located here: <https://sticsrpacks.github.io/sandbox/>
 
 ### Sandbox
 
 The `sandbox` repository is an R package that was specifically created to help new people to learn the basis of all tools used in the project. It is strongly advised to read the documents from this project before starting anything.
+
 + [Project](https://github.com/SticsRPacks/sandbox) - the github repository
 + [Website](https://sticsrpacks.github.io/sandbox/) - the repository website
 
