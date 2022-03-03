@@ -22,6 +22,8 @@ There are two things to do to ensure the basics:
     style_pkg()
     ```
 
+    Or more simply `usethis::use_tidy_style()`
+
 Make sure to make those steps on a clean git repository (*i.e.* make a commit **before**) to be able to revert the changes easily.
 
 ## Checks
