@@ -33,6 +33,7 @@ Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
 - [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
 - [ ] Check that all imported or suggested packages are available on CRAN. If any mentioned in ‘Suggests’ or ‘Enhances’ fields are not from such a repository, where to obtain them at a repository should be specified in an ‘Additional_repositories’ field of the DESCRIPTION file (as a comma-separated list of repository URLs)
+- [ ] Tidy-up the DESCRIPTION file using `usethis::use_tidy_description()`
 - [ ] Make sure the package is not larger than 5MB on disk. Data should be compressed when possible.
 - [ ] Make sure you are running with one of the latest R versions
 - [ ] Update all of your packages: `update.packages()`
