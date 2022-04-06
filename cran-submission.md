@@ -15,8 +15,8 @@ There are two things to do to ensure the basics:
     goodpractice::gp()
     ```
 Special :
-When find "1:length(...)" replace by seq_along
-gp warn about setwd() use but the code looks correct by using on.exit
++When find "1:length(...)" replace by seq_along
++gp warn about setwd() use but the code looks correct by using on.exit
 
 - Use [{styler}](https://styler.r-lib.org). Then use it from the add-in menu in R-Studio, or on the full package using:
 
