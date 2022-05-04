@@ -11,7 +11,7 @@ There are two things to do to ensure the basics:
 - use [{goodpractices}](http://mangothecat.github.io/goodpractice/):
 
     ```r
-    libary(goodpractice)
+    library(goodpractice)
     goodpractice::gp()
     ```
 Special :
@@ -21,7 +21,7 @@ Special :
 - Use [{styler}](https://styler.r-lib.org). Then use it from the add-in menu in R-Studio, or on the full package using:
 
     ```r
-    libary(styler)
+    library(styler)
     style_pkg()
     ```
 
