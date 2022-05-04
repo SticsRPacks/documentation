@@ -1,5 +1,6 @@
 
 * update doc: ctrl-shift-D
+* Rebuild and check README.md
 * build the package: ctrl-shift-B
 * check the package: ctrl-shift-E
 * check SticsRTest with the current state of the package and the last release of the other ones
