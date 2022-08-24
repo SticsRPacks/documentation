@@ -1,8 +1,8 @@
 
 * update doc: ctrl-shift-D
-* Rebuild and check README.md
 * build the package: ctrl-shift-B
 * check the package: ctrl-shift-E
+* Rebuild and check README.md
 * check SticsRTest with the current state of the package and the last release of the other ones
 * change version number: usethis::use_version(which="major" or "minor" or "patch")
 * update the Date field in DESCRIPTION file
