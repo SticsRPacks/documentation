@@ -25,8 +25,15 @@ The following paragraphs add more details on the workflow.
 
 ## TOOLS
 
-1.	RSTUDIO
-The IDE used in our projects is [RSTUDIO](https://www.rstudio.com/). This IDE is free and is widely used in the R community because of the numerous tools that comes along. The best resource to develop R packages is the book from Hadley Wickham available freely [here](http://r-pkgs.had.co.nz/intro.html).
+1.	VS Code
+
+The IDE used in our projects is VS Code, It is prefered over [RSTUDIO](https://www.rstudio.com/) because we can automatically use a styler and a linter. Also it works on all platforms, is free and open-source, and is used by many developers for R and other languages. When you install VSCode, check the box to add it to the contextual menu, it will help you a lot when opening a project.
+
+You'll have to install the following extensions:
+- R for VS Code
+- Code Spell Checker
+
+And also install [Pandoc](https://pandoc.org/installing.html) to build the vignettes.
 
 1.	GIT
 The cornerstone of efficient collaboration is [GIT](https://git-scm.com/). If you do not know what GIT is, it is probably the most important tool you will learn, and the one that will help you the most for coding.
