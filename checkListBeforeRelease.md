@@ -2,6 +2,7 @@
 * update doc: ctrl-shift-D
 * build the package: ctrl-shift-B
 * check the package: ctrl-shift-E
+* check and correct URLs: `urlchecker::url_update(path = ".", results = urlchecker::url_check("."))`, and then `urlchecker::url_check(".")` to check if everything has been updated
 * check using Rhub: `check = rhub::check_for_cran()`.
 * check the results from Rhub: `check$cran_summary()`. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
 * add the output of `check$cran_summary()` to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
