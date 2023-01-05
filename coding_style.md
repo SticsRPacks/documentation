@@ -23,6 +23,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 *	The file extension is always : .R
 
 ### Object/variable names
+
 *	As for file names words must be separated exclusively with "_" (snake case)
 *   Variables/objects names contain nouns (not verbs)
 *	Avoid using names of existing variables or built in functions
@@ -32,6 +33,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
     +	sum, mean, ...
 
 ###	Function definitions
+
 *   Function definitions first list arguments without default values, followed by those with default values.
     + GOOD: rnorm <- function(n, mean=0, sd=1)
 	+ BAD: rnorm <- function(mean=0, sd=1, n)           # n should be listed first
@@ -40,6 +42,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
 ## Syntax
 
 ### Spacing
+
 *	Insert spaces around operators: +, -, \*, <, ... and assignement <-, =
 *	... but neither around : nor ::  
     + `X <- 1:10`
@@ -49,6 +52,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
     &emsp;&emsp;`if (x > 10) {`
 
 ### Braces
+
 *	Allow single conditional instruction to be on one line if the line is inferior to the authorized size limit but let the curly braces :  
   &emsp;&emsp;`if (x > 10)  { X - 10 }`
 *	Use curly braces even if a test bloc contains only one instruction
@@ -62,6 +66,7 @@ It is based on the [style guide](http://adv-r.had.co.nz/Style.html) from Hadley 
     &emsp;&emsp;`}`
 
 ### Line length and bloc formatting
+
 *	It is recommended to limit line length to 80 characters (more comfortable for editing and printing). It is possible to add a delimitation line in `RStudio` at a given
 character length: Tools -> Global Options -> Code -> Display -> Show margin.
 
@@ -77,7 +82,7 @@ Indentation:
 ## External packages
 
 * Add external packages using `usethis` as follows: `usethis::use_package("package_name")`.     
-* Use functions from external packages as follows: `package_name::some_function()`. This format increase readability and maintenance.  
+* Use functions from external packages as follows (based on [Wickham's R Packages (2e)](https://r-pkgs.org/dependencies-in-practice.html#in-code-below-r)): `package_name::some_function()`. This format increase readability and maintenance.  
   * except for operators (e.g. %>%) => use importFrom (no choice!)
   * except when a function is called many times or in a loop => use importFrom (reduce computing time)
 
