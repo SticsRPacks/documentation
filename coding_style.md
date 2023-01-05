@@ -78,6 +78,8 @@ Indentation:
 
 * Add external packages using `usethis` as follows: `usethis::use_package("package_name")`.     
 * Use functions from external packages as follows: `package_name::some_function()`. This format increase readability and maintenance.  
+  * except for operators (e.g. %>%) => use importFrom (no choice!)
+  * except when a function is called many times or in a loop => use importFrom (reduce computing time)
 
 ## Organization
 
