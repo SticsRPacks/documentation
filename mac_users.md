@@ -12,14 +12,32 @@ Then, unzip the file and move the folder to your home directory (or any other di
 
 ### Download the source code
 
-Download the latest version of STICS from the [same link](https://w3.avignon.inra.fr/forge/projects/stics_main_projecv/files). It is `STICS-sources-v10.0.0-r3392.zip` as the time of this writing. Then, unzip the file and move the folder wherever you want.
+Download the latest version of STICS from the [same link](https://w3.avignon.inra.fr/forge/projects/stics_main_projecv/files). It is `STICS-sources-v10.0.0-r3392_with_makefiles.zip` as the time of this writing. Then, unzip the file and move the folder wherever you want.
+
+### Set up the environment
+
+STICS is developed in FORTRAN, so we need to install a compiler. The easiest way to do so is to install [Homebrew](https://brew.sh/). 
+
+Then, we need to install Xtools (which is a part of Xcode). To do so, open a terminal and run the following command:
+
+```bash
+xcode-select --install
+```
+
+Then, run the following command in a terminal:
+
+```bash
+brew install gcc
+```
+
+This will install the GNU compiler collection, which includes the `gfortran` compiler.
 
 ### Compile the executable
 
 Open a terminal in the folder where you unzipped the STICS source code. Then, run the following commands:
 
 ```bash
-cd ./Debug
+cd ./build
 make all
 ```
 
