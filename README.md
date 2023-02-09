@@ -12,6 +12,7 @@ Welcome to the documentation of the `SticsRPacks` project.
 + The [procedure to deprecate](deprecation.md) functions or arguments
 + The [procedure for CRAN](cran-submission.md) (re-)submission
 + The [checklist](checkListBeforeRelease.md) to control before releasing new versions of the packages 
++ [Troubleshooting for Mac users](mac_users.md)
 
 ## Package documentation
 
