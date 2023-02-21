@@ -57,9 +57,9 @@ HTTP error 403.
   - Use `usethis::edit_r_environ()` and add the token as `GITHUB_PAT`.
 ```
 
-In case you use a VPN, tries to disconnect from the VPN and re-install the package. In case you have a VPN installed but you were not connected to it, tries to connect to VPN and re-install the package. 
+In case you use a VPN, try to disconnect from the VPN and re-install the package. In case you have a VPN installed but you were not connected to it, try to connect to VPN and re-install the package.
 
-Otherwise, the solution is to create a GitHub personal access token (PAT) and use it to install the package. A PAT is a little bit like a password. You can follow the instructions on the [GitHub documentation](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token) to create a PAT. 
+Otherwise, or fi this does not solve the problem, the solution is to create a GitHub personal access token (PAT) and use it to install the package. A PAT is a little bit like a password. You can follow the instructions on the [GitHub documentation](https://docs.github.com/en/free-pro-team@latest/github/authenticating-to-github/creating-a-personal-access-token) to create a PAT. 
 
 Or you can use the function `usethis::browse_github_pat()` to create it directly from R. It will open Github for you to create the token. If you don't have an account on GitHub, you'll have to create one first. Then, you'll have to choose a name for your token, for example Rtoken, and select the scopes you want to give to the token. The scopes are the permissions you give to the token. You can select all the scopes, but it is not recommended. The minimum scope you need is `repo`. Then you'll have to click on the `Generate token` button. Finally, copy the token.
 
