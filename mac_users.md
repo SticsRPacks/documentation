@@ -45,7 +45,7 @@ This will create a `stics` executable in the `Debug` folder.
 
 ### Move the executable
 
-Rename the `Stics` executable into `stic_modulo_mac`, and move it to the bin folder inside the `JavaSTICS-1.5.1-STICS-10.0.0` folder. Then, you can run the `JavaSTICS-1.5.1-STICS-10.0.0` executable, and it will use this new executable by default!
+Rename the `Stics` executable into `stic_modulo_mac`, and move it to the bin folder inside the `JavaSTICS-1.5.1-STICS-10.0.0/bin` folder. Then, you can run the `JavaSTICS-1.5.1-STICS-10.0.0` executable, and it will use this new executable by default!
 
 ## Open JavaStics
 
