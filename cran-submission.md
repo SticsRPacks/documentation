@@ -77,14 +77,22 @@ When everything is checked, you can finally:
 ```r
 devtools::release()
 ```
+or
 
+```r
+devtools::submit_cran()
+```
 At this stage, you should increment the version number of you package so you don't forget in the future.
 
 You'll receive an email few minutes after you submission. Then CRAN maintainers will get in touch in about 1 to 5 days.
 
 If your submission fails, follow [the steps from the R Packages book](https://r-pkgs.org/release.html#on-failure). You can also look into [these recommendations](https://github.com/DavisVaughan/extrachecks) to better understand rejections.
 
-If your submission passes, **make a new release on Github**.
+If your submission passes, **make a new release on Github**. 
+After submission, a `CRAN-SUBMISSION` file has been created which can be used for creating a new release using:  
+```r
+usethis::use_github_release()
+```
 
 ## Badges
 
