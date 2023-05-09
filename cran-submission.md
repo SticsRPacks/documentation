@@ -32,7 +32,9 @@ Make sure to make those steps on a clean git repository (*i.e.* make a commit **
 ## Checks
 
 Here is a checklist that you must follow before any submission to the CRAN:
-
+- [ ] Update (aspirational) install instructions in README
+- [ ] Check that all exported functions have @return (use "@return None" if nothing is returned), and @examples
+- [ ] Review extra-checks that may e useful: https://github.com/DavisVaughan/extrachecks
 - [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
 - [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
 - [ ] Check that all imported or suggested packages are available on CRAN. If any mentioned in ‘Suggests’ or ‘Enhances’ fields are not from such a repository, where to obtain them at a repository should be specified in an ‘Additional_repositories’ field of the DESCRIPTION file (as a comma-separated list of repository URLs)
@@ -68,7 +70,7 @@ Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Check the results from Rhub: `check$cran_summary()`. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
 - [ ] Add the output of `check$cran_summary()` to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
 - [ ] Check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
-- [ ] Update README.md (if necessary) and NEWS.md.
+- [ ] Update README.md (devtools::build_readme(), if necessary) and NEWS.md.
 
 When everything is checked, you can finally:
 
