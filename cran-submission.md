@@ -34,12 +34,13 @@ Make sure to make those steps on a clean git repository (*i.e.* make a commit **
 Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Update (aspirational) install instructions in README
 - [ ] Check that all exported functions have @return (use "@return None" if nothing is returned), and @examples
-- [ ] Exported functions examples: use of \dontrun (better \donttest according to a CRAN reviewer for submission, ⚠️ but failing on Actions for the moment, not locally)
-      when examples cannot really be executed
+- [ ] Exported functions examples: use of \dontrun when examples cannot really be executed or execution time is > 5 s
 - [ ] Unexported functions: their documentation is useful for developers, but avoid producing Rd files using the keyword '@noRd' additionally to '@keywords internal'
 - [ ] Functions calls (examples, tests): no need to use library(PackageName), PackageName:: or PackageName::
 - [ ] In examples/vignettes/tests: writing in the user's home filespace (including the package directory and getwd()) is not allowed by CRAN policies.
       Use the 'tempdir()' for that.
+- [ ] Do not use getwd() as a default value for function arguments
+- [ ] Do not write in library directory or package directory 
 - [ ] Review extra-checks that may e useful: https://github.com/DavisVaughan/extrachecks
 - [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
 - [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
