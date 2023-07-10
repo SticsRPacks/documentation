@@ -40,7 +40,9 @@ Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] In examples/vignettes/tests: writing in the user's home filespace (including the package directory and getwd()) is not allowed by CRAN policies.
       Use the 'tempdir()' for that.
 - [ ] Do not use getwd() as a default value for function arguments
-- [ ] Do not write in library directory or package directory 
+- [ ] Do not write in library directory or package directory
+- [ ] Instead of print()/cat() rather use message()/warning()  or if(verbose)cat(..) (or maybe stop()) if you really have to write text to the console.
+(except for print, summary, interactive functions) 
 - [ ] Review extra-checks that may e useful: https://github.com/DavisVaughan/extrachecks
 - [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
 - [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
