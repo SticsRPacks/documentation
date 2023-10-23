@@ -51,6 +51,7 @@ Rename the `Stics` executable into `stic_modulo_mac`, and move it to the bin fol
 
 Before running JavaSTICS, please refer to the documentation for getting which version of java is required.
 For the moment, java 11 is needed.
+Informations about switching between java installed versions or defining aliases can be found [here](https://medium.com/@manvendrapsingh/installing-many-jdk-versions-on-macos-dfc177bc8c2b)
 
 To run JavaStics, you have to execute the following command in a terminal:
 
