@@ -49,6 +49,9 @@ Rename the `Stics` executable into `stic_modulo_mac`, and move it to the bin fol
 
 ## Open JavaStics
 
+Before running JavaSTICS, please refer to the documentation for getting which version of java is required.
+For the moment, java 11 is needed.
+
 To run JavaStics, you have to execute the following command in a terminal:
 
 ```bash
