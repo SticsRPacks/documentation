@@ -26,7 +26,7 @@ sudo xcode-select --install
 
 This will install the GNU compiler collection, which includes the `gfortran` compiler.
 
-If these tools have been installed previously and a MacOS system has been made after that, they must be reinstalled
+If these tools have been installed previously and a MacOS system update has been made after that, they must be reinstalled
 to have the updated gfortran libraries. 
 * First tools are be removed   
 ```bash
