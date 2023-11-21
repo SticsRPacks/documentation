@@ -23,6 +23,10 @@ Then, we need to install Xtools (which is a part of Xcode). To do so, open a ter
 ```bash
 sudo xcode-select --install
 ```
+And then:
+```bash
+brew install gcc
+```
 
 This will install the GNU compiler collection, which includes the `gfortran` compiler.
 
