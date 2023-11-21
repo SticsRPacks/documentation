@@ -39,11 +39,11 @@ sudo rm -fR /Library/Developer/CommandLineTools
 Open a terminal in the folder where you unzipped the STICS source code. Then, run the following commands:
 
 ```bash
-cd ./build
+cd build
 make all
 ```
 
-This will create a `Stics` executable in the `build` folder. 
+This will create a `Stics` executable in the current `build` folder. 
 
 ### Move the executable
 
