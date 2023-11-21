@@ -21,16 +21,18 @@ STICS is developed in FORTRAN, so we need to install a compiler. The easiest way
 Then, we need to install Xtools (which is a part of Xcode). To do so, open a terminal and run the following command:
 
 ```bash
-xcode-select --install
-```
-
-Then, run the following command in a terminal:
-
-```bash
-brew install gcc
+sudo xcode-select --install
 ```
 
 This will install the GNU compiler collection, which includes the `gfortran` compiler.
+
+If these tools have been installed previously and a MacOS system has been made after that, they must be reinstalled
+to have the updated gfortran libraries. 
+* First tools are be removed   
+```bash
+sudo rm -fR /Library/Developer/CommandLineTools
+```
+* Then tools can be  installed again with the previous command.
 
 ### Compile the executable
 
