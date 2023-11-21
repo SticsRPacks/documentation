@@ -41,7 +41,7 @@ cd ./build
 make all
 ```
 
-This will create a `stics` executable in the `Debug` folder. 
+This will create a `Stics` executable in the `build` folder. 
 
 ### Move the executable
 
@@ -53,11 +53,12 @@ Before running JavaSTICS, please refer to the documentation for getting which ve
 For the moment, java 11 is needed.
 Informations about switching between java installed versions or defining aliases can be found [here](https://medium.com/@manvendrapsingh/installing-many-jdk-versions-on-macos-dfc177bc8c2b)
 
-To run JavaStics, you have to execute the following command in a terminal:
+To run JavaStics, you have to execute the following command in a terminal if the default java version is 11:
 
 ```bash
 java -jar JavaStics.exe 
 ```
+Otherwise, an alias pointing to the java 11 executable location may be used instead of `java` in the command line (i.e. java11 -jar ...)
 
 And that's it! You can now use JavaStics on your mac!
 
