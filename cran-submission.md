@@ -79,6 +79,10 @@ Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Check the results from Rhub: `check$cran_summary()`. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
 - [ ] Add the output of `check$cran_summary()` to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
 - [ ] Check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
+    - install devtools::install_github('r-lib/revdepcheck')
+    - for the first time execute usethis::use_revdep()
+    - execute dep_check <- revdepcheck::revdep_check(num_workers = 4)
+    - revdep check results are written in a `revdep` folder 
 - [ ] Update README.md (devtools::build_readme(), if necessary) and NEWS.md.
 
 When everything is checked, you can finally:
