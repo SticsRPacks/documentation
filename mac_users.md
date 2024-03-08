@@ -25,6 +25,7 @@ sudo xcode-select --install
 ```
 
 And then:
+
 ```bash
 brew install gcc
 ```
@@ -42,16 +43,24 @@ sudo rm -fR /Library/Developer/CommandLineTools
 
 * Install them again following the previous steps (xcode + gcc).
 
+
+Install the Fortran Package Mananager (FPM):
+
+```bash
+brew tap fortran-lang/homebrew-fortran
+brew install fpm
+```
+
 ### Compile the executable
 
 Open a terminal in the folder where you unzipped the STICS source code. Then, run the following commands:
 
 ```bash
-cd build
-make all
+cd stics
+fpm install --prefix .
 ```
 
-This will create a `Stics` executable in the current `build` folder. 
+This will create a `bin` folder in the `stics` folder, with the `Stics` executable inside. 
 
 ### Move the executable
 
