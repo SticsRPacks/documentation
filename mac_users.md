@@ -23,6 +23,7 @@ Then, we need to install Xtools (which is a part of Xcode). To do so, open a ter
 ```bash
 sudo xcode-select --install
 ```
+
 And then:
 ```bash
 brew install gcc
@@ -32,11 +33,14 @@ This will install the GNU compiler collection, which includes the `gfortran` com
 
 If these tools have been installed previously and a MacOS system update has been made after that, they must be reinstalled
 to have the updated gfortran libraries. 
-* First tools are be removed   
+
+* Remove the command line tools:
+
 ```bash
 sudo rm -fR /Library/Developer/CommandLineTools
 ```
-* Then tools can be  installed again with the previous command.
+
+* Install them again following the previous steps (xcode + gcc).
 
 ### Compile the executable
 
