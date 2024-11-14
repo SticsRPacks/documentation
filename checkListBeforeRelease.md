@@ -14,6 +14,7 @@
 * update NEWS file (can use the script tools/git-changelog-with-tags.sh)
 * commit and push changes
 * check github actions tests
-* check SticsRTest results (done with the master version of the other packages ...)
+* check SticsRTests results (done with the main branch of the other packages ...)
+* change the version number in the citation.cff file (it will be automatically updated with dependencies information when a release is published)
 * create the new release in github (copy changes described in NEWS file in the changes section of the new release)
 * check the package website (generated on release) 
