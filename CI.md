@@ -21,4 +21,8 @@ We use a "Fine-grained personal access token" that we setup in the personal repo
 6. **Coverage** ([.github/workflow/test-coverage.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflow/test-coverage.yaml))
    - **Purpose**: The purpose of this workflow is to measure the test coverage of the R package. This workflow is triggered on pushes and pull requests to the main branche. It uses the `covr` package to generate test coverage reports and uploads them to a coverage service like `Codecov`.
 
+7. **Vdiffr** ([.github/workflow/vdiffr.yaml](https://github.com/SticsRPacks/CroPlotR/tree/main/.github/workflow/vdiffr.yaml))
+   - **Purpose**: The purpose of this GitHub Action workflow is to perform snapshot comparison for visual regression testing in CroPlotR. This workflow is triggered on push and pull_request events. It sets up an R environment, installs necessary dependencies, and generates snapshots from the latest commit to compare visual outputs and ensure they remain consistent over time. The comparison is made with the plots generated with the main branch.
+
+
 These workflows help automate various aspects of the CI/CD pipeline, ensuring code quality, compatibility, and proper documentation deployment.
