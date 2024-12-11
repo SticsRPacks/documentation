@@ -15,4 +15,10 @@ We use a "Fine-grained personal access token" that we setup in the personal repo
 4. **Update CITATION.cff** ([.github/workflows/update-citation-cff.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflows/update-citation-cff.yaml))
    - **Purpose**: This workflow updates the CITATION.cff file when a new release is published or when `DESCRIPTION` or `inst/CITATION` files are modified. It ensures that the citation information is current and accurate.
 
+5. **Denpendabot** ([.github/dependabot.yml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/dependabot.yml))
+   - **Purpose**: This workflow checks if any new version exists for the GitHub actions used in this repository, and make a PR if it finds one.
+
+6. **Coverage** ([.github/workflow/test-coverage.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflow/test-coverage.yaml))
+   - **Purpose**: The purpose of this workflow is to measure the test coverage of the R package. This workflow is triggered on pushes and pull requests to the main branche. It uses the `covr` package to generate test coverage reports and uploads them to a coverage service like `Codecov`.
+
 These workflows help automate various aspects of the CI/CD pipeline, ensuring code quality, compatibility, and proper documentation deployment.
