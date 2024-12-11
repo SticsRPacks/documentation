@@ -16,7 +16,8 @@ Welcome to the documentation of the `SticsRPacks` project.
 + The [optimum data structures](data_structure.md) - evaluation of different data structures such as `data.frame`, `data.table`, `tibble`, `list`, multi-dimensional `arrays` for their performance (memory, execution time, ease of use) in read/write, selection, computation, etc...
 + The [procedure to deprecate](deprecation.md) functions or arguments
 + The [procedure for CRAN](cran-submission.md) (re-)submission
-+ The [checklist](checkListBeforeRelease.md) to control before releasing new versions of the packages 
++ The [checklist](checkListBeforeRelease.md) to control before releasing new versions of the packages
++ Technical information about [CI/CD](CI.md)
 
 ## Package documentation
 
