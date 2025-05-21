@@ -74,6 +74,8 @@ Here is a checklist that you must follow before any submission to the CRAN:
 
 - [ ] Spell check (you have to add it first using `usethis::use_spell_check()`): `spelling::spell_check_package()`. Packages can be refused for spelling errors. Try to check that packages are spelled between `'` (*e.g.* 'dplyr') and acronyms capitalized in the DESCRIPTION file
 - [ ] Make a good DESCRIPTION file, especially the Description section that should be a full paragraph.
+      Don't forget to update the version number and the date when releasing a new version
+- [ ] If a citation file CITATION.cff resides in the package directory, update the version number also
 - [ ] Generate the `cran-comments.md` file using `usethis::use_cran_comments()`. This file is used to prove everything works and allow us to add comments (*e.g.* to explain notes). Make sure the file is tracked by Git and add it to `.Rbuildignore`.
 - [ ] Checking with Rhub is now done in the package repository as a github action (see how to install it [here](https://blog.r-hub.io/2024/04/11/rhub2/#set-up-r-hub-v2))done by default on the main branch
 - [ ] Check the results from the Rhub action looking at the artefacts for each platform (linux, win,mac), 00check.log files. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
