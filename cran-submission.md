@@ -72,7 +72,11 @@ Here is a checklist that you must follow before any submission to the CRAN:
     urlchecker::url_update()
     ```
 
-- [ ] Spell check (you have to add it first using `usethis::use_spell_check()`): `spelling::spell_check_package()`. Packages can be refused for spelling errors. Try to check that packages are spelled between `'` (*e.g.* 'dplyr') and acronyms capitalized in the DESCRIPTION file
+- [ ] Spell check (you have to add it first using `usethis::use_spell_check()`): `spelling::spell_check_package()`. Packages can be refused for spelling errors. Try to check that packages are spelled between
+       `'`  (*e.g.* 'dplyr') and acronyms capitalized in the DESCRIPTION file
+      The R CMD Check is also doing the job and the output as `Potential spelling errors`
+      Anyway, spelling errors have to be reviewed and fix if possible. The remaining ones which are specific words not attached the language can be added to the wordlist by using spelling::update_wordlist().
+      An additional R CMD Check may be done for verifying there is nomore spelling errors.
 - [ ] Make a good DESCRIPTION file, especially the Description section that should be a full paragraph.
       Don't forget to update the version number and the date when releasing a new version
 - [ ] If a citation file CITATION.cff resides in the package directory, update the version number also
