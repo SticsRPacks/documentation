@@ -11,13 +11,14 @@ Welcome to the documentation of the `SticsRPacks` project.
 
 + [A general overview](overview.md) - a brief, general overview of the developing workflow and tools used in the project and where to find them.
 + The [`sandbox`](https://github.com/SticsRPacks/sandbox/blob/master/README.md) - an example project to introduce step by step all the tools described in the `SticsRPacks` documentation with use cases. The users can clone this project and use the tools. It is strongly recommanded to read the documents in this project before doing anything.
-+ The [reviewing process](reviewing.md) - a tutorial on how to review other contributors changes.
++ The [guidelines for git workflow](git_workflow_guidelines.md) - detail how to name and describe issues, branches, commits, PRs
 + The [coding style](coding_style.md) - the coding style guide for our project.
 + The [optimum data structures](data_structure.md) - evaluation of different data structures such as `data.frame`, `data.table`, `tibble`, `list`, multi-dimensional `arrays` for their performance (memory, execution time, ease of use) in read/write, selection, computation, etc...
 + The [procedure to deprecate](deprecation.md) functions or arguments
++ Technical information about [CI/CD](CI.md)
++ The [reviewing process](reviewing.md) - a tutorial on how to review other contributors changes.
 + The [procedure for CRAN](cran-submission.md) (re-)submission
 + The [checklist](checkListBeforeRelease.md) to control before releasing new versions of the packages
-+ Technical information about [CI/CD](CI.md)
 
 ## Package documentation
 
