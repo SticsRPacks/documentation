@@ -9,6 +9,7 @@
 * check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
 * rebuild and check README.md
 * check SticsRTest with the current state of the package and the last release of the other ones
+* update list of contributors
 * change version number: usethis::use_version(which="major" or "minor" or "patch")
 * update the Date field in DESCRIPTION file
 * update NEWS file (can use the script tools/git-changelog-with-tags.sh)
