@@ -126,35 +126,14 @@ act -l
 
 ### Run the manual integration workflow
 
-Example for `SticsOnR`:
+Example local run:
 
 ```bash
 act workflow_dispatch \
   -W .github/workflows/integration-tests.yaml \
   -j integration-tests \
-  --container-architecture=linux/amd64 \
+  --input dependency_mode=main \
   --input sticsrtests_ref=main
 ```
 
-### Run the PR integration jobs
-
-To test the PR workflow locally, use `pr-checks.yaml`, not `integration-tests.yaml` directly.
-
-Example:
-
-```bash
-act pull_request \
-  -W .github/workflows/pr-checks.yaml \
-  -j integration-tests-main \
-  --container-architecture=linux/amd64
-```
-
-To run the release mode:
-
-```bash
-cd /Users/rvezy/Documents/dev/SticsRPacks/SticsOnR
-act pull_request \
-  -W .github/workflows/pr-checks.yaml \
-  -j integration-tests-release \
-  --container-architecture=linux/amd64
-```
+This will run the `integration-tests` job from the `integration-tests.yaml` workflow, with the `main` branch of `SticsRTests` and the `main` branches of our packages as dependencies. It will of course use the local branch of the package repository as the tested ref.
