@@ -1,52 +1,160 @@
 # Documentation on CI/CD
 
-All packages have automatic CI/CD using Github actions. Here is a general overview of what each GitHub Actions YAML file does in our projects:
+All `SticsRPacks` repositories use GitHub Actions for checks, coverage, documentation, and integration testing.
 
-1. **Style Check** ([.github/workflows/style.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflows/style.yaml))
-   - **Purpose**: This workflow checks and enforces code style using the `styler` package. It runs on pull requests and can be manually triggered. It ensures that the R code adheres to the specified style guidelines and automatically commits any changes.
+## Main workflows
 
-2. **R CMD Check** ([.github/workflows/check-standard.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflows/check-standard.yaml))
-   - **Purpose**: This workflow runs R CMD check on multiple operating systems (macOS, Windows, Ubuntu) and R versions to ensure package compatibility and correctness. It is triggered on push and pull request events. This check verifies that the package can be built and installed, and that all tests pass without errors or warnings. If the tests are passing (*i.e.* there is no error), the action will then trigger the actions from another repository: SticsRTest, which provides more integrative tests by making real simulations with the model. The workflow uses the following Github action: `peter-evans/repository-dispatch`, which helps trigger actions from another repository. To setup this action, we need to use a personal access token. 
-We use a "Fine-grained personal access token" that we setup in the personal repository of Rémi Vezy, and gave its value to each repository as a repository secret variable called `TRIGGER_PAT`.
+The package repositories (`CroPlotR`, `CroptimizR`, `SticsRFiles`, `SticsOnR`, `SticsRPacks`) now use the followin main CI workflows:
 
-3. **Pkgdown Site Build** ([.github/workflows/pkgdown.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflows/pkgdown.yaml))
-   - **Purpose**: This workflow builds and deploys the pkgdown site to GitHub Pages. It is triggered on release events and can be manually triggered. The workflow ensures that the documentation website is up-to-date with the latest changes in the package.
- 
-4. **Update CITATION.cff** ([.github/workflows/update-citation-cff.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflows/update-citation-cff.yaml))
-   - **Purpose**: This workflow updates the CITATION.cff file when a new release is published or when `DESCRIPTION` or `inst/CITATION` files are modified. It ensures that the citation information is current and accurate.
+1. `check-standard.yaml`
 
-5. **Denpendabot** ([.github/dependabot.yml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/dependabot.yml))
-   - **Purpose**: This workflow checks if any new version exists for the GitHub actions used in this repository, and make a PR if it finds one.
+   - Runs the standard `R-CMD-check`.
+   - Triggered on `push` to `main` or `master`.
+   - This is the workflow used for the README badge, so it stays independent from integration tests.
 
-6. **Coverage** ([.github/workflow/test-coverage.yaml](https://github.com/SticsRPacks/SticsRFiles/tree/main/.github/workflow/test-coverage.yaml))
-   - **Purpose**: The purpose of this workflow is to measure the test coverage of the R package. This workflow is triggered on pushes and pull requests to the main branche. It uses the `covr` package to generate test coverage reports and uploads them to a coverage service like `Codecov`.
+2. `pr-checks.yaml`
 
-7. **Vdiffr** ([.github/workflow/vdiffr.yaml](https://github.com/SticsRPacks/CroPlotR/tree/main/.github/workflow/vdiffr.yaml))
-   - **Purpose**: The purpose of this GitHub Action workflow is to perform snapshot comparison for visual regression testing in CroPlotR. This workflow is triggered on push and pull_request events. It sets up an R environment, installs necessary dependencies, and generates snapshots from the latest commit to compare visual outputs and ensure they remain consistent over time. The comparison is made with the plots generated with the main branch.
+   - Triggered on `pull_request`.
+   - Runs:
+     - `R-CMD-check`
+     - integration tests with the other packages at `main`
+     - integration tests with the other packages at `release`
+   - The integration jobs depend on the success of `R-CMD-check`.
+   - Because this workflow is PR-triggered, the integration checks are visible directly from the PR page.
 
+3. `integration-tests.yaml`
 
-These workflows help automate various aspects of the CI/CD pipeline, ensuring code quality, compatibility, and proper documentation deployment.
+   - Triggered automatically after a successful `R-CMD-check` on `push` to `main` or `master`.
+   - Also supports manual `workflow_dispatch`.
+   - On post-merge runs, only the `release` integration mode is executed.
+   - On manual runs, the workflow also lets us choose the `SticsRTests` ref to use.
 
+4. `dependabot.yml`
 
-## Triggering SticsRTests
+   - Checks if any new version exists for the GitHub actions used in this repository, and make a PR if it finds one.
 
-SticsRTests is automatically triggered from the test suite of the packages. For that it uses a personal access token generated by one of the core developers (right now, VEZY), which is used to automatically act on behalf of them. To update this token, follow the steps below:
+Other workflows remain repository-specific:
 
+- `style.yaml`: style checks and optional auto-formatting.
+- `test-coverage.yaml`: test coverage reporting.
+- `pkgdown.yaml`: documentation website deployment.
+- `update-citation-cff.yaml`: update of citation metadata.
+- `vdiffr.yaml`: visual snapshot regression checks for `CroPlotR`. It sets up an R environment, installs necessary dependencies, and generates snapshots from the latest commit on the current branch and on the main branch to compare visual outputs and ensure they remain consistent over time.
 
-Go to https://github.com/settings/personal-access-tokens/ in Fine-grained tokens. Click on the token `TRIGGER_STICSRTEST` , and then on Regenerate token:
+## Reusable SticsRTests workflow
 
-![image.png](attachment:684d1ec9-1cf1-4fd9-898c-09272117c061:image.png)
+Integration tests are run using a reusable workflow:
 
-Once generated, copy the access token to your clipboard, and save it somewhere temporarily to avoid loosing it. 
+- `SticsRTests/.github/workflows/integration-tests.yaml`
 
-Then, open each SticsRPacks repository and go its settings, secrets, actions, and modify the `TRIGGER_PAT` value:
+Each package repository calls it with:
 
-https://github.com/SticsRPacks/CroPlotR/settings/secrets/actions
+- the repository under test
+- the branch or SHA of the package under test
+- a dependency mode for the other packages: `main` or `release`
+- optionally, a `SticsRTests` branch/tag/SHA for manual runs
 
-https://github.com/SticsRPacks/SticsRFiles/settings/secrets/actions
+The reusable workflow:
 
-https://github.com/SticsRPacks/SticsOnR/settings/secrets/actions
+1. checks out `SticsRTests`
+2. resolves which refs to use for:
+   - `SticsRPacks`
+   - `SticsRFiles`
+   - `SticsOnR`
+   - `CroptimizR`
+   - `CroPlotR`
+3. installs the selected component packages and their dependencies
+4. installs `SticsRPacks` afterwards with `dependencies = FALSE`
+5. prints the selected refs and installed versions
+6. runs `testthat::test_local()` from `SticsRTests`
 
-https://github.com/SticsRPacks/CroptimizR/settings/secrets/actions
+This ordering is important:
 
-https://github.com/SticsRPacks/SticsRPacks/settings/secrets/actions
+- the component packages are installed first so the tested branch or SHA is respected
+- `SticsRPacks` is installed afterwards with `dependencies = FALSE` so it does not reinstall packages from its own `Remotes`
+
+## Dependency resolution
+
+The CI now uses `r-lib/actions/setup-r-dependencies@v2` wherever possible.
+
+Two patterns are used:
+
+1. Standard package checks
+
+   - `setup-r-dependencies` installs the package dependencies and caches them.
+   - In `SticsRTests`, the workflow also reads `SticsRPacks/DESCRIPTION` so that CRAN dependencies required by `SticsRPacks` are installed too.
+   - `SticsRPacks` itself is then installed separately with `dependencies = FALSE`.
+
+2. Integration tests
+
+   - `setup-r-dependencies` installs:
+     - CRAN dependencies from `SticsRTests`
+     - CRAN dependencies from the selected `SticsRPacks` ref
+     - the selected GitHub refs for `SticsRFiles`, `SticsOnR`, `CroptimizR`, and `CroPlotR`
+   - `SticsRPacks` is then installed separately with `dependencies = FALSE`
+
+This keeps the dependency cache useful while avoiding ref conflicts between `main` and `release`.
+
+## Manual triggering from GitHub
+
+Each package repository has a manual integration workflow dispatch:
+
+- open the `integration-tests` workflow in the GitHub Actions tab
+- click `Run workflow`
+- choose the branch of the package repository to run from
+- optionally set `sticsrtests_ref` to a branch, tag, or SHA of `SticsRTests`
+
+This is useful when validating a branch of `SticsRTests` without merging it first.
+
+## Running workflows locally with act
+
+[`act`](https://github.com/nektos/act) can be used to run some GitHub Actions workflows locally with Docker.
+
+Important points:
+
+- run `act` from the repository you want to test
+- many of our workflows are not triggered by `push`, so you usually need to specify the event explicitly
+- for Apple Silicon, use `--container-architecture=linux/amd64`
+
+### List workflows seen by act
+
+From a package repository:
+
+```bash
+act -l
+```
+
+### Run the manual integration workflow
+
+Example for `SticsOnR`:
+
+```bash
+act workflow_dispatch \
+  -W .github/workflows/integration-tests.yaml \
+  -j integration-tests \
+  --container-architecture=linux/amd64 \
+  --input sticsrtests_ref=main
+```
+
+### Run the PR integration jobs
+
+To test the PR workflow locally, use `pr-checks.yaml`, not `integration-tests.yaml` directly.
+
+Example:
+
+```bash
+act pull_request \
+  -W .github/workflows/pr-checks.yaml \
+  -j integration-tests-main \
+  --container-architecture=linux/amd64
+```
+
+To run the release mode:
+
+```bash
+cd /Users/rvezy/Documents/dev/SticsRPacks/SticsOnR
+act pull_request \
+  -W .github/workflows/pr-checks.yaml \
+  -j integration-tests-release \
+  --container-architecture=linux/amd64
+```
