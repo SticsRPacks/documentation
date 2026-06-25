@@ -8,7 +8,7 @@ Before any submissions, please check that you follow SticsRPacks' good practices
 
 There are two things to do to ensure the basics:
 
-- use [{goodpractices}](http://mangothecat.github.io/goodpractice/):
+- use [{goodpractice}](http://mangothecat.github.io/goodpractice/):
 
     ```r
     library(goodpractice)
@@ -34,7 +34,7 @@ Make sure to make those steps on a clean git repository (*i.e.* make a commit **
 Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Update (aspirational) install instructions in README
 - [ ] Check that all exported functions have @return (use "@return None" if nothing is returned), and @examples
-- [ ] Exported functions examples: use of \dontrun when examples cannot really be executed or execution time is > 5 s
+- [ ] Exported functions: they all need examples, but use \dontrun when examples cannot really be executed or execution time is > 5 s
 - [ ] Unexported functions: their documentation is useful for developers, but avoid producing Rd files using the keyword '@noRd' additionally to '@keywords internal'
 - [ ] Functions calls (examples, tests): no need to use library(PackageName), PackageName:: or PackageName::
 - [ ] In examples/vignettes/tests: writing in the user's home filespace (including the package directory and getwd()) is not allowed by CRAN policies.
@@ -47,7 +47,7 @@ Here is a checklist that you must follow before any submission to the CRAN:
 - [ ] Check that your licence is on [this list](https://svn.r-project.org/R/trunk/share/licenses/license.db). If not, you'll probably won't be able to publish your package.
 - [ ] Check the name of the package is not in [this list](https://cran.r-project.org/src/contrib/Archive/).
 - [ ] Check that all imported or suggested packages are available on CRAN. If any mentioned in ‘Suggests’ or ‘Enhances’ fields are not from such a repository, where to obtain them at a repository should be specified in an ‘Additional_repositories’ field of the DESCRIPTION file (as a comma-separated list of repository URLs)
-- [ ] Tidy-up the DESCRIPTION file using `usethis::use_tidy_description()`
+- [ ] Tidy-up the DESCRIPTION file using `usethis::use_tidy_description()` (or see inteRgrate checks)
 - [ ] Make sure the package is not larger than 5MB on disk. Data should be compressed when possible.
 - [ ] Make sure you are running with one of the latest R versions
 - [ ] Update all of your packages: `update.packages()`
@@ -81,8 +81,9 @@ Here is a checklist that you must follow before any submission to the CRAN:
       Don't forget to update the version number and the date when releasing a new version
 - [ ] If a citation file CITATION.cff resides in the package directory, update the version number also
 - [ ] Generate the `cran-comments.md` file using `usethis::use_cran_comments()`. This file is used to prove everything works and allow us to add comments (*e.g.* to explain notes). Make sure the file is tracked by Git and add it to `.Rbuildignore`.
-- [ ] Checking with Rhub is now done in the package repository as a github action (see how to install it [here](https://blog.r-hub.io/2024/04/11/rhub2/#set-up-r-hub-v2))done by default on the main branch
-- [ ] Check the results from the Rhub action looking at the artefacts for each platform (linux, win,mac), 00check.log files. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
+- [ ] Checking with Rhub is now done in the package repository as a github action (see how to install it [here](https://blog.r-hub.io/2024/04/11/rhub2/#set-up-r-hub-v2)) done by default on the main branch. Use rhub::rhub_check() or for a specific branch rhub::rhub_check(branch = ...). So all local changes must be pushed on the main or the tested branch.
+      To avoid interactive platforms selection add platforms = c("linux", "windows", "macos") argument.
+- [ ] Check the results from the Rhub action looking at the artefacts for each platform (linux, win,macos), 00check.log files. It shouldn't return any error, warning or notes. If some notes are returned, you should address them, or prepare to explain why they appear (must be a good reason!)
 - [ ] Add the output of Rhub check to the `cran-comments.md` file, or write one following the example from the [R Packages book here](https://r-pkgs.org/release.html#release-process).
 - [ ] Check for reverse-dependencies if it is not the first release. [See more information here](https://r-pkgs.org/release.html#release-deps). Add the output to the `cran-comments.md` file, if first submission, write that you don't have any downstream dependencies yet.
     - install devtools::install_github('r-lib/revdepcheck')
